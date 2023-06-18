@@ -16,15 +16,16 @@ CHIP RAM8 {
 
     PARTS:
     // Put your code here:
-    Register(in[0..15]=false, load=load, out=tmpReg1);
-    Register(in[0..15]=false, load=load, out=tmpReg2);
-    Register(in[0..15]=false, load=load, out=tmpReg3);
-    Register(in[0..15]=false, load=load, out=tmpReg4);
-    Register(in[0..15]=false, load=load, out=tmpReg5);
-    Register(in[0..15]=false, load=load, out=tmpReg6);
-    Register(in[0..15]=false, load=load, out=tmpReg7);
-    Register(in[0..15]=false, load=load, out=tmpReg8);
+    DMux8Way(in=load, sel=address, a=loadA, b=loadB, c=loadC, d=loadD, e=loadE, f=loadF, g=loadG, h=loadH);
 
-    Mux8Way16(a=tmpReg1, b=tmpReg2, c=tmpReg3, d=tmpReg4, e=tmpReg5, f=tmpReg6, g=tmpReg7, h=tmpReg8, sel=address, out=selRegister);
-    Add16(a=selRegister, b=in, out=out);
+    Register(in=in, load=loadA, out=tmpReg1);
+    Register(in=in, load=loadB, out=tmpReg2);
+    Register(in=in, load=loadC, out=tmpReg3);
+    Register(in=in, load=loadD, out=tmpReg4);
+    Register(in=in, load=loadE, out=tmpReg5);
+    Register(in=in, load=loadF, out=tmpReg6);
+    Register(in=in, load=loadG, out=tmpReg7);
+    Register(in=in, load=loadH, out=tmpReg8);
+
+    Mux8Way16(a=tmpReg1, b=tmpReg2, c=tmpReg3, d=tmpReg4, e=tmpReg5, f=tmpReg6, g=tmpReg7, h=tmpReg8, sel=address, out=out);
 }
