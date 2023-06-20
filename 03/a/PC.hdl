@@ -17,4 +17,17 @@ CHIP PC {
 
     PARTS:
     // Put your code here:
+    Mux16(a=in, b[0..15]=false, sel=reset, out=resetOrInputOut);
+
+    Not(in=reset, out=notReset);
+    Not(in=load, out=notLoad);
+
+    And(a=notReset, b=notLoad, out=notResetAndNotLoad);
+    And(a=inc, b=notResetAndNotLoad, out=incPrim);
+
+    Inc16(in=tmpRegisterIn, out=incOut);
+
+    Mux16(a=resetOrInputOut, b=incOut, sel=incPrim, out=tmpOut);
+
+    Register(in=tmpOut, load=true, out=tmpRegisterIn, out=out);
 }
