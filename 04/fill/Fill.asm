@@ -25,11 +25,11 @@
     @width
     M=D // width = 32
 
-    @255
+    @256
     D=A
 
     @height
-    M=D // height = 255
+    M=D // height = 256
 
     @SCREEN
     D=A
