@@ -46,6 +46,22 @@
     @ACTIVATE
     0;JMP // else goto ACTIVATE
 
+// Sets the pixel value to 0 (or white) and whitens the screen
+(DEACTIVATE)
+    @pixel
+    M=0 // pixel becomes white
+
+    @OUTER
+    0;JMP
+
+// Sets the pixel value to -1 (or black) and blackens the screen
+(ACTIVATE)
+    @pixel
+    M=-1 // pixel becomes black
+
+    @OUTER
+    0;JMP
+    
 // Outer Loop that takes care of the rows
 (OUTER)
     @i
@@ -97,18 +113,3 @@
 
     @OUTER
     0;JMP
-
-(DEACTIVATE)
-    @pixel
-    M=0 // pixel becomes white
-
-    @OUTER
-    0;JMP
-
-(ACTIVATE)
-    @pixel
-    M=-1 // pixel becomes black
-
-    @OUTER
-    0;JMP
-    
