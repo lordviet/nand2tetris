@@ -12,6 +12,7 @@
 // the screen should remain fully clear as long as no key is pressed.
 
 // Put your code here.
+(LIFECYCLE)
     @i
     M=0 // i = 0
 
@@ -22,7 +23,7 @@
     D=A
 
     @width
-    M=D // width = 32 (511 maybe it should be?)
+    M=D // width = 32
 
     @255
     D=A
@@ -36,6 +37,15 @@
     @address
     M=D // address = 16384 (base address of the Hack screen)
 
+    @KBD // Access keyboard memory map
+    D=M // Get the input and store it to the data register
+
+    @DEACTIVATE
+    D;JEQ // if (input == 0) goto DEACTIVATE
+
+    @ACTIVATE
+    0;JMP // else goto ACTIVATE
+
 // Outer Loop that takes care of the rows
 (OUTER)
     @i
@@ -44,7 +54,7 @@
     @height
     D=D-M
 
-    @END
+    @LIFECYCLE
     D;JEQ
 
     @y
@@ -64,15 +74,18 @@
     @LOOPBRIDGE
     D;JEQ
 
+    @pixel
+    D=M
+
     @address
     A=M
-    M=-1
+    M=D
 
     @y
     M=M+1
 
     @address
-    M=M+1 // address = address + 32
+    M=M+1 // address = address + 1
 
     @INNER
     0;JMP
@@ -81,26 +94,21 @@
 (LOOPBRIDGE)
     @i
     M=M+1
+
     @OUTER
     0;JMP
 
-(END)
-// (LOOP) 
-//     @SCREEN // Access screen memory map
-//     M=0 // Start overwriting pixels in white
+(DEACTIVATE)
+    @pixel
+    M=0 // pixel becomes white
 
-//     @KBD // Access keyboard memory map
-//     D=M // Get the input and store it to the data register
-
-//     @LOOP
-//     D;JEQ // if (input == 0) goto LOOP 
-
-//     @SCREEN // Access screen memory map
-//     M=1 // Start overwriting pixels in black
-    
-//     // TODO: Written like that it will go to the beginning of the memory map whereas we want to go getting the memory input
-//     @KBD
-//     0;JMP  // Goto LOOP
-// (END)
-    @END
+    @OUTER
     0;JMP
+
+(ACTIVATE)
+    @pixel
+    M=-1 // pixel becomes black
+
+    @OUTER
+    0;JMP
+    
