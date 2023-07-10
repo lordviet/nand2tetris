@@ -40,4 +40,27 @@ CHIP CPU {
 
     PARTS:
     // Put your code here:
+    // TODO: Alu Out?
+    Mux16(a=instruction, b=aluOut, sel=instruction[0], out=forARegister);
+
+    // TODO: Figure out load here?
+    Not(in=instruction[0], out=isAInstruction);
+
+    Register(in=forARegister, load=isAInstruction, out=aRegOut, out=addressM);
+
+    //aOut should branch to a MUX and to a PC and be the value of addressM
+
+    // we need to have a D register somewhere here
+    Register(in=, load=, out=dRegOut);
+
+    // figure out selection bit here?
+    Mux16(a=aRegOut, b=inM, sel=, out=aluIn);
+
+    ALU(x=dRegOut, y=aluIn, zx=instruction[4], nx=instruction[5], zy=instruction[6], ny=instruction[7], f=instruction[8], no=instruction[9], out=outM, out=aluOut, zr=aluOutZr, ng=aluOutNg);
+
+    // if
+    // jump then PC = A else PC++. The value of the Boolean expression jump depends on the
+    // instruction’s j-bits and on the ALU output
+    // not sure about input
+    PC(in=aRegOut, load=, inc=, reset=reset, out=pc);
 }
