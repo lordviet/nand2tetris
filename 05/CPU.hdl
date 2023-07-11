@@ -45,11 +45,11 @@ CHIP CPU {
 
     // A-register
     // load of D-register is d1 => instruction[10]
-    Register(in=forARegister, load=instruction[10], out=aRegOut, out[0..14]=addressM); // TODO: Possily wrong syntax
+    ARegister(in=forARegister, load=instruction[10], out=aRegOut, out[0..14]=addressM); // TODO: Possily wrong syntax
 
     // D-register
     // load of D-register is d2 => instruction[11]
-    Register(in=aluOut, load=instruction[11], out=dRegOut);
+    DRegister(in=aluOut, load=instruction[11], out=dRegOut);
 
     // In the case of a C-instruction, the single a-bit determines
     // Whether the ALU will operate on the A register output or on the M input. 
