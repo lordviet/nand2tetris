@@ -42,7 +42,6 @@ CHIP CPU {
     // Put your code here:
     Mux16(a=instruction, b=aluOut, sel=instruction[15], out=forARegister);
 
-
     // A-register
     // load of A-register is d1 => instruction[5]
     Mux(a=true, b=instruction[5], sel=instruction[15], out=loadA);
@@ -55,8 +54,8 @@ CHIP CPU {
 
     // In the case of a C-instruction, the single a-bit determines
     // whether the ALU will operate on the A register output or on the M input
-    // a-bit => instruction[3] 
-    Mux16(a=aRegOut, b=inM, sel=instruction[3], out=aluIn);
+    // a-bit => instruction[12] 
+    Mux16(a=aRegOut, b=inM, sel=instruction[12], out=aluIn);
 
     ALU(x=dRegOut, y=aluIn, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=outM, out=aluOut, zr=aluOutZr, ng=aluOutNg);
 
