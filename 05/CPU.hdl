@@ -40,15 +40,21 @@ CHIP CPU {
 
     PARTS:
     // Put your code here:
+
+    // instruction[15] represents the op-code
+    // if op-code == 0 => A-instruction
+    // if op-code == 1 => C-instruction
     Mux16(a=instruction, b=aluOut, sel=instruction[15], out=forARegister);
 
     // A-register
-    // load of A-register is d1 => instruction[5]
+    // if A-instruction => loadA = true
+    // if C-instruction => loadA = d1 bit (instruction[5])
     Mux(a=true, b=instruction[5], sel=instruction[15], out=loadA);
     ARegister(in=forARegister, load=loadA, out=aRegOut, out[0..14]=addressM);
 
     // D-register
-    // load of D-register is d2 => instruction[4]
+    // if A-instruction => loadD = false
+    // if C-instruction => loadD = d2 bit (instruction[4])
     And(a=instruction[4], b=instruction[15], out=loadD);
     DRegister(in=aluOut, load=loadD, out=dRegOut);
 
@@ -60,14 +66,16 @@ CHIP CPU {
     ALU(x=dRegOut, y=aluIn, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=outM, out=aluOut, zr=aluOutZr, ng=aluOutNg);
 
     // M-register
-    // out is load of M-register which is d3 => instruction[3]
+    // if A-instruction => writeM = false
+    // if C-instruction => writeM = d3 bit (instruction[3])
     And(a=instruction[3], b=instruction[15], out=writeM);
 
     // PC section
     Or(a=aluOutNg, b=aluOutZr, out=nonPositive);
     Not(in=nonPositive, out=positive);
 
-    // The three j-bits are used to for branching control.
+    // The three j-bits are used to for branching control
+    // The zr and ng outputs from the ALU are used for confirmation
     And(a=instruction[2], b=aluOutNg, out=ngJmpConfirm);
     And(a=instruction[1], b=aluOutZr, out=zrJmpConfirm);
     And(a=instruction[0], b=positive, out=posJmpConfirm);
@@ -77,5 +85,7 @@ CHIP CPU {
 
     Mux(a=false, b=jmp, sel=instruction[15], out=pcLoad);
 
+    // if pcLoad == 1 => PC = A
+    // if pcLoad == 0 => PC++
     PC(in=aRegOut, load=pcLoad, inc=true, reset=reset, out[0..14]=pc);
 }
