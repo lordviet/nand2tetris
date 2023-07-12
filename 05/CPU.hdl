@@ -40,11 +40,10 @@ CHIP CPU {
 
     PARTS:
     // Put your code here:
-    // TODO: sel is possibly wrong
-    Mux16(a=instruction, b=aluOut, sel=instruction[12], out=forARegister);
+    Mux16(a=instruction, b=aluOut, sel=instruction[0], out=forARegister);
 
     // A-register
-    // load of D-register is d1 => instruction[10]
+    // load of A-register is d1 => instruction[10]
     ARegister(in=forARegister, load=instruction[10], out=aRegOut, out[0..14]=addressM); // TODO: Possily wrong syntax
 
     // D-register
@@ -52,15 +51,15 @@ CHIP CPU {
     DRegister(in=aluOut, load=instruction[11], out=dRegOut);
 
     // In the case of a C-instruction, the single a-bit determines
-    // Whether the ALU will operate on the A register output or on the M input. 
-    Mux16(a=aRegOut, b=inM, sel=instruction[0], out=aluIn);
+    // whether the ALU will operate on the A register output or on the M input
+    // a-bit => instruction[3] 
+    Mux16(a=aRegOut, b=inM, sel=instruction[3], out=aluIn);
 
     ALU(x=dRegOut, y=aluIn, zx=instruction[4], nx=instruction[5], zy=instruction[6], ny=instruction[7], f=instruction[8], no=instruction[9], out=outM, out=aluOut, zr=aluOutZr, ng=aluOutNg);
 
-    // TODO:
-    // The three d-bits are used to determine which registers should “accept” the ALU resulting output
-    // I only have one d3 unused which is instruction[12]
-    // d3 corresponds to Memory[A] (memory register addressed by A)
+    // M-register
+    // out is load of M-register which is d3 => instruction[12]
+    And(a=instruction[12], b=instruction[12], out=writeM);
 
     // PC section
 
