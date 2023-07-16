@@ -77,9 +77,16 @@ namespace HackAssembler.Implementations
         {
             this.ThrowIfCommandTypeIsUnexpected(Enums.CommandType.C, $"Can only retrieve destination bits from a C-instruction.");
 
-            //string command = this.GetCurrentInstruction();
+            string command = this.GetCurrentInstruction();
 
-            return "";
+            int equalityIndex = command.IndexOf('=');
+
+            if (equalityIndex == -1)
+            {
+                return null;
+            }
+
+            return command[0..equalityIndex];
         }
 
         public string Computation()
