@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using HackAssembler.Enums;
 using HackAssembler.Implementations;
 
@@ -18,6 +17,8 @@ class Program
         //string fileContents = File.ReadAllText(args[0]);
 
         string fileContents = File.ReadAllText("/Users/dmtodev/Desktop/Projects/nand2tetris/06/add/Add.asm");
+
+        IDictionary<string, int> symbolTable = InitializeSymbolMap();
 
         Parser parser = new Parser(fileContents);
         MnemonicsConverter converter = new MnemonicsConverter();
@@ -75,12 +76,40 @@ class Program
         string computationBinary = converter.Computation(computation);
         string jumpBinary = converter.Jump(jump);
 
-        const int onePadCount = 3;
-        string padding = new('1', onePadCount);
+        const int OnePadCount = 3;
+        string padding = new('1', OnePadCount);
 
         string converted = $"{padding}{computationBinary}{destinationBinary}{jumpBinary}{Environment.NewLine}";
 
         return converted;
+    }
+
+    private static IDictionary<string, int> InitializeSymbolMap()
+    {
+        // Add default predefined symbols
+        IDictionary<string, int> symbolMap = new Dictionary<string, int>()
+        {
+            ["SP"] = 0,
+            ["LCL"] = 1,
+            ["ARG"] = 2,
+            ["THIS"] = 3,
+            ["THAT"] = 4,
+        };
+
+        // Add default R0 - R15 symbols
+        for (int address = 0; address < 16; address++)
+        {
+            symbolMap.Add($"R{address}", address);
+        }
+
+        // Add screen and keyboard symbols
+        const int ScreenAddress = 16384;
+        const int KeyboardAddress = 24576;
+
+        symbolMap.Add("SCREEN", ScreenAddress);
+        symbolMap.Add("KBD", KeyboardAddress);
+
+        return symbolMap;
     }
 }
 
