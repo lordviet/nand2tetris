@@ -2,11 +2,11 @@
 {
     public interface IMnemonicsConverter
 	{
-		string Destination(string mnemonic);
+		string Destination(string? mnemonic);
 
 		string Computation(string mnemonic);
 
-		string Jump(string mnemonic);
+		string Jump(string? mnemonic);
 	}
 }
 
