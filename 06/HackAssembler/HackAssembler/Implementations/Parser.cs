@@ -4,7 +4,7 @@ using HackAssembler.Enums;
 using HackAssembler.Exceptions;
 using HackAssembler.Extensions;
 
-namespace HackAssembler
+namespace HackAssembler.Implementations
 {
     public class Parser : IParser
     {
@@ -73,7 +73,7 @@ namespace HackAssembler
             };
         }
 
-        public string Destination()
+        public string? Destination()
         {
             this.ThrowIfCommandTypeIsUnexpected(Enums.CommandType.C, $"Can only retrieve destination bits from a C-instruction.");
 
@@ -89,7 +89,7 @@ namespace HackAssembler
             return "";
         }
 
-        public string Jump()
+        public string? Jump()
         {
             this.ThrowIfCommandTypeIsUnexpected(Enums.CommandType.C, $"Can only retrieve computation bits from a C-instruction.");
 

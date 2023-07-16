@@ -14,11 +14,11 @@ namespace HackAssembler.Contracts
 
         string Symbol();
 
-        string Destination();
+        string? Destination();
 
         string Computation();
 
-        string Jump();
+        string? Jump();
     }
 }
 
