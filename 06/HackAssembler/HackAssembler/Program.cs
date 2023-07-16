@@ -37,7 +37,7 @@ class Program
                 sb.Append(aInstructionBits);
             }
 
-            if(currentInstructionType == CommandType.C)
+            if (currentInstructionType == CommandType.C)
             {
                 string? destination = parser.Destination();
                 string computation = parser.Computation();
@@ -71,8 +71,6 @@ class Program
 
     private static string HandleCInstruction(MnemonicsConverter converter, string? destination, string computation, string? jump)
     {
-        string aBit = "1"; // TODO method to retrieve the a-bit
-
         string destinationBinary = converter.Destination(destination);
         string computationBinary = converter.Computation(computation);
         string jumpBinary = converter.Jump(jump);
@@ -80,7 +78,7 @@ class Program
         const int onePadCount = 3;
         string padding = new('1', onePadCount);
 
-        string converted = $"{padding}{aBit}{computationBinary}{destinationBinary}{jumpBinary}{Environment.NewLine}";
+        string converted = $"{padding}{computationBinary}{destinationBinary}{jumpBinary}{Environment.NewLine}";
 
         return converted;
     }

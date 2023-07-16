@@ -72,7 +72,10 @@ namespace HackAssembler.Implementations
 
         public string Computation(string mnemonic)
         {
-            return this.ConvertMnemonic(mnemonic, this.computationMap);
+            string aBit = this.DetermineABit(mnemonic);
+            string computation = this.ConvertMnemonic(mnemonic, this.computationMap);
+
+            return $"{aBit}{computation}";
         }
 
         public string Jump(string? mnemonic)
@@ -95,6 +98,21 @@ namespace HackAssembler.Implementations
             return mnemonicsMap[mnemonic];
         }
 
+        private string DetermineABit(string mnemonic)
+        {
+            if (!this.computationMap.ContainsKey(mnemonic))
+            {
+                throw new NotSupportedException($"Computation mnemonics map does not support mnemonic - '{mnemonic}'");
+            }
+
+            string[] zeroABitElements = new string[]
+            {
+                "0", "1", "-1", "D", "A", "!D", "!A", "-D", "-A",
+                "D+1", "A+1", "D-1", "A-1", "D+A", "D-A", "A-D", "D&A", "D|A"
+            };
+
+            return zeroABitElements.Contains(mnemonic) ? "0" : "1";
+        }
     }
 }
 
