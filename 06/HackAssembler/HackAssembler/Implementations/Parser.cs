@@ -20,6 +20,7 @@ namespace HackAssembler.Implementations
                 .Where(line => !line.IsComment())
                 .Where(line => !string.IsNullOrWhiteSpace(line))
                 .Select(line => line.TrimEnd('\r', '\n'))
+                .Select(line => line.Trim())
                 .ToArray();
 
             this.counter = 0;
@@ -93,14 +94,47 @@ namespace HackAssembler.Implementations
         {
             this.ThrowIfCommandTypeIsUnexpected(Enums.CommandType.C, $"Can only retrieve computation bits from a C-instruction.");
 
-            return "";
+            string command = this.GetCurrentInstruction();
+
+            int equalityIndex = command.IndexOf('=');
+            int semiColonIndex = command.IndexOf(';');
+
+            if (equalityIndex == -1 && semiColonIndex == -1)
+            {
+                throw new NotSupportedException("In a C-instruction, either the dest or jump fields may be empty, but not both");
+            }
+
+            if (equalityIndex == -1)
+            {
+                return command[0..semiColonIndex];
+            }
+
+            int startIndex = equalityIndex + 1;
+
+            if (semiColonIndex == -1)
+            {
+                return command[startIndex..];
+            }
+
+            return command[startIndex..semiColonIndex];
         }
 
         public string? Jump()
         {
             this.ThrowIfCommandTypeIsUnexpected(Enums.CommandType.C, $"Can only retrieve computation bits from a C-instruction.");
 
-            return "";
+            string command = this.GetCurrentInstruction();
+
+            int semiColonIndex = command.IndexOf(';');
+
+            if (semiColonIndex == -1)
+            {
+                return null;
+            }
+
+            int startIndex = semiColonIndex + 1;
+
+            return command[startIndex..];
         }
 
         private void ThrowIfCommandTypeIsUnexpected(CommandType expected, string message)
