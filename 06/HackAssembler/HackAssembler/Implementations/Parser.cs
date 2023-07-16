@@ -19,6 +19,7 @@ namespace HackAssembler
                 .Split("\n")
                 .Where(line => !line.IsComment())
                 .Where(line => !string.IsNullOrWhiteSpace(line))
+                .Select(line => line.TrimEnd('\r', '\n'))
                 .ToArray();
 
             this.counter = 0;
@@ -31,7 +32,7 @@ namespace HackAssembler
 
         public bool HasMoreCommands()
         {
-            return this.counter <= this.fileContents.Length;
+            return this.counter <= this.fileContents.Length - 1;
         }
 
         public void Advance()
@@ -65,7 +66,7 @@ namespace HackAssembler
 
             return type switch
             {
-                Enums.CommandType.A => command[..1], // @XXX -> XXX
+                Enums.CommandType.A => command[1..], // @XXX -> XXX
                 Enums.CommandType.Label => Regex.Match(command, this.parenthesesPattern).Value, // (XXX) -> XXX
 
                 _ => throw new UnexpectedCommandTypeException($"Unexpected command type received - '{type}'.")

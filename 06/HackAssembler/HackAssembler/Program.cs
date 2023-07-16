@@ -1,4 +1,7 @@
-﻿namespace HackAssembler;
+﻿using System.Text;
+using HackAssembler.Enums;
+
+namespace HackAssembler;
 
 class Program
 {
@@ -16,10 +19,34 @@ class Program
 
         Parser parser = new Parser(fileContents);
 
+        StringBuilder sb = new StringBuilder();
+
         while (parser.HasMoreCommands())
         {
+            CommandType currentInstructionType = parser.CommandType();
+
+            if (currentInstructionType == CommandType.A)
+            {
+                // TODO extract as method
+                string symbol = parser.Symbol();
+
+                int value = int.Parse(symbol);
+
+                string binary = Convert.ToString(value, 2);
+
+                int zeroPadCount = 16 - binary.Length;
+
+                string padding = new('0', zeroPadCount);
+
+                string converted = $"{padding}{binary}{Environment.NewLine}";
+
+                sb.Append(converted);
+            }
+
             parser.Advance();
         }
+
+        Console.WriteLine(sb.ToString());
     }
 }
 
