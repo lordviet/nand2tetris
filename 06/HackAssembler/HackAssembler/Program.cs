@@ -68,6 +68,8 @@ class Program
 
     private static string HandleAInstruction(string symbol)
     {
+        // TODO Check if the A instruction is a string or a int and retrieve from the symbol table if exists
+
         int value = int.Parse(symbol);
 
         string binary = Convert.ToString(value, 2);

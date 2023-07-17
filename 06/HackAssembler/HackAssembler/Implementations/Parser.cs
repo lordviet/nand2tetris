@@ -9,7 +9,7 @@ namespace HackAssembler.Implementations
 {
     public class Parser : IParser
     {
-        private readonly string[] fileContents;
+        private string[] fileContents;
         private int counter;
 
         private readonly string parenthesesPattern = @"(?<=\\().+?(?=\\))\";
@@ -17,12 +17,11 @@ namespace HackAssembler.Implementations
         public Parser(string fileContents)
         {
             this.fileContents = fileContents
-                .Split("\n")
-                .Where(line => !line.IsComment())
+                .Split(Environment.NewLine)
+                .Select(line => line.StripComment())
                 .Where(line => !string.IsNullOrWhiteSpace(line))
                 .Select(line => line.TrimEnd('\r', '\n'))
                 .Select(line => line.Trim())
-                // TODO strip in-line comments
                 .ToArray();
 
             this.counter = 0;
@@ -30,7 +29,7 @@ namespace HackAssembler.Implementations
 
         public IEnumerable<FileContentMeta> ScrapeLabelsWithLineNumbers()
         {
-            int romLine = 0;
+            int line = 0;
 
             List<FileContentMeta> scraped = new List<FileContentMeta>();
 
@@ -43,14 +42,20 @@ namespace HackAssembler.Implementations
                     scraped.Add(new FileContentMeta
                     {
                         Content = currentContent,
-                        LineNumber = romLine
+                        LineNumber = line
                     });
 
                     continue;
                 }
 
-                romLine++;
+                line++;
             }
+
+            string[] fileContentsWithoutLabels = this.fileContents
+                .Where(c => !c.IsLabelCommand())
+                .ToArray();
+
+            this.fileContents = fileContentsWithoutLabels;
 
             return scraped;
         }
