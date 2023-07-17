@@ -44,7 +44,7 @@ class Program
             {
                 string symbol = parser.Symbol();
 
-                string aInstructionBits = HandleAInstruction(symbol);
+                string aInstructionBits = HandleAInstruction(symbol, symbolTable);
 
                 sb.Append(aInstructionBits);
             }
@@ -66,21 +66,38 @@ class Program
         Console.WriteLine(sb.ToString());
     }
 
-    private static string HandleAInstruction(string symbol)
+    private static string HandleAInstruction(string symbol, IDictionary<string, int> symbolTable)
     {
-        // TODO Check if the A instruction is a string or a int and retrieve from the symbol table if exists
+        if (int.TryParse(symbol, out int parsed))
+        {
+            string binary = Convert.ToString(parsed, 2);
 
-        int value = int.Parse(symbol);
+            int zeroPadCount = 16 - binary.Length;
 
-        string binary = Convert.ToString(value, 2);
+            string padding = new('0', zeroPadCount);
 
-        int zeroPadCount = 16 - binary.Length;
+            string converted = $"{padding}{binary}{Environment.NewLine}";
 
-        string padding = new('0', zeroPadCount);
+            return converted;
+        }
 
-        string converted = $"{padding}{binary}{Environment.NewLine}";
+        if (symbolTable.ContainsKey(symbol))
+        {
+            int stored = symbolTable[symbol];
 
-        return converted;
+            // TODO extract as a func
+            string binary = Convert.ToString(stored, 2);
+
+            int zeroPadCount = 16 - binary.Length;
+
+            string padding = new('0', zeroPadCount);
+
+            string converted = $"{padding}{binary}{Environment.NewLine}";
+
+            return converted;
+        }
+
+        return string.Empty;
     }
 
     private static string HandleCInstruction(MnemonicsConverter converter, string? destination, string computation, string? jump)
