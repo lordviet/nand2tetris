@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using HackAssembler.Enums;
 using HackAssembler.Implementations;
+using HackAssembler.Models;
 
 namespace HackAssembler;
 
@@ -16,15 +17,25 @@ class Program
 
         //string fileContents = File.ReadAllText(args[0]);
 
-        string fileContents = File.ReadAllText("/Users/dmtodev/Desktop/Projects/nand2tetris/06/add/Add.asm");
+        string fileContents = File.ReadAllText("/Users/dmtodev/Desktop/Projects/nand2tetris/06/max/Max.asm");
 
         IDictionary<string, int> symbolTable = InitializeSymbolMap();
 
         Parser parser = new Parser(fileContents);
+
+        // First pass
+        IEnumerable<FileContentMeta> scrapedSymbols = parser.ScrapeLabelsWithLineNumbers();
+
+        foreach (FileContentMeta symbol in scrapedSymbols)
+        {
+            symbolTable.Add(symbol.Content, symbol.LineNumber);
+        }
+
         MnemonicsConverter converter = new MnemonicsConverter();
 
         StringBuilder sb = new StringBuilder();
 
+        // Second pass
         while (parser.HasMoreCommands())
         {
             CommandType currentInstructionType = parser.CommandType();

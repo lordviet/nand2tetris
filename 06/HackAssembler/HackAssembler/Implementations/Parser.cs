@@ -3,6 +3,7 @@ using HackAssembler.Contracts;
 using HackAssembler.Enums;
 using HackAssembler.Exceptions;
 using HackAssembler.Extensions;
+using HackAssembler.Models;
 
 namespace HackAssembler.Implementations
 {
@@ -21,9 +22,37 @@ namespace HackAssembler.Implementations
                 .Where(line => !string.IsNullOrWhiteSpace(line))
                 .Select(line => line.TrimEnd('\r', '\n'))
                 .Select(line => line.Trim())
+                // TODO strip in-line comments
                 .ToArray();
 
             this.counter = 0;
+        }
+
+        public IEnumerable<FileContentMeta> ScrapeLabelsWithLineNumbers()
+        {
+            int romLine = 0;
+
+            List<FileContentMeta> scraped = new List<FileContentMeta>();
+
+            for (int i = 0; i < fileContents.Length; i++)
+            {
+                string currentContent = fileContents[i];
+
+                if (currentContent.IsLabelCommand())
+                {
+                    scraped.Add(new FileContentMeta
+                    {
+                        Content = currentContent,
+                        LineNumber = romLine
+                    });
+
+                    continue;
+                }
+
+                romLine++;
+            }
+
+            return scraped;
         }
 
         public string GetCurrentInstruction()

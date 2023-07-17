@@ -1,9 +1,12 @@
 ﻿using HackAssembler.Enums;
+using HackAssembler.Models;
 
 namespace HackAssembler.Contracts
 {
     public interface IParser
     {
+        IEnumerable<FileContentMeta> ScrapeLabelsWithLineNumbers();
+
         string GetCurrentInstruction();
 
         bool HasMoreCommands();
