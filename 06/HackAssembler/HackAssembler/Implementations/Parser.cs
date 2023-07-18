@@ -12,7 +12,7 @@ namespace HackAssembler.Implementations
         private string[] fileContents;
         private int counter;
 
-        private readonly string parenthesesPattern = @"(?<=\\().+?(?=\\))\";
+        private readonly string parenthesesPattern = @"(?<=\().+?(?=\))";
 
         public Parser(string fileContents)
         {
@@ -41,7 +41,7 @@ namespace HackAssembler.Implementations
                 {
                     scraped.Add(new FileContentMeta
                     {
-                        Content = currentContent,
+                        Content = Regex.Match(currentContent, this.parenthesesPattern).Value,
                         LineNumber = line
                     });
 

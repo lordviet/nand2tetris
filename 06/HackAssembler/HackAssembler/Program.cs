@@ -17,9 +17,9 @@ class Program
 
         //string fileContents = File.ReadAllText(args[0]);
 
-        string fileContents = File.ReadAllText("/Users/dmtodev/Desktop/Projects/nand2tetris/06/max/Max.asm");
+        string fileContents = File.ReadAllText("/Users/dmtodev/Desktop/Projects/nand2tetris/06/rect/Rect.asm");
 
-        IDictionary<string, int> symbolTable = InitializeSymbolMap();
+        SymbolTable symbolTable = new SymbolTable();
 
         Parser parser = new Parser(fileContents);
 
@@ -28,7 +28,7 @@ class Program
 
         foreach (FileContentMeta symbol in scrapedSymbols)
         {
-            symbolTable.Add(symbol.Content, symbol.LineNumber);
+            symbolTable.AddEntry(symbol.Content, symbol.LineNumber);
         }
 
         MnemonicsConverter converter = new MnemonicsConverter();
@@ -66,38 +66,21 @@ class Program
         Console.WriteLine(sb.ToString());
     }
 
-    private static string HandleAInstruction(string symbol, IDictionary<string, int> symbolTable)
+    private static string HandleAInstruction(string symbol, SymbolTable table)
     {
         if (int.TryParse(symbol, out int parsed))
         {
-            string binary = Convert.ToString(parsed, 2);
-
-            int zeroPadCount = 16 - binary.Length;
-
-            string padding = new('0', zeroPadCount);
-
-            string converted = $"{padding}{binary}{Environment.NewLine}";
-
-            return converted;
+            return ConvertAInstructionToBinary(parsed);
         }
 
-        if (symbolTable.ContainsKey(symbol))
+        if (!table.Contains(symbol))
         {
-            int stored = symbolTable[symbol];
-
-            // TODO extract as a func
-            string binary = Convert.ToString(stored, 2);
-
-            int zeroPadCount = 16 - binary.Length;
-
-            string padding = new('0', zeroPadCount);
-
-            string converted = $"{padding}{binary}{Environment.NewLine}";
-
-            return converted;
+            table.AddEntry(symbol);
         }
 
-        return string.Empty;
+        int stored = table.GetAddress(symbol);
+
+        return ConvertAInstructionToBinary(stored);
     }
 
     private static string HandleCInstruction(MnemonicsConverter converter, string? destination, string computation, string? jump)
@@ -114,32 +97,17 @@ class Program
         return converted;
     }
 
-    private static IDictionary<string, int> InitializeSymbolMap()
+    private static string ConvertAInstructionToBinary(int value)
     {
-        // Add default predefined symbols
-        IDictionary<string, int> symbolMap = new Dictionary<string, int>()
-        {
-            ["SP"] = 0,
-            ["LCL"] = 1,
-            ["ARG"] = 2,
-            ["THIS"] = 3,
-            ["THAT"] = 4,
-        };
+        string coreBinary = Convert.ToString(value, 2);
 
-        // Add default R0 - R15 symbols
-        for (int address = 0; address < 16; address++)
-        {
-            symbolMap.Add($"R{address}", address);
-        }
+        int zeroPadCount = 16 - coreBinary.Length;
 
-        // Add screen and keyboard symbols
-        const int ScreenAddress = 16384;
-        const int KeyboardAddress = 24576;
+        string padding = new('0', zeroPadCount);
 
-        symbolMap.Add("SCREEN", ScreenAddress);
-        symbolMap.Add("KBD", KeyboardAddress);
+        string converted = $"{padding}{coreBinary}{Environment.NewLine}";
 
-        return symbolMap;
+        return converted;
     }
 }
 
