@@ -15,9 +15,9 @@ class Program
             return;
         }
 
-        //string fileContents = File.ReadAllText(args[0]);
+        string fileContents = File.ReadAllText(args[0]);
 
-        string fileContents = File.ReadAllText("/Users/dmtodev/Desktop/Projects/nand2tetris/06/rect/Rect.asm");
+        //string fileContents = File.ReadAllText("/Users/dmtodev/Desktop/Projects/nand2tetris/06/rect/Rect.asm");
 
         SymbolTable symbolTable = new SymbolTable();
 
@@ -63,7 +63,11 @@ class Program
             parser.Advance();
         }
 
-        Console.WriteLine(sb.ToString());
+        string directoryPath = AppDomain.CurrentDomain.BaseDirectory;
+        string filePath = Path.Combine(directoryPath, "output.hack");
+
+        File.WriteAllText(filePath, sb.ToString());
+        Console.WriteLine("Compiled successfully.");
     }
 
     private static string HandleAInstruction(string symbol, SymbolTable table)
