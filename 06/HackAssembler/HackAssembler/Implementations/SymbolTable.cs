@@ -20,11 +20,6 @@ namespace HackAssembler.Implementations
 
         public void AddEntry(string symbol)
         {
-            while (this.entries.Values.Contains(this.nextFreeAddress))
-            {
-                this.nextFreeAddress++;
-            }
-
             this.entries.Add(symbol, this.nextFreeAddress);
             this.nextFreeAddress++;
         }
