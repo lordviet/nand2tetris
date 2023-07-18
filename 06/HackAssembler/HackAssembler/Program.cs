@@ -11,16 +11,34 @@ class Program
     {
         if (args == null || args.Length == 0)
         {
-            Console.WriteLine("Please specify a .asm filename as a parameter for the assembler.");
+            Console.WriteLine($"Usage: HackAssembler <inputFile>.{Constants.DefaultInputFileExtension}");
             return;
         }
 
-        string fileContents = File.ReadAllText(args[0]);
+        string fileName = args[0];
 
-        //string fileContents = File.ReadAllText("/Users/dmtodev/Desktop/Projects/nand2tetris/06/rect/Rect.asm");
+        if (!string.Equals(Path.GetExtension(fileName), Constants.DefaultInputFileExtension, StringComparison.OrdinalIgnoreCase))
+        {
+            Console.WriteLine($"Invalid input file. Please provide a {Constants.DefaultInputFileExtension} file.");
+            return;
+        }
 
+        if (!File.Exists(fileName))
+        {
+            Console.WriteLine($"Input file '{fileName}' does not exist.");
+            return;
+        }
+
+        string fileContents = File.ReadAllText(fileName);
+
+        string compiled = CompileAssemblyCode(fileContents);
+
+        SaveOutputFile(fileName, compiled);
+    }
+
+    private static string CompileAssemblyCode(string fileContents)
+    {
         SymbolTable symbolTable = new SymbolTable();
-
         Parser parser = new Parser(fileContents);
 
         // First pass
@@ -63,11 +81,34 @@ class Program
             parser.Advance();
         }
 
-        string directoryPath = AppDomain.CurrentDomain.BaseDirectory;
-        string filePath = Path.Combine(directoryPath, "output.hack");
+        string compiled = sb.ToString();
 
-        File.WriteAllText(filePath, sb.ToString());
-        Console.WriteLine("Compiled successfully.");
+        return compiled;
+    }
+
+    private static void SaveOutputFile(string fileName, string compiledCode)
+    {
+        // Save the compiled code to the output file
+        string? directoryName = Path.GetDirectoryName(fileName);
+
+        if (directoryName is null)
+        {
+            Console.WriteLine($"Could not get directory information for file - {fileName}");
+            return;
+        }
+
+        string fileNameWithoutExtensions = Path.GetFileNameWithoutExtension(fileName);
+        string outputFile = Path.Combine(directoryName, $"{fileNameWithoutExtensions}.hack");
+
+        try
+        {
+            File.WriteAllText(outputFile, compiledCode);
+            Console.WriteLine("Compiled successfully. Output file: " + outputFile);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error saving the output file: " + ex.Message);
+        }
     }
 
     private static string HandleAInstruction(string symbol, SymbolTable table)
