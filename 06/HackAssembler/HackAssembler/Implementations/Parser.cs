@@ -16,14 +16,7 @@ namespace HackAssembler.Implementations
 
         public Parser(string fileContents)
         {
-            this.fileContents = fileContents
-                .Split(Environment.NewLine)
-                .Select(line => line.StripComment())
-                .Where(line => !string.IsNullOrWhiteSpace(line))
-                .Select(line => line.TrimEnd('\r', '\n'))
-                .Select(line => line.Trim())
-                .ToArray();
-
+            this.fileContents = PreprocessFileContents(fileContents);
             this.counter = 0;
         }
 
@@ -179,6 +172,17 @@ namespace HackAssembler.Implementations
             {
                 throw new UnexpectedCommandTypeException(message);
             }
+        }
+
+        private static string[] PreprocessFileContents(string fileContents)
+        {
+            return fileContents
+                .Split(Environment.NewLine)
+                .Select(line => line.StripComment())
+                .Where(line => !string.IsNullOrWhiteSpace(line))
+                .Select(line => line.TrimEnd('\r', '\n'))
+                .Select(line => line.Trim())
+                .ToArray();
         }
     }
 }
