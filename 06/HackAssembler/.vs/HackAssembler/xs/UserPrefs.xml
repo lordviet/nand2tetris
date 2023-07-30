@@ -1,12 +1,12 @@
 ﻿<Properties StartupConfiguration="{DE1C5F26-62D5-499F-A071-BC42951433F2}|Default">
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" />
   <MonoDevelop.Ide.ItemProperties.HackAssembler PreferredExecutionTarget="MonoDevelop.Default" />
   <MultiItemStartupConfigurations />
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <Debugger.DebugSourceFolders />
-  <MonoDevelop.Ide.Workbench ActiveDocument="HackAssembler/Program.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="HackAssembler/Implementations/SymbolTable.cs">
     <Files>
-      <File FileName="HackAssembler/Program.cs" Line="19" Column="1" />
+      <File FileName="HackAssembler/Program.cs" Line="47" Column="8" />
       <File FileName="HackAssembler/Enums/CommandType.cs" Line="3" Column="17" />
       <File FileName="HackAssembler/Extensions/StringExtensions.cs" Line="8" Column="10" />
       <File FileName="HackAssembler/Contracts/IParser.cs" Line="6" Column="29" />
@@ -16,17 +16,18 @@
       <File FileName="HackAssembler/Implementations/Parser.cs" Line="177" Column="39" />
       <File FileName="HackAssembler/Models/FileContentMeta.cs" Line="10" Column="1" />
       <File FileName="HackAssembler/Contracts/ISymbolTable.cs" Line="9" Column="14" />
-      <File FileName="HackAssembler/Implementations/SymbolTable.cs" Line="21" Column="43" />
+      <File FileName="HackAssembler/Implementations/SymbolTable.cs" Line="15" Column="1" />
       <File FileName="HackAssembler/Constants.cs" Line="5" Column="55" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="HackAssembler" expanded="True">
-            <Node name="HackAssembler" selected="True">
+            <Node name="HackAssembler">
               <Node name="Contracts" expanded="True" />
               <Node name="Enums" expanded="True" />
               <Node name="Extensions" expanded="True" />
+              <Node name="Implementations" expanded="True" />
               <Node name="Models" expanded="True" />
             </Node>
           </Node>
@@ -34,20 +35,13 @@
       </Pad>
       <Pad Id="MonoDevelop.Debugger.WatchPad">
         <State>
-          <Value>parser.GetCurrentInstruction()</Value>
-          <Value>converted</Value>
-          <Value>symbolTable</Value>
-          <Value>this.fil</Value>
-          <Value>this.fileContents</Value>
-          <Value>this.entries</Value>
-          <Value>currentContent</Value>
+          <Value>symbol</Value>
+          <Value>entries</Value>
         </State>
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="/Users/dmtodev/Desktop/Projects/nand2tetris/06/HackAssembler/HackAssembler/Program.cs" relfile="HackAssembler/Program.cs" line="18" column="9" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
 </Properties>
