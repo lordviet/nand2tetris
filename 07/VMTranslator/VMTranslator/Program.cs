@@ -1,0 +1,6 @@
+﻿namespace VMTranslator;
+
+class Program
+{
+
+}
