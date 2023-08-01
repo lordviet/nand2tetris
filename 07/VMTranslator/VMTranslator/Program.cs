@@ -11,7 +11,7 @@ class Program
     {
         if (args == null || args.Length == 0)
         {
-            Console.WriteLine($"Usage: VMTranslator <inputFile>.{Constants.DefaultInputFileExtension}");
+            Console.WriteLine($"Usage: VMTranslator <inputFile>{Constants.DefaultInputFileExtension}");
             return;
         }
 
@@ -64,7 +64,7 @@ class Program
             parser.Advance();
         }
 
-        return string.Empty;
+        return sb.ToString();
     }
 
     private static void SaveOutputFile(string fileName, string translatedCode)
@@ -79,7 +79,7 @@ class Program
         }
 
         string fileNameWithoutExtensions = Path.GetFileNameWithoutExtension(fileName);
-        string outputFile = Path.Combine(directoryName, $"{fileNameWithoutExtensions}.hack");
+        string outputFile = Path.Combine(directoryName, $"{fileNameWithoutExtensions}{Constants.DefaultOutputFileExtension}");
 
         try
         {

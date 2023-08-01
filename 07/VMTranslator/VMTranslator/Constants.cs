@@ -3,6 +3,7 @@
     public static class Constants
     {
         public const string DefaultInputFileExtension = ".vm";
+        public const string DefaultOutputFileExtension = ".asm";
 
         public const string PushKeyword = "push";
         public const string PopKeyword = "pop";
