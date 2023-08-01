@@ -11,7 +11,7 @@ class Program
     {
         if (args == null || args.Length == 0)
         {
-            Console.WriteLine($"Usage: HackAssembler <inputFile>.{Constants.DefaultInputFileExtension}");
+            Console.WriteLine($"Usage: HackAssembler <inputFile>{Constants.DefaultInputFileExtension}");
             return;
         }
 
