@@ -12,9 +12,9 @@ namespace VMTranslator.Contracts
 
         CommandType CommandType();
 
-        string FirstArg();
+        string? FirstArg();
 
-        int SecondArg();
+        int? SecondArg();
     }
 }
 

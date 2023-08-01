@@ -5,12 +5,12 @@ using VMTranslator.Extensions;
 namespace VMTranslator.Implementations
 {
     public class Parser : IParser
-	{
+    {
         private string[] fileContents;
         private int counter;
 
-		public Parser(string fileContents)
-		{
+        public Parser(string fileContents)
+        {
             this.fileContents = PreprocessFileContents(fileContents);
             this.counter = 0;
         }
@@ -33,10 +33,27 @@ namespace VMTranslator.Implementations
 
         public CommandType CommandType()
         {
-            throw new NotImplementedException();
+            string currentInstruction = this.GetCurrentInstruction();
+
+            if (currentInstruction.Contains(Constants.PushKeyword))
+            {
+                return Enums.CommandType.Push;
+            }
+
+            if (currentInstruction.Contains(Constants.PopKeyword))
+            {
+                return Enums.CommandType.Pop;
+            }
+
+            if (Constants.ArithmeticCommandKeywords.Any(currentInstruction.Contains))
+            {
+                return Enums.CommandType.Arithmetic;
+            }
+
+            throw new NotSupportedException($"Could not derive command type out of the following instruction '{currentInstruction}'");
         }
 
-        public string FirstArg()
+        public string? FirstArg()
         {
             string currentInstruction = this.GetCurrentInstruction();
 
@@ -45,17 +62,28 @@ namespace VMTranslator.Implementations
             return currentCommand switch
             {
                 Enums.CommandType.Arithmetic => currentInstruction, // add, sub, etc...
-                Enums.CommandType.Return => string.Empty, // should not be called with return command type
-                _ => string.Empty, // TODO: Implement, e.g push constant 18 (should return push)
+                Enums.CommandType.Return => null,
+                _ => currentInstruction.ExtractFirstArgumentFromInstruction(),
             };
         }
 
-        public int SecondArg()
+        public int? SecondArg()
         {
-            throw new NotImplementedException();
+            string currentInstruction = this.GetCurrentInstruction();
+
+            CommandType currentCommand = this.CommandType();
+
+            return currentCommand switch
+            {
+                Enums.CommandType.Push or
+                Enums.CommandType.Pop or
+                Enums.CommandType.Function or
+                Enums.CommandType.Call => currentInstruction.ExtractSecondArgumentFromInstruction(),
+                _ => null
+            };
         }
 
-        private string[] PreprocessFileContents(string fileContents)
+        private static string[] PreprocessFileContents(string fileContents)
         {
             return fileContents
                 .Split(Environment.NewLine)
