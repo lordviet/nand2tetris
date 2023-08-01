@@ -24,6 +24,11 @@
                 ? int.MinValue
                 : parsedArg;
         }
+
+        public static string CommentOut(this string sorce)
+        {
+            return $"// {sorce}\n";
+        }
     }
 }
 
