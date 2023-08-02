@@ -1,6 +1,4 @@
-﻿using System.Text;
-using VMTranslator.Enums;
-using VMTranslator.Extensions;
+﻿using VMTranslator.Enums;
 using VMTranslator.Implementations;
 
 namespace VMTranslator;
@@ -40,7 +38,8 @@ class Program
     {
         Parser parser = new Parser(fileContents);
 
-        StringBuilder sb = new StringBuilder();
+        // TODO: Potentially move the string builder in the code writer
+        CodeWriter writer = new CodeWriter();
 
         while (parser.HasMoreCommands())
         {
@@ -48,23 +47,22 @@ class Program
 
             string currentInstruction = parser.GetCurrentInstruction();
 
-            sb.Append(currentInstruction.CommentOut());
+            writer.WriteCommentedOutInstruction(currentInstruction);
 
             if (currentInstructionType == CommandType.Push)
-            {   
-                //sb.Append(...);
+            {
+                writer.WritePushPop(currentInstructionType, parser.FirstArg(), parser.SecondArg());
             }
 
             if (currentInstructionType == CommandType.Pop)
             {
-
-                //sb.Append(...);
+                writer.WriteArithmetic(parser.FirstArg());
             }
 
             parser.Advance();
         }
 
-        return sb.ToString();
+        return writer.Close();
     }
 
     private static void SaveOutputFile(string fileName, string translatedCode)

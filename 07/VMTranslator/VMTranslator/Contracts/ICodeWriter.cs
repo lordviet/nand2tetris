@@ -6,11 +6,13 @@ namespace VMTranslator.Contracts
 	{
 		void SetFileName(string fileName);
 
+		void WriteCommentedOutInstruction(string instrction);
+
 		void WriteArithmetic(string command);
 
 		void WritePushPop(CommandType command, string segment, int index);
 
-		void Close();
+		string Close();
 
 		// TODO: To be extended with more routines
 	}

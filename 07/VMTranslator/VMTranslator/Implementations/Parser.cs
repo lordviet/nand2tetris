@@ -6,7 +6,7 @@ namespace VMTranslator.Implementations
 {
     public class Parser : IParser
     {
-        private string[] fileContents;
+        private readonly string[] fileContents;
         private int counter;
 
         public Parser(string fileContents)
@@ -53,33 +53,33 @@ namespace VMTranslator.Implementations
             throw new NotSupportedException($"Could not derive command type out of the following instruction '{currentInstruction}'");
         }
 
-        public string? FirstArg()
+        public string FirstArg()
         {
             string currentInstruction = this.GetCurrentInstruction();
 
-            CommandType currentCommand = this.CommandType();
+            CommandType currentCommandType = this.CommandType();
 
-            return currentCommand switch
+            return currentCommandType switch
             {
                 Enums.CommandType.Arithmetic => currentInstruction, // add, sub, etc...
-                Enums.CommandType.Return => null,
+                Enums.CommandType.Return => throw new InvalidOperationException($"Invalid operation: Trying to access the first argument of the {currentCommandType} instruction is not valid."),
                 _ => currentInstruction.ExtractFirstArgumentFromInstruction(),
             };
         }
 
-        public int? SecondArg()
+        public int SecondArg()
         {
             string currentInstruction = this.GetCurrentInstruction();
 
-            CommandType currentCommand = this.CommandType();
+            CommandType currentCommandType = this.CommandType();
 
-            return currentCommand switch
+            return currentCommandType switch
             {
                 Enums.CommandType.Push or
                 Enums.CommandType.Pop or
                 Enums.CommandType.Function or
                 Enums.CommandType.Call => currentInstruction.ExtractSecondArgumentFromInstruction(),
-                _ => null
+                _ => throw new InvalidOperationException($"Invalid operation: Trying to access the second argument of the {currentCommandType} instruction is not valid.")
             };
         }
 
@@ -93,6 +93,8 @@ namespace VMTranslator.Implementations
                 .Select(line => line.Trim())
                 .ToArray();
         }
+
+        private 
     }
 }
 
