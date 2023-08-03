@@ -94,7 +94,6 @@ namespace VMTranslator.Implementations
                 .ToArray();
         }
 
-        private 
     }
 }
 
