@@ -6,13 +6,16 @@ using VMTranslator.Extensions;
 namespace VMTranslator.Implementations
 {
     public class CodeWriter : ICodeWriter
-	{
+    {
         private readonly StringBuilder transformed;
 
-		public CodeWriter()
-		{
+        // TODO: introduce common commands
+        private const string DRegEqA = "D=A\n";
+
+        public CodeWriter()
+        {
             this.transformed = new StringBuilder();
-		}
+        }
 
         public void WriteCommentedOutInstruction(string instruction)
         {
@@ -24,14 +27,20 @@ namespace VMTranslator.Implementations
             throw new NotImplementedException();
         }
 
-        public void WritePushPop(CommandType command, string segment, int index)
+        public void WritePushPop(CommandType commandType, string segment, int index)
         {
-            // TODO: Translate code
-            throw new NotImplementedException();
-        }
+            if (segment == "constant")
+            {
+                string aInstruction = $"@{index}\n";
 
-        public void SetFileName(string fileName)
-        {
+                this.transformed.Append(aInstruction)
+                                .Append(DRegEqA);
+
+                return;
+            }
+
+            // TODO: Implement remaining segments and introduce a list of valid segments
+
             throw new NotImplementedException();
         }
 
