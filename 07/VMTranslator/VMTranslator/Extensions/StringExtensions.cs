@@ -13,7 +13,7 @@
 
         public static string ExtractFirstArgumentFromInstruction(this string source)
         {
-            return source.Split(" ")[0];
+            return source.Split(" ")[1];
         }
 
         public static int ExtractSecondArgumentFromInstruction(this string source)
@@ -21,8 +21,8 @@
             string extracted = source.Split(" ").Last();
 
             return int.TryParse(extracted, out int parsedArg)
-                ? int.MinValue
-                : parsedArg;
+                ? parsedArg
+                : int.MinValue;
         }
 
         public static string CommentOut(this string sorce)
