@@ -11,6 +11,11 @@ namespace VMTranslator.Implementations
 
         // TODO: introduce common commands
         private const string DRegEqA = "D=A\n";
+        private const string ARegEqM = "A=M\n";
+        private const string MRegEqD = "M=D\n";
+
+        private const string MPlusOne = "M=M+1\n";
+        private const string MMinusOne = "M=M-1\n";
 
         public CodeWriter()
         {
@@ -31,10 +36,7 @@ namespace VMTranslator.Implementations
         {
             if (segment == "constant")
             {
-                string aInstruction = $"@{index}\n";
-
-                this.transformed.Append(aInstruction)
-                                .Append(DRegEqA);
+                HandlePushPopInConstantSegment(commandType, index);
 
                 return;
             }
@@ -47,6 +49,61 @@ namespace VMTranslator.Implementations
         public string Close()
         {
             return this.transformed.ToString();
+        }
+
+        private void HandlePushPopInConstantSegment(CommandType commandType, int index)
+        {
+            switch (commandType)
+            {
+                case CommandType.Push:
+                    HandlePushInConstantSegment(index);
+                    return;
+                case CommandType.Pop:
+                    HandlePopInConstantSegment(index);
+                    return;
+                default:
+                    throw new NotSupportedException($"Unexpected command type '{commandType}'! Expected either '{CommandType.Push}' or '{CommandType.Pop}'.");
+            };
+
+        }
+
+        private void HandlePushInConstantSegment(int index)
+        {
+            string aInstructionForIndex = $"@{index}\n";
+            string aInstructionForPointer = $"@{Constants.StackPointerMnemonic}\n";
+
+            this.transformed.Append(aInstructionForIndex)
+                            .Append(DRegEqA)
+                            .Append(aInstructionForPointer)
+                            .Append(ARegEqM)
+                            .Append(MRegEqD);
+
+            this.IncrementStackPointerCommand();
+        }
+
+        // TODO: think about this one?
+        private void HandlePopInConstantSegment(int index)
+        {
+            //string aInstruction = $"@{index}\n";
+
+            //this.transformed.Append(aInstruction)
+            //                .Append(DRegEqA);
+
+            this.DecrementStackPointerCommand();
+        }
+
+        private void IncrementStackPointerCommand()
+        {
+            string aInstruction = $"@{Constants.StackPointerMnemonic}\n";
+
+            this.transformed.Append(aInstruction)
+                            .Append(MPlusOne);
+        }
+
+        private void DecrementStackPointerCommand()
+        {
+            this.transformed.Append($"@{Constants.StackPointerMnemonic}")
+                            .Append(MMinusOne);
         }
     }
 }
