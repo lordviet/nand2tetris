@@ -56,6 +56,11 @@ class Program
 
             if (currentInstructionType == CommandType.Pop)
             {
+                writer.WritePushPop(currentInstructionType, parser.FirstArg(), parser.SecondArg());
+            }
+
+            if(currentInstructionType == CommandType.Arithmetic)
+            {
                 writer.WriteArithmetic(parser.FirstArg());
             }
 

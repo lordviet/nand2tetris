@@ -9,10 +9,13 @@ namespace VMTranslator.Implementations
     {
         private readonly StringBuilder transformed;
 
-        // TODO: introduce common commands
+        // TODO: idea make different extension methods over the string builder F(sb) => sb and chain them; document them in a human-readable way
+        // TODO: introduce common commands and document
         private const string DRegEqA = "D=A\n";
+        private const string DRegEqM = "D=M\n";
         private const string ARegEqM = "A=M\n";
         private const string MRegEqD = "M=D\n";
+        private const string DRegEqDPlusM = "D=D+M\n";
 
         private const string MPlusOne = "M=M+1\n";
         private const string MMinusOne = "M=M-1\n";
@@ -29,11 +32,25 @@ namespace VMTranslator.Implementations
 
         public void WriteArithmetic(string command)
         {
+            if (!Constants.ArithmeticCommandKeywords.Contains(command))
+            {
+                throw new ArgumentException($"Command '{command}' is not a valid artihmetic command.");
+            }
+
+            if (command == "add")
+            {
+                HandleAddCommand();
+
+                return;
+            }
+
             throw new NotImplementedException();
         }
 
         public void WritePushPop(CommandType commandType, string segment, int index)
         {
+            // TODO: introduce a list of valid segments to check against if the input segment is valid
+
             if (segment == "constant")
             {
                 HandlePushPopInConstantSegment(commandType, index);
@@ -41,7 +58,7 @@ namespace VMTranslator.Implementations
                 return;
             }
 
-            // TODO: Implement remaining segments and introduce a list of valid segments
+            // TODO: Implement remaining segments
 
             throw new NotImplementedException();
         }
@@ -51,15 +68,40 @@ namespace VMTranslator.Implementations
             return this.transformed.ToString();
         }
 
+        #region Arithmetic handlers
+        private void HandleAddCommand()
+        {
+            this.DecrementStackPointerCommand();
+
+            string aInstructionForPointer = $"@{Constants.StackPointerMnemonic}\n";
+
+            this.transformed.Append(aInstructionForPointer)
+                            .Append(ARegEqM)
+                            .Append(DRegEqM);
+
+            this.DecrementStackPointerCommand();
+
+            this.transformed.Append(aInstructionForPointer)
+                            .Append(ARegEqM)
+                            .Append(DRegEqDPlusM)
+                            .Append(MRegEqD);
+
+            this.IncrementStackPointerCommand();
+
+            return;
+        }
+        #endregion
+
+        #region Push/Pop handlers
         private void HandlePushPopInConstantSegment(CommandType commandType, int index)
         {
             switch (commandType)
             {
                 case CommandType.Push:
-                    HandlePushInConstantSegment(index);
+                    this.HandlePushInConstantSegment(index);
                     return;
                 case CommandType.Pop:
-                    HandlePopInConstantSegment(index);
+                    this.HandlePopInConstantSegment(index);
                     return;
                 default:
                     throw new NotSupportedException($"Unexpected command type '{commandType}'! Expected either '{CommandType.Push}' or '{CommandType.Pop}'.");
@@ -91,6 +133,7 @@ namespace VMTranslator.Implementations
 
             this.DecrementStackPointerCommand();
         }
+        #endregion
 
         private void IncrementStackPointerCommand()
         {
@@ -102,7 +145,7 @@ namespace VMTranslator.Implementations
 
         private void DecrementStackPointerCommand()
         {
-            this.transformed.Append($"@{Constants.StackPointerMnemonic}")
+            this.transformed.Append($"@{Constants.StackPointerMnemonic}\n")
                             .Append(MMinusOne);
         }
     }
