@@ -58,6 +58,13 @@ namespace VMTranslator.Implementations
                 return;
             }
 
+            if (segment == "local")
+            {
+                HandlePushPopInLocalSegment(commandType, index);
+
+                return;
+            }
+
             // TODO: Implement remaining segments
 
             throw new NotImplementedException();
@@ -109,6 +116,21 @@ namespace VMTranslator.Implementations
 
         }
 
+        private void HandlePushPopInLocalSegment(CommandType commandType, int index)
+        {
+            switch (commandType)
+            {
+                case CommandType.Push:
+                    this.HandlePushInLocalSegment(index);
+                    return;
+                case CommandType.Pop:
+                    this.HandlePopInLocalSegment(index);
+                    return;
+                default:
+                    throw new NotSupportedException($"Unexpected command type '{commandType}'! Expected either '{CommandType.Push}' or '{CommandType.Pop}'.");
+            };
+        }
+
         private void HandlePushInConstantSegment(int index)
         {
             string aInstructionForIndex = $"@{index}\n";
@@ -133,8 +155,34 @@ namespace VMTranslator.Implementations
 
             this.DecrementStackPointerCommand();
         }
+
+        private void HandlePushInLocalSegment(int index)
+        {
+            //string aInstructionForIndex = $"@{index}\n";
+            //string aInstructionForPointer = $"@{Constants.StackPointerMnemonic}\n";
+
+            //this.transformed.Append(aInstructionForIndex)
+            //                .Append(DRegEqA)
+            //                .Append(aInstructionForPointer)
+            //                .Append(ARegEqM)
+            //                .Append(MRegEqD);
+
+            this.IncrementStackPointerCommand();
+        }
+
+        // TODO: think about this one?
+        private void HandlePopInLocalSegment(int index)
+        {
+            //string aInstruction = $"@{index}\n";
+
+            //this.transformed.Append(aInstruction)
+            //                .Append(DRegEqA);
+
+            this.DecrementStackPointerCommand();
+        }
         #endregion
 
+        #region Common commands
         private void IncrementStackPointerCommand()
         {
             string aInstruction = $"@{Constants.StackPointerMnemonic}\n";
@@ -145,9 +193,25 @@ namespace VMTranslator.Implementations
 
         private void DecrementStackPointerCommand()
         {
-            this.transformed.Append($"@{Constants.StackPointerMnemonic}\n")
+            string aInstruction = $"@{Constants.StackPointerMnemonic}\n";
+
+            this.transformed.Append(aInstruction)
                             .Append(MMinusOne);
         }
+
+        private void IncrementLclCommand(int index)
+        {
+            string aInstruction = $"@{Constants.LocalSegmentMnemonic}\n";
+
+            this.transformed.Append(aInstruction)
+                            .Append(MPlusIndex(index));
+        }
+
+        private string MPlusIndex(int index)
+        {
+            return $"M=M+{index}";
+        }
+        #endregion
     }
 }
 
