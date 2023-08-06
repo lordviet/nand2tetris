@@ -1,7 +1,7 @@
 ﻿namespace VMTranslator.Extensions
 {
     public static class StringExtensions
-	{
+    {
         public static string StripComment(this string source)
         {
             int commentStart = source.IndexOf("//");
@@ -25,9 +25,14 @@
                 : int.MinValue;
         }
 
-        public static string CommentOut(this string sorce)
+        public static string CommentOut(this string source)
         {
-            return $"// {sorce}\n";
+            return $"// {source}\n";
+        }
+
+        public static string ToAInstruction(this string source)
+        {
+            return $"@{source}\n";
         }
     }
 }

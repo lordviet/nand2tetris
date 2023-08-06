@@ -80,7 +80,7 @@ namespace VMTranslator.Implementations
         {
             this.DecrementStackPointerCommand();
 
-            string aInstructionForPointer = $"@{Constants.StackPointerMnemonic}\n";
+            string aInstructionForPointer = Constants.StackPointerMnemonic.ToAInstruction();
 
             this.transformed.Append(aInstructionForPointer)
                             .Append(ARegEqM)
@@ -133,8 +133,8 @@ namespace VMTranslator.Implementations
 
         private void HandlePushInConstantSegment(int index)
         {
-            string aInstructionForIndex = $"@{index}\n";
-            string aInstructionForPointer = $"@{Constants.StackPointerMnemonic}\n";
+            string aInstructionForIndex = $"{index}".ToAInstruction();
+            string aInstructionForPointer = Constants.StackPointerMnemonic.ToAInstruction();
 
             this.transformed.Append(aInstructionForIndex)
                             .Append(DRegEqA)
@@ -176,10 +176,10 @@ namespace VMTranslator.Implementations
             // SP--
             this.DecrementStackPointerCommand();
 
-            string aInstructionForIndex = $"@{index}\n";
-            string aInstructionForLocalSegment = $"@{Constants.LocalSegmentMnemonic}\n";
-            string aInstructinoForR13 = "@R13\n";
-            string aInstructionForStackPointer = $"@{Constants.StackPointerMnemonic}\n";
+            string aInstructionForIndex = $"{index}".ToAInstruction();
+            string aInstructionForLocalSegment = Constants.LocalSegmentMnemonic.ToAInstruction();
+            string aInstructinoForR13 = "R13".ToAInstruction();
+            string aInstructionForStackPointer = Constants.StackPointerMnemonic.ToAInstruction();
 
 
             // Store (LCL + Index) in a free register R13
@@ -206,27 +206,15 @@ namespace VMTranslator.Implementations
         #region Common commands
         private void IncrementStackPointerCommand()
         {
-            string aInstruction = $"@{Constants.StackPointerMnemonic}\n";
-
-            this.transformed.Append(aInstruction)
+            this.transformed.Append(Constants.StackPointerMnemonic.ToAInstruction())
                             .Append(MPlusOne);
         }
 
         private void DecrementStackPointerCommand()
         {
-            string aInstruction = $"@{Constants.StackPointerMnemonic}\n";
-
-            this.transformed.Append(aInstruction)
+            this.transformed.Append(Constants.StackPointerMnemonic.ToAInstruction())
                             .Append(MMinusOne);
         }
-
-        //private void IncrementLclCommand(int index)
-        //{
-        //    string aInstruction = $"@{Constants.LocalSegmentMnemonic}\n";
-
-        //    this.transformed.Append(aInstruction)
-        //                    .Append(MPlusIndex(index));
-        //}
         #endregion
     }
 }
