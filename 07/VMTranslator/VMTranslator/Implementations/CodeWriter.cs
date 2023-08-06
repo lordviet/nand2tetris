@@ -173,12 +173,33 @@ namespace VMTranslator.Implementations
         // TODO: think about this one?
         private void HandlePopInLocalSegment(int index)
         {
-            //string aInstruction = $"@{index}\n";
-
-            //this.transformed.Append(aInstruction)
-            //                .Append(DRegEqA);
-
+            // SP--
             this.DecrementStackPointerCommand();
+
+            string aInstructionForIndex = $"@{index}\n";
+            string aInstructionForLocalSegment = $"@{Constants.LocalSegmentMnemonic}\n";
+            string aInstructinoForR13 = "@R13\n";
+            string aInstructionForStackPointer = $"@{Constants.StackPointerMnemonic}\n";
+
+
+            // Store (LCL + Index) in a free register R13
+            this.transformed.Append(aInstructionForIndex)
+                            .Append(DRegEqA)
+                            .Append(aInstructionForLocalSegment)
+                            .Append(DRegEqDPlusM)
+                            .Append(aInstructinoForR13)
+                            .Append(MRegEqD);
+
+            // Store RAM[SP] in the D register
+            // Retrieve the pointer (LCL + Index) from R13
+            // RAM[LCL + Index] = RAM[SP]
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(ARegEqM)
+                            .Append(DRegEqM)
+                            .Append(aInstructinoForR13)
+                            .Append(ARegEqM)
+                            .Append(MRegEqD);
+
         }
         #endregion
 
@@ -199,18 +220,13 @@ namespace VMTranslator.Implementations
                             .Append(MMinusOne);
         }
 
-        private void IncrementLclCommand(int index)
-        {
-            string aInstruction = $"@{Constants.LocalSegmentMnemonic}\n";
+        //private void IncrementLclCommand(int index)
+        //{
+        //    string aInstruction = $"@{Constants.LocalSegmentMnemonic}\n";
 
-            this.transformed.Append(aInstruction)
-                            .Append(MPlusIndex(index));
-        }
-
-        private string MPlusIndex(int index)
-        {
-            return $"M=M+{index}";
-        }
+        //    this.transformed.Append(aInstruction)
+        //                    .Append(MPlusIndex(index));
+        //}
         #endregion
     }
 }

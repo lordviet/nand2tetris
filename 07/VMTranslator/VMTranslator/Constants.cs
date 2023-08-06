@@ -11,7 +11,7 @@
         public static readonly string[] ArithmeticCommandKeywords = new string[] { "add", "sub", "neg", "eq", "gt", "lt", "and", "or", "not" };
 
         public const string StackPointerMnemonic = "SP";
-        public const string LocalSegmentMnemonig = "LCL";
+        public const string LocalSegmentMnemonic = "LCL";
     }
 }
 
