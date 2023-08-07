@@ -39,10 +39,10 @@
         {
             return source switch
             {
-                "local" => Constants.SegmentMnemonics.Local,
-                "argument" => Constants.SegmentMnemonics.Arg,
-                "this" => Constants.SegmentMnemonics.This,
-                "that" => Constants.SegmentMnemonics.That,
+                "local" => Constants.Mnemonics.Segments.Local,
+                "argument" => Constants.Mnemonics.Segments.Arg,
+                "this" => Constants.Mnemonics.Segments.This,
+                "that" => Constants.Mnemonics.Segments.That,
                 _ => null
             };
         }

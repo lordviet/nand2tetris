@@ -84,7 +84,7 @@ namespace VMTranslator.Implementations
         {
             this.DecrementStackPointerCommand();
 
-            string aInstructionForStackPointer = Constants.SegmentMnemonics.StackPointer.ToAInstruction();
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
 
             this.transformed.Append(aInstructionForStackPointer)
                             .Append(ARegEqM)
@@ -137,7 +137,7 @@ namespace VMTranslator.Implementations
         private void HandlePushInConstantSegment(int index)
         {
             string aInstructionForIndex = $"{index}".ToAInstruction();
-            string aInstructionForStackPointer = Constants.SegmentMnemonics.StackPointer.ToAInstruction();
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
 
             this.transformed.Append(aInstructionForIndex)
                             .Append(DRegEqA)
@@ -152,7 +152,7 @@ namespace VMTranslator.Implementations
         {
             string aInstructionForIndex = $"{index}".ToAInstruction();
             string aInstructionForSegment = memorySegment.ToAInstruction();   
-            string aInstructionForStackPointer = Constants.SegmentMnemonics.StackPointer.ToAInstruction();
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
 
             // Store (LCL + Index) in D register
             this.transformed.Append(aInstructionForIndex)
@@ -178,7 +178,7 @@ namespace VMTranslator.Implementations
             string aInstructionForIndex = $"{index}".ToAInstruction();
             string aInstructionForSegment = memorySegment.ToAInstruction();
             string aInstructinoForR13 = "R13".ToAInstruction();
-            string aInstructionForStackPointer = Constants.SegmentMnemonics.StackPointer.ToAInstruction();
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
 
             // Store (LCL + Index) in a free register R13
             this.transformed.Append(aInstructionForIndex)
@@ -204,13 +204,13 @@ namespace VMTranslator.Implementations
         #region Common commands
         private void IncrementStackPointerCommand()
         {
-            this.transformed.Append(Constants.SegmentMnemonics.StackPointer.ToAInstruction())
+            this.transformed.Append(Constants.Mnemonics.StackPointer.ToAInstruction())
                             .Append(MPlusOne);
         }
 
         private void DecrementStackPointerCommand()
         {
-            this.transformed.Append(Constants.SegmentMnemonics.StackPointer.ToAInstruction())
+            this.transformed.Append(Constants.Mnemonics.StackPointer.ToAInstruction())
                             .Append(MMinusOne);
         }
         #endregion
