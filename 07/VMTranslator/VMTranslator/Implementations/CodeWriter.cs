@@ -16,6 +16,7 @@ namespace VMTranslator.Implementations
         private const string ARegEqM = "A=M\n";
         private const string MRegEqD = "M=D\n";
         private const string DRegEqDPlusM = "D=D+M\n";
+        private const string ARegEqDPlusM = "A=D+M\n";
 
         private const string MPlusOne = "M=M+1\n";
         private const string MMinusOne = "M=M-1\n";
@@ -158,15 +159,23 @@ namespace VMTranslator.Implementations
 
         private void HandlePushInLocalSegment(int index)
         {
-            //string aInstructionForIndex = $"@{index}\n";
-            //string aInstructionForPointer = $"@{Constants.StackPointerMnemonic}\n";
+            string aInstructionForIndex = $"{index}".ToAInstruction();
+            string aInstructionForLocalSegment = Constants.LocalSegmentMnemonic.ToAInstruction();   
+            string aInstructionForStackPointer = Constants.StackPointerMnemonic.ToAInstruction();
 
-            //this.transformed.Append(aInstructionForIndex)
-            //                .Append(DRegEqA)
-            //                .Append(aInstructionForPointer)
-            //                .Append(ARegEqM)
-            //                .Append(MRegEqD);
+            // Store (LCL + Index) in D register
+            this.transformed.Append(aInstructionForIndex)
+                            .Append(DRegEqA)
+                            .Append(aInstructionForLocalSegment)
+                            .Append(ARegEqDPlusM)   
+                            .Append(DRegEqM);
 
+            // RAM[SP] = RAM[LCL + Index]
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(ARegEqM)
+                            .Append(MRegEqD);
+
+            // SP++
             this.IncrementStackPointerCommand();
         }
 
@@ -180,7 +189,6 @@ namespace VMTranslator.Implementations
             string aInstructionForLocalSegment = Constants.LocalSegmentMnemonic.ToAInstruction();
             string aInstructinoForR13 = "R13".ToAInstruction();
             string aInstructionForStackPointer = Constants.StackPointerMnemonic.ToAInstruction();
-
 
             // Store (LCL + Index) in a free register R13
             this.transformed.Append(aInstructionForIndex)
