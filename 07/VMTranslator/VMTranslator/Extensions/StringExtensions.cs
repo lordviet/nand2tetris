@@ -34,6 +34,18 @@
         {
             return $"@{source}\n";
         }
+
+        public static string? ToSegmentMnemonic(this string source)
+        {
+            return source switch
+            {
+                "local" => Constants.SegmentMnemonics.Local,
+                "argument" => Constants.SegmentMnemonics.Arg,
+                "this" => Constants.SegmentMnemonics.This,
+                "that" => Constants.SegmentMnemonics.That,
+                _ => null
+            };
+        }
     }
 }
 

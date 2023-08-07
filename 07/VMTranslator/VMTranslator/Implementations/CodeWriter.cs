@@ -54,14 +54,17 @@ namespace VMTranslator.Implementations
 
             if (segment == "constant")
             {
-                HandlePushPopInConstantSegment(commandType, index);
+                HandlePushInConstantSegment(commandType, index);
 
                 return;
             }
 
-            if (segment == "local")
+            // TODO: think aboout safe checks
+            string? segmentMnemonic = segment.ToSegmentMnemonic();
+
+            if (segmentMnemonic is not null)
             {
-                HandlePushPopInLocalSegment(commandType, index);
+                HandlePushPopInMemorySegment(commandType, index, segmentMnemonic);
 
                 return;
             }
@@ -81,15 +84,15 @@ namespace VMTranslator.Implementations
         {
             this.DecrementStackPointerCommand();
 
-            string aInstructionForPointer = Constants.StackPointerMnemonic.ToAInstruction();
+            string aInstructionForStackPointer = Constants.SegmentMnemonics.StackPointer.ToAInstruction();
 
-            this.transformed.Append(aInstructionForPointer)
+            this.transformed.Append(aInstructionForStackPointer)
                             .Append(ARegEqM)
                             .Append(DRegEqM);
 
             this.DecrementStackPointerCommand();
 
-            this.transformed.Append(aInstructionForPointer)
+            this.transformed.Append(aInstructionForStackPointer)
                             .Append(ARegEqM)
                             .Append(DRegEqDPlusM)
                             .Append(MRegEqD);
@@ -101,31 +104,30 @@ namespace VMTranslator.Implementations
         #endregion
 
         #region Push/Pop handlers
-        private void HandlePushPopInConstantSegment(CommandType commandType, int index)
+        private void HandlePushInConstantSegment(CommandType commandType, int index)
         {
             switch (commandType)
             {
                 case CommandType.Push:
                     this.HandlePushInConstantSegment(index);
                     return;
-                case CommandType.Pop:
-                    this.HandlePopInConstantSegment(index);
-                    return;
                 default:
-                    throw new NotSupportedException($"Unexpected command type '{commandType}'! Expected either '{CommandType.Push}' or '{CommandType.Pop}'.");
+                    throw new NotSupportedException($"Unexpected command type '{commandType}'! Expected '{CommandType.Push}'.");
             };
 
         }
 
-        private void HandlePushPopInLocalSegment(CommandType commandType, int index)
+        // Handles LCL, ARG, THIS, THAT
+        // TODO: Possibly introduce Enum for segments
+        private void HandlePushPopInMemorySegment(CommandType commandType, int index, string segmentMnemonic)
         {
             switch (commandType)
             {
                 case CommandType.Push:
-                    this.HandlePushInLocalSegment(index);
+                    this.HandlePushInMemorySegment(index, segmentMnemonic);
                     return;
                 case CommandType.Pop:
-                    this.HandlePopInLocalSegment(index);
+                    this.HandlePopInMemorySegment(index, segmentMnemonic);
                     return;
                 default:
                     throw new NotSupportedException($"Unexpected command type '{commandType}'! Expected either '{CommandType.Push}' or '{CommandType.Pop}'.");
@@ -135,38 +137,27 @@ namespace VMTranslator.Implementations
         private void HandlePushInConstantSegment(int index)
         {
             string aInstructionForIndex = $"{index}".ToAInstruction();
-            string aInstructionForPointer = Constants.StackPointerMnemonic.ToAInstruction();
+            string aInstructionForStackPointer = Constants.SegmentMnemonics.StackPointer.ToAInstruction();
 
             this.transformed.Append(aInstructionForIndex)
                             .Append(DRegEqA)
-                            .Append(aInstructionForPointer)
+                            .Append(aInstructionForStackPointer)
                             .Append(ARegEqM)
                             .Append(MRegEqD);
 
             this.IncrementStackPointerCommand();
         }
 
-        // TODO: think about this one?
-        private void HandlePopInConstantSegment(int index)
-        {
-            //string aInstruction = $"@{index}\n";
-
-            //this.transformed.Append(aInstruction)
-            //                .Append(DRegEqA);
-
-            this.DecrementStackPointerCommand();
-        }
-
-        private void HandlePushInLocalSegment(int index)
+        private void HandlePushInMemorySegment(int index, string memorySegment)
         {
             string aInstructionForIndex = $"{index}".ToAInstruction();
-            string aInstructionForLocalSegment = Constants.LocalSegmentMnemonic.ToAInstruction();   
-            string aInstructionForStackPointer = Constants.StackPointerMnemonic.ToAInstruction();
+            string aInstructionForSegment = memorySegment.ToAInstruction();   
+            string aInstructionForStackPointer = Constants.SegmentMnemonics.StackPointer.ToAInstruction();
 
             // Store (LCL + Index) in D register
             this.transformed.Append(aInstructionForIndex)
                             .Append(DRegEqA)
-                            .Append(aInstructionForLocalSegment)
+                            .Append(aInstructionForSegment)
                             .Append(ARegEqDPlusM)   
                             .Append(DRegEqM);
 
@@ -179,21 +170,20 @@ namespace VMTranslator.Implementations
             this.IncrementStackPointerCommand();
         }
 
-        // TODO: think about this one?
-        private void HandlePopInLocalSegment(int index)
+        private void HandlePopInMemorySegment(int index, string memorySegment)
         {
             // SP--
             this.DecrementStackPointerCommand();
 
             string aInstructionForIndex = $"{index}".ToAInstruction();
-            string aInstructionForLocalSegment = Constants.LocalSegmentMnemonic.ToAInstruction();
+            string aInstructionForSegment = memorySegment.ToAInstruction();
             string aInstructinoForR13 = "R13".ToAInstruction();
-            string aInstructionForStackPointer = Constants.StackPointerMnemonic.ToAInstruction();
+            string aInstructionForStackPointer = Constants.SegmentMnemonics.StackPointer.ToAInstruction();
 
             // Store (LCL + Index) in a free register R13
             this.transformed.Append(aInstructionForIndex)
                             .Append(DRegEqA)
-                            .Append(aInstructionForLocalSegment)
+                            .Append(aInstructionForSegment)
                             .Append(DRegEqDPlusM)
                             .Append(aInstructinoForR13)
                             .Append(MRegEqD);
@@ -214,13 +204,13 @@ namespace VMTranslator.Implementations
         #region Common commands
         private void IncrementStackPointerCommand()
         {
-            this.transformed.Append(Constants.StackPointerMnemonic.ToAInstruction())
+            this.transformed.Append(Constants.SegmentMnemonics.StackPointer.ToAInstruction())
                             .Append(MPlusOne);
         }
 
         private void DecrementStackPointerCommand()
         {
-            this.transformed.Append(Constants.StackPointerMnemonic.ToAInstruction())
+            this.transformed.Append(Constants.SegmentMnemonics.StackPointer.ToAInstruction())
                             .Append(MMinusOne);
         }
         #endregion
