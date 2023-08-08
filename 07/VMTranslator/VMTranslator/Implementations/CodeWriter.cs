@@ -7,6 +7,7 @@ namespace VMTranslator.Implementations
 {
     public class CodeWriter : ICodeWriter
     {
+        private readonly string fileName;
         private readonly StringBuilder transformed;
 
         // TODO: idea make different extension methods over the string builder F(sb) => sb and chain them; document them in a human-readable way
@@ -21,8 +22,9 @@ namespace VMTranslator.Implementations
         private const string MPlusOne = "M=M+1\n";
         private const string MMinusOne = "M=M-1\n";
 
-        public CodeWriter()
+        public CodeWriter(string fileName)
         {
+            this.fileName = fileName;
             this.transformed = new StringBuilder();
         }
 
@@ -55,6 +57,13 @@ namespace VMTranslator.Implementations
             if (segment == "constant")
             {
                 HandlePushInConstantSegment(commandType, index);
+
+                return;
+            }
+
+            if(segment == "static")
+            {
+                HandlePushPopInStaticSegment(commandType, index, this.fileName);
 
                 return;
             }
@@ -117,6 +126,21 @@ namespace VMTranslator.Implementations
 
         }
 
+        private void HandlePushPopInStaticSegment(CommandType commandType, int index, string fileName)
+        {
+            switch (commandType)
+            {
+                case CommandType.Push:
+                    this.HandlePushInStaticSegment(index, fileName);
+                    return;
+                case CommandType.Pop:
+                    this.HandlePopInStaticSegment(index, fileName);
+                    return;
+                default:
+                    throw new NotSupportedException($"Unexpected command type '{commandType}'! Expected either '{CommandType.Push}' or '{CommandType.Pop}'.");
+            };
+        }
+
         // Handles LCL, ARG, THIS, THAT
         // TODO: Possibly introduce Enum for segments
         private void HandlePushPopInMemorySegment(CommandType commandType, int index, string segmentMnemonic)
@@ -146,6 +170,41 @@ namespace VMTranslator.Implementations
                             .Append(MRegEqD);
 
             this.IncrementStackPointerCommand();
+        }
+
+        private void HandlePushInStaticSegment(int index, string fileName)
+        {
+            string aInstructionForStaticVariable = $"{fileName}.{index}".ToAInstruction();
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
+
+            // Store RAM[@fileName.index] in D register
+            this.transformed.Append(aInstructionForStaticVariable)
+                            .Append(DRegEqM);
+
+            // RAM[SP] = RAM[@fileName.index]
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(ARegEqM)
+                            .Append(MRegEqD);
+
+            this.IncrementStackPointerCommand();
+        }
+
+        private void HandlePopInStaticSegment(int index, string fileName)
+        {
+            // SP--
+            this.DecrementStackPointerCommand();
+
+            string aInstructionForStaticVariable = $"{fileName}.{index}".ToAInstruction();
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
+
+            // Store RAM[SP] in the D register
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(ARegEqM)
+                            .Append(DRegEqM);
+
+            // RAM[@fileName.index] = RAM[SP]
+            this.transformed.Append(aInstructionForStaticVariable)
+                            .Append(MRegEqD);
         }
 
         private void HandlePushInMemorySegment(int index, string memorySegment)
@@ -197,7 +256,6 @@ namespace VMTranslator.Implementations
                             .Append(aInstructinoForR13)
                             .Append(ARegEqM)
                             .Append(MRegEqD);
-
         }
         #endregion
 

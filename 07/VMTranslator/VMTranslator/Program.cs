@@ -28,18 +28,18 @@ class Program
         }
 
         string fileContents = File.ReadAllText(fileName);
+        string fileNameWithoutExtensions = Path.GetFileNameWithoutExtension(fileName);
 
-        string translated = TranslateIntermediateCode(fileContents);
+        string translated = TranslateIntermediateCode(fileContents, fileNameWithoutExtensions);
 
         SaveOutputFile(fileName, translated);
     }
 
-    private static string TranslateIntermediateCode(string fileContents)
+    private static string TranslateIntermediateCode(string fileContents, string fileName)
     {
         Parser parser = new Parser(fileContents);
 
-        // TODO: Potentially move the string builder in the code writer
-        CodeWriter writer = new CodeWriter();
+        CodeWriter writer = new CodeWriter(fileName);
 
         while (parser.HasMoreCommands())
         {
@@ -59,7 +59,7 @@ class Program
                 writer.WritePushPop(currentInstructionType, parser.FirstArg(), parser.SecondArg());
             }
 
-            if(currentInstructionType == CommandType.Arithmetic)
+            if (currentInstructionType == CommandType.Arithmetic)
             {
                 writer.WriteArithmetic(parser.FirstArg());
             }
