@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using VMTranslator.Contracts;
 using VMTranslator.Enums;
+using VMTranslator.Exceptions;
 using VMTranslator.Extensions;
 
 namespace VMTranslator.Implementations
@@ -75,6 +76,13 @@ namespace VMTranslator.Implementations
                 return;
             }
 
+            if (segment == "pointer")
+            {
+                HandlePushPopInPointerSegment(commandType, index);
+
+                return;
+            }
+
             // TODO: think aboout safe checks
             string? segmentMnemonic = segment.ToSegmentMnemonic();
 
@@ -84,8 +92,6 @@ namespace VMTranslator.Implementations
 
                 return;
             }
-
-            // TODO: Implement remaining segments
 
             throw new NotImplementedException();
         }
@@ -144,7 +150,7 @@ namespace VMTranslator.Implementations
                     this.HandlePopInStaticSegment(index, fileName);
                     return;
                 default:
-                    throw new NotSupportedException($"Unexpected command type '{commandType}'! Expected either '{CommandType.Push}' or '{CommandType.Pop}'.");
+                    throw new UnexpectedCommandTypeException($"Unexpected command type '{commandType}'! Expected either '{CommandType.Push}' or '{CommandType.Pop}'.");
             };
         }
 
@@ -157,6 +163,26 @@ namespace VMTranslator.Implementations
                     return;
                 case CommandType.Pop:
                     this.HandlePopInTempSegment(index);
+                    return;
+                default:
+                    throw new UnexpectedCommandTypeException($"Unexpected command type '{commandType}'! Expected either '{CommandType.Push}' or '{CommandType.Pop}'.");
+            };
+        }
+
+        private void HandlePushPopInPointerSegment(CommandType commandType, int index)
+        {
+            if (!index.IsValidPointerIndex())
+            {
+                throw new ArgumentException($"Unexpected index for pointer command '{index}'! Expected either '0' or '1'");
+            }
+
+            switch (commandType)
+            {
+                case CommandType.Push:
+                    this.HandlePushInPointerSegment(index);
+                    return;
+                case CommandType.Pop:
+                    this.HandlePopInPointerSegment(index);
                     return;
                 default:
                     throw new NotSupportedException($"Unexpected command type '{commandType}'! Expected either '{CommandType.Push}' or '{CommandType.Pop}'.");
@@ -261,6 +287,42 @@ namespace VMTranslator.Implementations
 
             // RAM[@R(5+index)] = RAM[SP]
             this.transformed.Append(aInstructionForRegister)
+                            .Append(MRegEqD);
+        }
+
+        private void HandlePushInPointerSegment(int index)
+        {
+            string aInstructionForPointer = index.PointerIndexToMnemonicMemorySegment().ToAInstruction();
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
+
+            // Store THIS/THAT in D register
+            this.transformed.Append(aInstructionForPointer)
+                            .Append(DRegEqA);
+
+            // RAM[SP] = THIS/THAT (stored in D register)
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(ARegEqM)
+                            .Append(DRegEqM);
+
+            // SP++
+            this.IncrementStackPointerCommand();
+        }
+
+        private void HandlePopInPointerSegment(int index)
+        {
+            // SP--
+            this.DecrementStackPointerCommand();
+
+            string aInstructionForPointer = index.PointerIndexToMnemonicMemorySegment().ToAInstruction();
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
+
+            // Store RAM[SP] in the D register
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(ARegEqM)
+                            .Append(DRegEqM);
+
+            // THIS/THAT = RAM[SP]
+            this.transformed.Append(aInstructionForPointer)
                             .Append(MRegEqD);
         }
 

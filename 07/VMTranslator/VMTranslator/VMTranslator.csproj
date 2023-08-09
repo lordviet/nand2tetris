@@ -12,11 +12,13 @@
     <None Remove="Contracts\" />
     <None Remove="Implementations\" />
     <None Remove="Extensions\" />
+    <None Remove="Exceptions\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Enums\" />
     <Folder Include="Contracts\" />
     <Folder Include="Implementations\" />
     <Folder Include="Extensions\" />
+    <Folder Include="Exceptions\" />
   </ItemGroup>
 </Project>
