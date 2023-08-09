@@ -53,7 +53,7 @@ namespace VMTranslator.Implementations
         public void WritePushPop(CommandType commandType, string segment, int index)
         {
             // TODO: introduce a list of valid segments to check against if the input segment is valid
-
+            // TODO: idea, use a mapper to convert the segment to an Enum and use a generalized version of HandlePushPopInMemorySegment
             if (segment == "constant")
             {
                 HandlePushInConstantSegment(commandType, index);
@@ -61,9 +61,16 @@ namespace VMTranslator.Implementations
                 return;
             }
 
-            if(segment == "static")
+            if (segment == "static")
             {
                 HandlePushPopInStaticSegment(commandType, index, this.fileName);
+
+                return;
+            }
+
+            if (segment == "temp")
+            {
+                HandlePushPopInTempSegment(commandType, index);
 
                 return;
             }
@@ -141,17 +148,32 @@ namespace VMTranslator.Implementations
             };
         }
 
-        // Handles LCL, ARG, THIS, THAT
-        // TODO: Possibly introduce Enum for segments
-        private void HandlePushPopInMemorySegment(CommandType commandType, int index, string segmentMnemonic)
+        private void HandlePushPopInTempSegment(CommandType commandType, int index)
         {
             switch (commandType)
             {
                 case CommandType.Push:
-                    this.HandlePushInMemorySegment(index, segmentMnemonic);
+                    this.HandlePushInTempSegment(index);
                     return;
                 case CommandType.Pop:
-                    this.HandlePopInMemorySegment(index, segmentMnemonic);
+                    this.HandlePopInTempSegment(index);
+                    return;
+                default:
+                    throw new NotSupportedException($"Unexpected command type '{commandType}'! Expected either '{CommandType.Push}' or '{CommandType.Pop}'.");
+            };
+        }
+
+        // Handles LCL, ARG, THIS, THAT
+        // TODO: Possibly introduce Enum for segments
+        private void HandlePushPopInMemorySegment(CommandType commandType, int index, string segment)
+        {
+            switch (commandType)
+            {
+                case CommandType.Push:
+                    this.HandlePushInMemorySegment(index, segment);
+                    return;
+                case CommandType.Pop:
+                    this.HandlePopInMemorySegment(index, segment);
                     return;
                 default:
                     throw new NotSupportedException($"Unexpected command type '{commandType}'! Expected either '{CommandType.Push}' or '{CommandType.Pop}'.");
@@ -207,17 +229,52 @@ namespace VMTranslator.Implementations
                             .Append(MRegEqD);
         }
 
+        private void HandlePushInTempSegment(int index)
+        {
+            string aInstructionForRegister = $"R{index + Constants.DefaultTempRegisterIndex}".ToAInstruction();
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
+
+            // Store RAM[@R(5+index)] in D register
+            this.transformed.Append(aInstructionForRegister)
+                            .Append(DRegEqM);
+
+            // RAM[SP] = RAM[@R(5+index)]
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(ARegEqM)
+                            .Append(MRegEqD);
+
+            this.IncrementStackPointerCommand();
+        }
+
+        private void HandlePopInTempSegment(int index)
+        {
+            // SP--
+            this.DecrementStackPointerCommand();
+
+            string aInstructionForRegister = $"R{index + Constants.DefaultTempRegisterIndex}".ToAInstruction();
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
+
+            // Store RAM[SP] in the D register
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(ARegEqM)
+                            .Append(DRegEqM);
+
+            // RAM[@R(5+index)] = RAM[SP]
+            this.transformed.Append(aInstructionForRegister)
+                            .Append(MRegEqD);
+        }
+
         private void HandlePushInMemorySegment(int index, string memorySegment)
         {
             string aInstructionForIndex = $"{index}".ToAInstruction();
-            string aInstructionForSegment = memorySegment.ToAInstruction();   
+            string aInstructionForSegment = memorySegment.ToAInstruction();
             string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
 
             // Store (LCL + Index) in D register
             this.transformed.Append(aInstructionForIndex)
                             .Append(DRegEqA)
                             .Append(aInstructionForSegment)
-                            .Append(ARegEqDPlusM)   
+                            .Append(ARegEqDPlusM)
                             .Append(DRegEqM);
 
             // RAM[SP] = RAM[LCL + Index]

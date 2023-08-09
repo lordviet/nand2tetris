@@ -8,6 +8,8 @@
         public const string PushKeyword = "push";
         public const string PopKeyword = "pop";
 
+        public const int DefaultTempRegisterIndex = 5;
+
         public static readonly string[] ArithmeticCommandKeywords = new string[] { "add", "sub", "neg", "eq", "gt", "lt", "and", "or", "not" };
 
         public static class Mnemonics
