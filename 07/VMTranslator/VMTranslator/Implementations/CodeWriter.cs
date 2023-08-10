@@ -18,6 +18,7 @@ namespace VMTranslator.Implementations
         private const string ARegEqM = "A=M\n";
         private const string MRegEqD = "M=D\n";
         private const string DRegEqDPlusM = "D=D+M\n";
+        private const string DRegEqMMinusD = "D=M-D\n";
         private const string ARegEqDPlusM = "A=D+M\n";
 
         private const string MPlusOne = "M=M+1\n";
@@ -44,6 +45,13 @@ namespace VMTranslator.Implementations
             if (command == "add")
             {
                 HandleAddCommand();
+
+                return;
+            }
+
+            if (command == "sub")
+            {
+                HandleSubCommand();
 
                 return;
             }
@@ -97,6 +105,28 @@ namespace VMTranslator.Implementations
             this.transformed.Append(aInstructionForStackPointer)
                             .Append(ARegEqM)
                             .Append(DRegEqDPlusM)
+                            .Append(MRegEqD);
+
+            this.IncrementStackPointerCommand();
+
+            return;
+        }
+
+        private void HandleSubCommand()
+        {
+            this.DecrementStackPointerCommand();
+
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
+
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(ARegEqM)
+                            .Append(DRegEqM);
+
+            this.DecrementStackPointerCommand();
+
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(ARegEqM)
+                            .Append(DRegEqMMinusD)
                             .Append(MRegEqD);
 
             this.IncrementStackPointerCommand();
