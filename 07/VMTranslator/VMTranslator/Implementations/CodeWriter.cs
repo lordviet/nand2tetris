@@ -12,7 +12,7 @@ namespace VMTranslator.Implementations
         private readonly StringBuilder transformed;
 
         // TODO: idea make different extension methods over the string builder F(sb) => sb and chain them; document them in a human-readable way
-        // TODO: introduce common commands and document
+        // TODO: introduce common command store and document
         private const string DRegEqA = "D=A\n";
         private const string DRegEqM = "D=M\n";
         private const string ARegEqM = "A=M\n";
@@ -53,7 +53,7 @@ namespace VMTranslator.Implementations
 
         public void WritePushPop(CommandType commandType, string segment, int index)
         {
-            // TODO: use a generalized version of HandlePushPopInMemorySegment
+            // TODO: use a generalized version of HandlePushPopInMemorySegment?
             Segment memorySegment = segment.ToSegmentEnum();
 
             switch (memorySegment)
@@ -194,15 +194,20 @@ namespace VMTranslator.Implementations
             string aInstructionForIndex = $"{index}".ToAInstruction();
             string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
 
+            // Store @index in D register
             this.transformed.Append(aInstructionForIndex)
-                            .Append(DRegEqA)
-                            .Append(aInstructionForStackPointer)
+                            .Append(DRegEqA);
+
+            // RAM[SP] = index
+            this.transformed.Append(aInstructionForStackPointer)
                             .Append(ARegEqM)
                             .Append(MRegEqD);
 
+            // SP++
             this.IncrementStackPointerCommand();
         }
 
+        // TODO: HandlePushPop in Static and Temp Segments is identical and can be abstracted further
         private void HandlePushInStaticSegment(int index, string fileName)
         {
             string aInstructionForStaticVariable = $"{fileName}.{index}".ToAInstruction();
