@@ -53,47 +53,27 @@ namespace VMTranslator.Implementations
 
         public void WritePushPop(CommandType commandType, string segment, int index)
         {
-            // TODO: introduce a list of valid segments to check against if the input segment is valid
-            // TODO: idea, use a mapper to convert the segment to an Enum and use a generalized version of HandlePushPopInMemorySegment
-            if (segment == "constant")
+            // TODO: use a generalized version of HandlePushPopInMemorySegment
+            Segment memorySegment = segment.ToSegmentEnum();
+
+            switch (memorySegment)
             {
-                HandlePushInConstantSegment(commandType, index);
-
-                return;
+                case Segment.Constant:
+                    this.HandlePushInConstantSegment(commandType, index);
+                    return;
+                case Segment.Static:
+                    this.HandlePushPopInStaticSegment(commandType, index, this.fileName);
+                    return;
+                case Segment.Temp:
+                    this.HandlePushPopInTempSegment(commandType, index);
+                    return;
+                case Segment.Pointer:
+                    this.HandlePushPopInPointerSegment(commandType, index); // TODO: test this one
+                    return;
+                default:
+                    this.HandlePushPopInMemorySegment(commandType, index, memorySegment.ToSegmentMnemonic());
+                    return;
             }
-
-            if (segment == "static")
-            {
-                HandlePushPopInStaticSegment(commandType, index, this.fileName);
-
-                return;
-            }
-
-            if (segment == "temp")
-            {
-                HandlePushPopInTempSegment(commandType, index);
-
-                return;
-            }
-
-            if (segment == "pointer")
-            {
-                HandlePushPopInPointerSegment(commandType, index);
-
-                return;
-            }
-
-            // TODO: think aboout safe checks
-            string? segmentMnemonic = segment.ToSegmentMnemonic();
-
-            if (segmentMnemonic is not null)
-            {
-                HandlePushPopInMemorySegment(commandType, index, segmentMnemonic);
-
-                return;
-            }
-
-            throw new NotImplementedException();
         }
 
         public string Close()

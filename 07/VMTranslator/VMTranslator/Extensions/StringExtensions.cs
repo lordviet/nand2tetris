@@ -1,4 +1,6 @@
-﻿namespace VMTranslator.Extensions
+﻿using VMTranslator.Enums;
+
+namespace VMTranslator.Extensions
 {
     public static class StringExtensions
     {
@@ -44,6 +46,22 @@
                 "this" => Constants.Mnemonics.Segments.This,
                 "that" => Constants.Mnemonics.Segments.That,
                 _ => null
+            };
+        }
+
+        public static Segment ToSegmentEnum(this string source)
+        {
+            return source switch
+            {
+                "constant" => Segment.Constant,
+                "static" => Segment.Static,
+                "temp" => Segment.Temp,
+                "pointer" => Segment.Pointer,
+                "local" => Segment.Local,
+                "arg" => Segment.Arg,
+                "this" => Segment.This,
+                "that" => Segment.That,
+                _ => throw new ArgumentException($"Unexpected segment '{source}'!")
             };
         }
     }
