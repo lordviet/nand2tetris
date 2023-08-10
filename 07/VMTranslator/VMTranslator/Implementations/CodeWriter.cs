@@ -114,9 +114,9 @@ namespace VMTranslator.Implementations
                     this.HandlePushInConstantSegment(index);
                     return;
                 default:
-                    throw new NotSupportedException($"Unexpected command type '{commandType}'! Expected '{CommandType.Push}'.");
+                    ThrowExpectedPushCommandTypeException(commandType);
+                    return;
             };
-
         }
 
         private void HandlePushPopInStaticSegment(CommandType commandType, int index, string fileName)
@@ -130,7 +130,8 @@ namespace VMTranslator.Implementations
                     this.HandlePopInStaticSegment(index, fileName);
                     return;
                 default:
-                    throw new UnexpectedCommandTypeException($"Unexpected command type '{commandType}'! Expected either '{CommandType.Push}' or '{CommandType.Pop}'.");
+                    ThrowExpectedPushOrPopCommandTypeException(commandType);
+                    return;
             };
         }
 
@@ -145,7 +146,8 @@ namespace VMTranslator.Implementations
                     this.HandlePopInTempSegment(index);
                     return;
                 default:
-                    throw new UnexpectedCommandTypeException($"Unexpected command type '{commandType}'! Expected either '{CommandType.Push}' or '{CommandType.Pop}'.");
+                    ThrowExpectedPushOrPopCommandTypeException(commandType);
+                    return;
             };
         }
 
@@ -165,24 +167,25 @@ namespace VMTranslator.Implementations
                     this.HandlePopInPointerSegment(index);
                     return;
                 default:
-                    throw new NotSupportedException($"Unexpected command type '{commandType}'! Expected either '{CommandType.Push}' or '{CommandType.Pop}'.");
+                    ThrowExpectedPushOrPopCommandTypeException(commandType);
+                    return;
             };
         }
 
         // Handles LCL, ARG, THIS, THAT
-        // TODO: Possibly introduce Enum for segments
-        private void HandlePushPopInMemorySegment(CommandType commandType, int index, string segment)
+        private void HandlePushPopInMemorySegment(CommandType commandType, int index, string segmentMnemonic)
         {
             switch (commandType)
             {
                 case CommandType.Push:
-                    this.HandlePushInMemorySegment(index, segment);
+                    this.HandlePushInMemorySegment(index, segmentMnemonic);
                     return;
                 case CommandType.Pop:
-                    this.HandlePopInMemorySegment(index, segment);
+                    this.HandlePopInMemorySegment(index, segmentMnemonic);
                     return;
                 default:
-                    throw new NotSupportedException($"Unexpected command type '{commandType}'! Expected either '{CommandType.Push}' or '{CommandType.Pop}'.");
+                    ThrowExpectedPushOrPopCommandTypeException(commandType);
+                    return;
             };
         }
 
@@ -306,20 +309,20 @@ namespace VMTranslator.Implementations
                             .Append(MRegEqD);
         }
 
-        private void HandlePushInMemorySegment(int index, string memorySegment)
+        private void HandlePushInMemorySegment(int index, string segmentMnemonic)
         {
             string aInstructionForIndex = $"{index}".ToAInstruction();
-            string aInstructionForSegment = memorySegment.ToAInstruction();
+            string aInstructionForSegment = segmentMnemonic.ToAInstruction();
             string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
 
-            // Store (LCL + Index) in D register
+            // Store (LCL|ARG|THIS|THAT + Index) in D register
             this.transformed.Append(aInstructionForIndex)
                             .Append(DRegEqA)
                             .Append(aInstructionForSegment)
                             .Append(ARegEqDPlusM)
                             .Append(DRegEqM);
 
-            // RAM[SP] = RAM[LCL + Index]
+            // RAM[SP] = RAM[LCL|ARG|THIS|THAT + Index]
             this.transformed.Append(aInstructionForStackPointer)
                             .Append(ARegEqM)
                             .Append(MRegEqD);
@@ -328,17 +331,17 @@ namespace VMTranslator.Implementations
             this.IncrementStackPointerCommand();
         }
 
-        private void HandlePopInMemorySegment(int index, string memorySegment)
+        private void HandlePopInMemorySegment(int index, string segmentMnemonic)
         {
             // SP--
             this.DecrementStackPointerCommand();
 
             string aInstructionForIndex = $"{index}".ToAInstruction();
-            string aInstructionForSegment = memorySegment.ToAInstruction();
+            string aInstructionForSegment = segmentMnemonic.ToAInstruction();
             string aInstructinoForR13 = "R13".ToAInstruction();
             string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
 
-            // Store (LCL + Index) in a free register R13
+            // Store (LCL|ARG|THIS|THAT + Index) in a free register R13
             this.transformed.Append(aInstructionForIndex)
                             .Append(DRegEqA)
                             .Append(aInstructionForSegment)
@@ -347,8 +350,8 @@ namespace VMTranslator.Implementations
                             .Append(MRegEqD);
 
             // Store RAM[SP] in the D register
-            // Retrieve the pointer (LCL + Index) from R13
-            // RAM[LCL + Index] = RAM[SP]
+            // Retrieve the pointer (LCL|ARG|THIS|THAT + Index) from R13
+            // RAM[LCL|ARG|THIS|THAT + Index] = RAM[SP]
             this.transformed.Append(aInstructionForStackPointer)
                             .Append(ARegEqM)
                             .Append(DRegEqM)
@@ -369,6 +372,18 @@ namespace VMTranslator.Implementations
         {
             this.transformed.Append(Constants.Mnemonics.StackPointer.ToAInstruction())
                             .Append(MMinusOne);
+        }
+        #endregion
+
+        #region Errors
+        private static void ThrowExpectedPushOrPopCommandTypeException(CommandType unexpected)
+        {
+            throw new UnexpectedCommandTypeException($"Unexpected command type '{unexpected}'! Expected either '{CommandType.Push}' or '{CommandType.Pop}'.");
+        }
+
+        private static void ThrowExpectedPushCommandTypeException(CommandType unexpected)
+        {
+            throw new UnexpectedCommandTypeException($"Unexpected command type '{unexpected}'! Expected '{CommandType.Push}'.");
         }
         #endregion
     }
