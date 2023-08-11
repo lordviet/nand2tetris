@@ -46,6 +46,8 @@ namespace VMTranslator.Implementations
                 throw new ArgumentException($"Command '{command}' is not a valid artihmetic command.");
             }
 
+            // TODO: introduce an enum ArithmeticCommand and use a swtich to exhaust it
+
             if (command == "add")
             {
                 HandleAddCommand();
@@ -80,6 +82,13 @@ namespace VMTranslator.Implementations
 
                 return;
             }
+
+            //if (command == "not")
+            //{
+            //    HandleNotCommand();
+
+            //    return;
+            //}
 
             throw new NotImplementedException();
         }
@@ -173,6 +182,21 @@ namespace VMTranslator.Implementations
 
             return;
         }
+
+        //private void HandleNotCommand()
+        //{
+        //    this.DecrementStackPointerCommand();
+
+        //    string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
+
+        //    this.transformed.Append(aInstructionForStackPointer)
+        //                    .Append(ARegEqM)
+        //                    .Append(MRegEqNotM);
+
+        //    this.IncrementStackPointerCommand();
+
+        //    return;
+        //}
 
         private void HandleAndCommand()
         {
