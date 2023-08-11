@@ -23,6 +23,7 @@ namespace VMTranslator.Implementations
 
         private const string MPlusOne = "M=M+1\n";
         private const string MMinusOne = "M=M-1\n";
+        private const string MRegEqMinusM = "M=-M\n";
 
         public CodeWriter(string fileName)
         {
@@ -149,7 +150,7 @@ namespace VMTranslator.Implementations
 
             this.transformed.Append(aInstructionForStackPointer)
                             .Append(ARegEqM)
-                            .Append(MMinusOne);
+                            .Append(MRegEqMinusM);
 
             this.IncrementStackPointerCommand();
 
