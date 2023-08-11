@@ -17,8 +17,11 @@ namespace VMTranslator.Implementations
         private const string DRegEqM = "D=M\n";
         private const string ARegEqM = "A=M\n";
         private const string MRegEqD = "M=D\n";
+
         private const string DRegEqDPlusM = "D=D+M\n";
         private const string DRegEqMMinusD = "D=M-D\n";
+        private const string DRegEqDAndM = "D=D&M\n";
+        private const string DRegEqDOrM = "D=D|M\n";
         private const string ARegEqDPlusM = "A=D+M\n";
 
         private const string MPlusOne = "M=M+1\n";
@@ -60,6 +63,20 @@ namespace VMTranslator.Implementations
             if (command == "neg")
             {
                 HandleNegCommand();
+
+                return;
+            }
+
+            if (command == "and")
+            {
+                HandleAndCommand();
+
+                return;
+            }
+
+            if (command == "or")
+            {
+                HandleOrCommand();
 
                 return;
             }
@@ -151,6 +168,50 @@ namespace VMTranslator.Implementations
             this.transformed.Append(aInstructionForStackPointer)
                             .Append(ARegEqM)
                             .Append(MRegEqMinusM);
+
+            this.IncrementStackPointerCommand();
+
+            return;
+        }
+
+        private void HandleAndCommand()
+        {
+            this.DecrementStackPointerCommand();
+
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
+
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(ARegEqM)
+                            .Append(DRegEqM);
+
+            this.DecrementStackPointerCommand();
+
+            this.transformed.Append(aInstructionForStackPointer)
+                         .Append(ARegEqM)
+                         .Append(DRegEqDAndM)
+                         .Append(MRegEqD);
+
+            this.IncrementStackPointerCommand();
+
+            return;
+        }
+
+        private void HandleOrCommand()
+        {
+            this.DecrementStackPointerCommand();
+
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
+
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(ARegEqM)
+                            .Append(DRegEqM);
+
+            this.DecrementStackPointerCommand();
+
+            this.transformed.Append(aInstructionForStackPointer)
+                         .Append(ARegEqM)
+                         .Append(DRegEqDOrM)
+                         .Append(MRegEqD);
 
             this.IncrementStackPointerCommand();
 
