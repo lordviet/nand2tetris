@@ -56,6 +56,13 @@ namespace VMTranslator.Implementations
                 return;
             }
 
+            if (command == "neg")
+            {
+                HandleNegCommand();
+
+                return;
+            }
+
             throw new NotImplementedException();
         }
 
@@ -128,6 +135,21 @@ namespace VMTranslator.Implementations
                             .Append(ARegEqM)
                             .Append(DRegEqMMinusD)
                             .Append(MRegEqD);
+
+            this.IncrementStackPointerCommand();
+
+            return;
+        }
+
+        private void HandleNegCommand()
+        {
+            this.DecrementStackPointerCommand();
+
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
+
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(ARegEqM)
+                            .Append(MMinusOne);
 
             this.IncrementStackPointerCommand();
 
