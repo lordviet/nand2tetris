@@ -90,6 +90,13 @@ namespace VMTranslator.Implementations
             //    return;
             //}
 
+            if (command == "eq")
+            {
+                HandleEqCommand();
+
+                return;
+            }
+
             throw new NotImplementedException();
         }
 
@@ -240,6 +247,11 @@ namespace VMTranslator.Implementations
             this.IncrementStackPointerCommand();
 
             return;
+        }
+
+        private void HandleEqCommand()
+        {
+
         }
         #endregion
 
