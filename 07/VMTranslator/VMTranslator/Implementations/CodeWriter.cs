@@ -22,11 +22,13 @@ namespace VMTranslator.Implementations
         private const string DRegEqMMinusD = "D=M-D\n";
         private const string DRegEqDAndM = "D=D&M\n";
         private const string DRegEqDOrM = "D=D|M\n";
+        private const string DRegEqExclD = "D=!D\n";
         private const string ARegEqDPlusM = "A=D+M\n";
 
         private const string MPlusOne = "M=M+1\n";
         private const string MMinusOne = "M=M-1\n";
         private const string MRegEqMinusM = "M=-M\n";
+        private const string MRegEqOne = "M=1\n";
 
         public CodeWriter(string fileName)
         {
@@ -218,9 +220,9 @@ namespace VMTranslator.Implementations
             this.DecrementStackPointerCommand();
 
             this.transformed.Append(aInstructionForStackPointer)
-                         .Append(ARegEqM)
-                         .Append(DRegEqDAndM)
-                         .Append(MRegEqD);
+                            .Append(ARegEqM)
+                            .Append(DRegEqDAndM)
+                            .Append(MRegEqD);
 
             this.IncrementStackPointerCommand();
 
@@ -240,9 +242,9 @@ namespace VMTranslator.Implementations
             this.DecrementStackPointerCommand();
 
             this.transformed.Append(aInstructionForStackPointer)
-                         .Append(ARegEqM)
-                         .Append(DRegEqDOrM)
-                         .Append(MRegEqD);
+                            .Append(ARegEqM)
+                            .Append(DRegEqDOrM)
+                            .Append(MRegEqD);
 
             this.IncrementStackPointerCommand();
 
@@ -251,7 +253,48 @@ namespace VMTranslator.Implementations
 
         private void HandleEqCommand()
         {
+            // SP--
+            this.DecrementStackPointerCommand();
 
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
+            string aInstructinoForR13 = "R13".ToAInstruction();
+
+            // Store last value from the stack in the D register
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(ARegEqM)
+                            .Append(DRegEqM);
+
+            // SP--
+            this.DecrementStackPointerCommand();
+
+            // Get the next value from the stack
+            // Subtract the value in the D register from it
+            // Store the result from the subtraction in the D register
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(ARegEqM)
+                            .Append(DRegEqMMinusD);
+
+            // Strip the value to either zero or one and negate it
+            this.transformed.Append(DRegEqExclD)
+                            .Append(DRegEqExclD)
+                            .Append(DRegEqExclD);
+
+            // Store the value 1 to Register 13
+            // Use it for logical AND to see if the integers are equal
+            // If x - y == 0; then !0 == 1; 1 AND 1 will output true
+            this.transformed.Append(aInstructinoForR13)
+                            .Append(MRegEqOne)
+                            .Append(DRegEqDAndM);
+
+            // Store the result in the next address shown by the stack pointer
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(ARegEqM)
+                            .Append(MRegEqD);
+
+            // SP++
+            this.IncrementStackPointerCommand();
+
+            return;
         }
         #endregion
 
