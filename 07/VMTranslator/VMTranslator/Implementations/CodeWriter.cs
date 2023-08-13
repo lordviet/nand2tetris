@@ -23,11 +23,13 @@ namespace VMTranslator.Implementations
         private const string DRegEqDAndM = "D=D&M\n";
         private const string DRegEqDOrM = "D=D|M\n";
         private const string DRegEqExclD = "D=!D\n";
+        private const string DRegEqExclM = "D=!M\n";
         private const string ARegEqDPlusM = "A=D+M\n";
 
         private const string MPlusOne = "M=M+1\n";
         private const string MMinusOne = "M=M-1\n";
         private const string MRegEqMinusM = "M=-M\n";
+        private const string MRegEqDPlusOne = "M=D+1\n";
         private const string MRegEqOne = "M=1\n";
 
         public CodeWriter(string fileName)
@@ -85,12 +87,12 @@ namespace VMTranslator.Implementations
                 return;
             }
 
-            //if (command == "not")
-            //{
-            //    HandleNotCommand();
+            if (command == "not")
+            {
+                HandleNotCommand();
 
-            //    return;
-            //}
+                return;
+            }
 
             if (command == "eq")
             {
@@ -192,20 +194,21 @@ namespace VMTranslator.Implementations
             return;
         }
 
-        //private void HandleNotCommand()
-        //{
-        //    this.DecrementStackPointerCommand();
+        private void HandleNotCommand()
+        {
+            this.DecrementStackPointerCommand();
 
-        //    string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
 
-        //    this.transformed.Append(aInstructionForStackPointer)
-        //                    .Append(ARegEqM)
-        //                    .Append(MRegEqNotM);
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(ARegEqM)
+                            .Append(DRegEqExclM)
+                            .Append(MRegEqDPlusOne);
 
-        //    this.IncrementStackPointerCommand();
+            this.IncrementStackPointerCommand();
 
-        //    return;
-        //}
+            return;
+        }
 
         private void HandleAndCommand()
         {
