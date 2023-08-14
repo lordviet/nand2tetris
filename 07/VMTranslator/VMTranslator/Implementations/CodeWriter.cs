@@ -101,6 +101,13 @@ namespace VMTranslator.Implementations
                 return;
             }
 
+            if(command == "gt")
+            {
+                HandleGreaterThanCommand();
+
+                return;
+            }
+
             throw new NotImplementedException();
         }
 
@@ -200,10 +207,11 @@ namespace VMTranslator.Implementations
 
             string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
 
+            // To negate a two's complement number, all the bits are inverted and 1 is added to the result. 
             this.transformed.Append(aInstructionForStackPointer)
                             .Append(ARegEqM)
-                            .Append(DRegEqExclM)
-                            .Append(MRegEqDPlusOne);
+                            .Append(DRegEqExclM) // Invert the bits
+                            .Append(MRegEqDPlusOne); // Add 1 to the result
 
             this.IncrementStackPointerCommand();
 
@@ -298,6 +306,29 @@ namespace VMTranslator.Implementations
             this.IncrementStackPointerCommand();
 
             return;
+        }
+
+        private void HandleGreterThanCommand()
+        {
+            this.DecrementStackPointerCommand();
+
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
+            string aInstructinoForR13 = "R13".ToAInstruction();
+
+            // Store last value from the stack in the D register
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(ARegEqM)
+                            .Append(DRegEqM);
+
+            this.DecrementStackPointerCommand();
+
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(ARegEqM)
+                            .Append(DRegEqMMinusD);
+
+            // TODO: Actual logic implementation?
+
+            this.IncrementStackPointerCommand();
         }
         #endregion
 
