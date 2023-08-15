@@ -31,6 +31,8 @@ namespace VMTranslator.Implementations
         private const string MRegEqMinusM = "M=-M\n";
         private const string MRegEqDPlusOne = "M=D+1\n";
         private const string MRegEqOne = "M=1\n";
+        private const string MRegEqMinusOne = "M=-1\n";
+        private const string MRegEqZero = "M=0\n";
 
         public CodeWriter(string fileName)
         {
@@ -43,7 +45,7 @@ namespace VMTranslator.Implementations
             this.transformed.Append(instruction.CommentOut());
         }
 
-        public void WriteArithmetic(string command)
+        public void WriteArithmetic(string command, int counter)
         {
             if (!Constants.ArithmeticCommandKeywords.Contains(command))
             {
@@ -101,9 +103,9 @@ namespace VMTranslator.Implementations
                 return;
             }
 
-            if(command == "gt")
+            if (command == "gt")
             {
-                HandleGreaterThanCommand();
+                HandleGreaterThanCommand(counter);
 
                 return;
             }
@@ -268,7 +270,7 @@ namespace VMTranslator.Implementations
             this.DecrementStackPointerCommand();
 
             string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
-            string aInstructinoForR13 = "R13".ToAInstruction();
+            string aInstructionForR13 = "R13".ToAInstruction();
 
             // Store last value from the stack in the D register
             this.transformed.Append(aInstructionForStackPointer)
@@ -293,7 +295,7 @@ namespace VMTranslator.Implementations
             // Store the value 1 to Register 13
             // Use it for logical AND to see if the integers are equal
             // If x - y == 0; then !0 == 1; 1 AND 1 will output true
-            this.transformed.Append(aInstructinoForR13)
+            this.transformed.Append(aInstructionForR13)
                             .Append(MRegEqOne)
                             .Append(DRegEqDAndM);
 
@@ -308,12 +310,11 @@ namespace VMTranslator.Implementations
             return;
         }
 
-        private void HandleGreterThanCommand()
+        private void HandleGreaterThanCommand(int counter)
         {
             this.DecrementStackPointerCommand();
 
             string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
-            string aInstructinoForR13 = "R13".ToAInstruction();
 
             // Store last value from the stack in the D register
             this.transformed.Append(aInstructionForStackPointer)
@@ -326,9 +327,61 @@ namespace VMTranslator.Implementations
                             .Append(ARegEqM)
                             .Append(DRegEqMMinusD);
 
-            // TODO: Actual logic implementation?
+            this.ComparisonLabelTemplate(counter);
 
             this.IncrementStackPointerCommand();
+        }
+
+        private void ComparisonLabelTemplate(int counter)
+        {
+            string positiveLabel = $"POSITIVE.{counter}";
+            string negativeLabel = $"NEGATIVE.{counter}";
+            string endLabel = $"END.{counter}";
+
+            string positiveLabelSymbolDeclaration = positiveLabel.ToLabelSymbolDeclaration();
+            string negativeLabelSymbolDeclaration = negativeLabel.ToLabelSymbolDeclaration();
+            string endLabelSymbolDeclaration = endLabel.ToLabelSymbolDeclaration();
+
+            string aInstructionForPositiveScenario = positiveLabel.ToAInstruction();
+            string aInstructionForNegativeScenario = negativeLabel.ToAInstruction();
+            string aInstructionForEnd = endLabel.ToAInstruction();
+
+            string aInstructionForR13 = "R13".ToAInstruction();
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
+
+            string dGreaterThanZeroJumpCommand = ConstructJumpCommand("D", Constants.Mnemonics.Jumps.GreaterThan);
+            string unconditionalJumpCommand = ConstructJumpCommand("0", Constants.Mnemonics.Jumps.Uncoditional);
+
+            this.transformed.Append(aInstructionForPositiveScenario)
+                            .Append(dGreaterThanZeroJumpCommand);
+
+            this.transformed.Append(aInstructionForNegativeScenario)
+                            .Append(unconditionalJumpCommand);
+
+            // TODO: these two can and should be abstracted ConstructLabelBody(x);
+            this.transformed.Append(positiveLabelSymbolDeclaration)
+                            .Append(aInstructionForR13)
+                            .Append(MRegEqMinusOne)
+                            .Append(DRegEqM)
+                            .Append(aInstructionForEnd)
+                            .Append(unconditionalJumpCommand);
+
+            this.transformed.Append(negativeLabelSymbolDeclaration)
+                            .Append(aInstructionForR13)
+                            .Append(MRegEqZero)
+                            .Append(DRegEqM)
+                            .Append(aInstructionForEnd)
+                            .Append(unconditionalJumpCommand);
+
+            this.transformed.Append(endLabelSymbolDeclaration)
+                            .Append(aInstructionForStackPointer)
+                            .Append(ARegEqM)
+                            .Append(MRegEqD);
+        }
+
+        private string ConstructJumpCommand(string operand, string jumpCommand)
+        {
+            return $"{operand};{jumpCommand}\n";
         }
         #endregion
 
@@ -570,7 +623,7 @@ namespace VMTranslator.Implementations
 
             string aInstructionForIndex = $"{index}".ToAInstruction();
             string aInstructionForSegment = segmentMnemonic.ToAInstruction();
-            string aInstructinoForR13 = "R13".ToAInstruction();
+            string aInstructionForR13 = "R13".ToAInstruction();
             string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
 
             // Store (LCL|ARG|THIS|THAT + Index) in a free register R13
@@ -578,7 +631,7 @@ namespace VMTranslator.Implementations
                             .Append(DRegEqA)
                             .Append(aInstructionForSegment)
                             .Append(DRegEqDPlusM)
-                            .Append(aInstructinoForR13)
+                            .Append(aInstructionForR13)
                             .Append(MRegEqD);
 
             // Store RAM[SP] in the D register
@@ -587,7 +640,7 @@ namespace VMTranslator.Implementations
             this.transformed.Append(aInstructionForStackPointer)
                             .Append(ARegEqM)
                             .Append(DRegEqM)
-                            .Append(aInstructinoForR13)
+                            .Append(aInstructionForR13)
                             .Append(ARegEqM)
                             .Append(MRegEqD);
         }

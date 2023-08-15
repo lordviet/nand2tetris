@@ -37,6 +37,11 @@ namespace VMTranslator.Extensions
             return $"@{source}\n";
         }
 
+        public static string ToLabelSymbolDeclaration(this string source)
+        {
+            return $"({source})\n";
+        }
+
         public static string? ToSegmentMnemonic(this string source)
         {
             return source switch

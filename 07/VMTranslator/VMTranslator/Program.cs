@@ -61,7 +61,7 @@ class Program
 
             if (currentInstructionType == CommandType.Arithmetic)
             {
-                writer.WriteArithmetic(parser.FirstArg());
+                writer.WriteArithmetic(parser.FirstArg(), parser.GetCurrentCounter());
             }
 
             parser.Advance();

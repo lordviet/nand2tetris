@@ -24,6 +24,12 @@
                 public const string That = "THAT";
             }
 
+            public static class Jumps
+            {
+                public const string GreaterThan = "JGT";
+                public const string LessThan = "JLT";
+                public const string Uncoditional = "JMP";
+            }
         }
     }
 }

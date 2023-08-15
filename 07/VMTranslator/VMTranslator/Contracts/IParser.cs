@@ -6,6 +6,8 @@ namespace VMTranslator.Contracts
     {
         string GetCurrentInstruction();
 
+        int GetCurrentCounter();
+
         bool HasMoreCommands();
 
         void Advance();

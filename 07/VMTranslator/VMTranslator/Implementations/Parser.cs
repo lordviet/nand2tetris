@@ -15,10 +15,14 @@ namespace VMTranslator.Implementations
             this.counter = 0;
         }
 
-        // TODO: Possibly private, we'll see.
         public string GetCurrentInstruction()
         {
             return this.fileContents[this.counter];
+        }
+
+        public int GetCurrentCounter()
+        {
+            return this.counter;
         }
 
         public bool HasMoreCommands()
