@@ -110,6 +110,13 @@ namespace VMTranslator.Implementations
                 return;
             }
 
+            if (command == "lt")
+            {
+                HandleLessThanCommand(counter);
+
+                return;
+            }
+
             throw new NotImplementedException();
         }
 
@@ -312,76 +319,12 @@ namespace VMTranslator.Implementations
 
         private void HandleGreaterThanCommand(int counter)
         {
-            this.DecrementStackPointerCommand();
-
-            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
-
-            // Store last value from the stack in the D register
-            this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(DRegEqM);
-
-            this.DecrementStackPointerCommand();
-
-            this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(DRegEqMMinusD);
-
-            this.ComparisonLabelTemplate(counter);
-
-            this.IncrementStackPointerCommand();
+            this.ComparisonBodyTemplate(counter, Constants.Mnemonics.Jumps.GreaterThan);
         }
 
-        private void ComparisonLabelTemplate(int counter)
+        private void HandleLessThanCommand(int counter)
         {
-            string positiveLabel = $"POSITIVE.{counter}";
-            string negativeLabel = $"NEGATIVE.{counter}";
-            string endLabel = $"END.{counter}";
-
-            string positiveLabelSymbolDeclaration = positiveLabel.ToLabelSymbolDeclaration();
-            string negativeLabelSymbolDeclaration = negativeLabel.ToLabelSymbolDeclaration();
-            string endLabelSymbolDeclaration = endLabel.ToLabelSymbolDeclaration();
-
-            string aInstructionForPositiveScenario = positiveLabel.ToAInstruction();
-            string aInstructionForNegativeScenario = negativeLabel.ToAInstruction();
-            string aInstructionForEnd = endLabel.ToAInstruction();
-
-            string aInstructionForR13 = "R13".ToAInstruction();
-            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
-
-            string dGreaterThanZeroJumpCommand = ConstructJumpCommand("D", Constants.Mnemonics.Jumps.GreaterThan);
-            string unconditionalJumpCommand = ConstructJumpCommand("0", Constants.Mnemonics.Jumps.Uncoditional);
-
-            this.transformed.Append(aInstructionForPositiveScenario)
-                            .Append(dGreaterThanZeroJumpCommand);
-
-            this.transformed.Append(aInstructionForNegativeScenario)
-                            .Append(unconditionalJumpCommand);
-
-            // TODO: these two can and should be abstracted ConstructLabelBody(x);
-            this.transformed.Append(positiveLabelSymbolDeclaration)
-                            .Append(aInstructionForR13)
-                            .Append(MRegEqMinusOne)
-                            .Append(DRegEqM)
-                            .Append(aInstructionForEnd)
-                            .Append(unconditionalJumpCommand);
-
-            this.transformed.Append(negativeLabelSymbolDeclaration)
-                            .Append(aInstructionForR13)
-                            .Append(MRegEqZero)
-                            .Append(DRegEqM)
-                            .Append(aInstructionForEnd)
-                            .Append(unconditionalJumpCommand);
-
-            this.transformed.Append(endLabelSymbolDeclaration)
-                            .Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(MRegEqD);
-        }
-
-        private string ConstructJumpCommand(string operand, string jumpCommand)
-        {
-            return $"{operand};{jumpCommand}\n";
+            this.ComparisonBodyTemplate(counter, Constants.Mnemonics.Jumps.LessThan);
         }
         #endregion
 
@@ -657,6 +600,76 @@ namespace VMTranslator.Implementations
         {
             this.transformed.Append(Constants.Mnemonics.StackPointer.ToAInstruction())
                             .Append(MMinusOne);
+        }
+
+        // Handles GT & LT
+        private void ComparisonBodyTemplate(int counter, string jumpMnemonic)
+        {
+            this.DecrementStackPointerCommand();
+
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
+
+            // Store last value from the stack in the D register
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(ARegEqM)
+                            .Append(DRegEqM);
+
+            this.DecrementStackPointerCommand();
+
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(ARegEqM)
+                            .Append(DRegEqMMinusD);
+
+            this.ComparisonLabelTemplate(counter, jumpMnemonic);
+
+            this.IncrementStackPointerCommand();
+        }
+
+        private void ComparisonLabelTemplate(int counter, string jumpMnemonic)
+        {
+            string positiveLabel = $"POSITIVE.{counter}";
+            string negativeLabel = $"NEGATIVE.{counter}";
+            string endLabel = $"END.{counter}";
+
+            string positiveLabelSymbolDeclaration = positiveLabel.ToLabelSymbolDeclaration();
+            string negativeLabelSymbolDeclaration = negativeLabel.ToLabelSymbolDeclaration();
+            string endLabelSymbolDeclaration = endLabel.ToLabelSymbolDeclaration();
+
+            string aInstructionForPositiveScenario = positiveLabel.ToAInstruction();
+            string aInstructionForNegativeScenario = negativeLabel.ToAInstruction();
+            string aInstructionForEnd = endLabel.ToAInstruction();
+
+            string aInstructionForR13 = "R13".ToAInstruction();
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
+
+            string dPostComparisonJumpCommand = "D".ToJumpCommand(jumpMnemonic);
+            string unconditionalJumpCommand = "0".ToJumpCommand(Constants.Mnemonics.Jumps.Uncoditional);
+
+            this.transformed.Append(aInstructionForPositiveScenario)
+                            .Append(dPostComparisonJumpCommand);
+
+            this.transformed.Append(aInstructionForNegativeScenario)
+                            .Append(unconditionalJumpCommand);
+
+            // TODO: these two can and should be abstracted ConstructLabelBody(x);
+            this.transformed.Append(positiveLabelSymbolDeclaration)
+                            .Append(aInstructionForR13)
+                            .Append(MRegEqMinusOne)
+                            .Append(DRegEqM)
+                            .Append(aInstructionForEnd)
+                            .Append(unconditionalJumpCommand);
+
+            this.transformed.Append(negativeLabelSymbolDeclaration)
+                            .Append(aInstructionForR13)
+                            .Append(MRegEqZero)
+                            .Append(DRegEqM)
+                            .Append(aInstructionForEnd)
+                            .Append(unconditionalJumpCommand);
+
+            this.transformed.Append(endLabelSymbolDeclaration)
+                            .Append(aInstructionForStackPointer)
+                            .Append(ARegEqM)
+                            .Append(MRegEqD);
         }
         #endregion
 

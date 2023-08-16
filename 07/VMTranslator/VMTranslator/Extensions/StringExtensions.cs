@@ -42,6 +42,11 @@ namespace VMTranslator.Extensions
             return $"({source})\n";
         }
 
+        public static string ToJumpCommand(this string operand, string jumpCommand)
+        {
+            return $"{operand};{jumpCommand}\n";
+        }
+
         public static string? ToSegmentMnemonic(this string source)
         {
             return source switch
