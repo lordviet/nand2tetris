@@ -52,72 +52,46 @@ namespace VMTranslator.Implementations
                 throw new ArgumentException($"Command '{command}' is not a valid artihmetic command.");
             }
 
-            // TODO: introduce an enum ArithmeticCommand and use a swtich to exhaust it
+            ArithmeticCommand arithmeticCommand = command.ToArithmeticCommand();
 
-            if (command == "add")
+            switch (arithmeticCommand)
             {
-                HandleAddCommand();
+                case ArithmeticCommand.Addition:
+                    HandleAddCommand();
+                    return;
 
-                return;
+                case ArithmeticCommand.Subtraction:
+                    HandleSubCommand();
+                    return;
+
+                case ArithmeticCommand.Negation:
+                    HandleNegCommand();
+                    return;
+
+                case ArithmeticCommand.And:
+                    HandleAndCommand();
+                    return;
+
+                case ArithmeticCommand.Or:
+                    HandleOrCommand();
+                    return;
+
+                case ArithmeticCommand.Not:
+                    HandleNotCommand();
+                    return;
+
+                case ArithmeticCommand.Equality:
+                    HandleEqCommand();
+                    return;
+
+                case ArithmeticCommand.GreaterThan:
+                    HandleGreaterThanCommand(counter);
+                    return;
+
+                case ArithmeticCommand.LessThan:
+                    HandleLessThanCommand(counter);
+                    return;
             }
-
-            if (command == "sub")
-            {
-                HandleSubCommand();
-
-                return;
-            }
-
-            if (command == "neg")
-            {
-                HandleNegCommand();
-
-                return;
-            }
-
-            if (command == "and")
-            {
-                HandleAndCommand();
-
-                return;
-            }
-
-            if (command == "or")
-            {
-                HandleOrCommand();
-
-                return;
-            }
-
-            if (command == "not")
-            {
-                HandleNotCommand();
-
-                return;
-            }
-
-            if (command == "eq")
-            {
-                HandleEqCommand();
-
-                return;
-            }
-
-            if (command == "gt")
-            {
-                HandleGreaterThanCommand(counter);
-
-                return;
-            }
-
-            if (command == "lt")
-            {
-                HandleLessThanCommand(counter);
-
-                return;
-            }
-
-            throw new NotImplementedException();
         }
 
         public void WritePushPop(CommandType commandType, string segment, int index)

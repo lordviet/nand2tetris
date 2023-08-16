@@ -74,6 +74,23 @@ namespace VMTranslator.Extensions
                 _ => throw new ArgumentException($"Unexpected segment '{source}'!")
             };
         }
+
+        public static ArithmeticCommand ToArithmeticCommand(this string source)
+        {
+            return source switch
+            {
+                "add" => ArithmeticCommand.Addition,
+                "sub" => ArithmeticCommand.Subtraction,
+                "neg" => ArithmeticCommand.Negation,
+                "eq" => ArithmeticCommand.Equality,
+                "gt" => ArithmeticCommand.GreaterThan,
+                "lt" => ArithmeticCommand.LessThan,
+                "and" => ArithmeticCommand.And,
+                "or" => ArithmeticCommand.Or,
+                "not" => ArithmeticCommand.Not,
+                _ => throw new ArgumentException($"Unexpected arithmetic command '{source}'!")
+            };
+        }
     }
 }
 
