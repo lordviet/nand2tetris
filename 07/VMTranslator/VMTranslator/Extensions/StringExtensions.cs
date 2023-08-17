@@ -68,7 +68,7 @@ namespace VMTranslator.Extensions
                 "temp" => Segment.Temp,
                 "pointer" => Segment.Pointer,
                 "local" => Segment.Local,
-                "arg" => Segment.Arg,
+                "argument" => Segment.Arg,
                 "this" => Segment.This,
                 "that" => Segment.That,
                 _ => throw new ArgumentException($"Unexpected segment '{source}'!")
