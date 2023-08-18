@@ -17,6 +17,7 @@ namespace VMTranslator.Implementations
         private const string DRegEqM = "D=M\n";
         private const string ARegEqM = "A=M\n";
         private const string MRegEqD = "M=D\n";
+        private const string MRegEqExclD = "M=!D\n";
 
         private const string DRegEqDPlusM = "D=D+M\n";
         private const string DRegEqMMinusD = "D=M-D\n";
@@ -29,7 +30,6 @@ namespace VMTranslator.Implementations
         private const string MPlusOne = "M=M+1\n";
         private const string MMinusOne = "M=M-1\n";
         private const string MRegEqMinusM = "M=-M\n";
-        private const string MRegEqDPlusOne = "M=D+1\n";
         private const string MRegEqOne = "M=1\n";
         private const string MRegEqMinusOne = "M=-1\n";
         private const string MRegEqZero = "M=0\n";
@@ -190,11 +190,12 @@ namespace VMTranslator.Implementations
 
             string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
 
-            // To negate a two's complement number, all the bits are inverted and 1 is added to the result. 
+            // Usually to negate a two's complement number, all the bits are inverted and 1 is added to the result.
+            // However, in this case only the inverted bits are going to be kept.
             this.transformed.Append(aInstructionForStackPointer)
                             .Append(ARegEqM)
                             .Append(DRegEqExclM) // Invert the bits
-                            .Append(MRegEqDPlusOne); // Add 1 to the result
+                            .Append(MRegEqD);
 
             this.IncrementStackPointerCommand();
 
@@ -269,9 +270,7 @@ namespace VMTranslator.Implementations
                             .Append(DRegEqMMinusD);
 
             // Strip the value to either zero or one and negate it
-            this.transformed.Append(DRegEqExclD)
-                            .Append(DRegEqExclD)
-                            .Append(DRegEqExclD);
+            this.transformed.Append(DRegEqExclD);
 
             // Store the value 1 to Register 13
             // Use it for logical AND to see if the integers are equal
@@ -280,10 +279,11 @@ namespace VMTranslator.Implementations
                             .Append(MRegEqOne)
                             .Append(DRegEqDAndM);
 
-            // Store the result in the next address shown by the stack pointer
+            // Store the inverted result in the next address shown by the stack pointer and add 1 to retrieve actual value
             this.transformed.Append(aInstructionForStackPointer)
                             .Append(ARegEqM)
-                            .Append(MRegEqD);
+                            .Append(MRegEqExclD)
+                            .Append(MPlusOne);
 
             // SP++
             this.IncrementStackPointerCommand();
