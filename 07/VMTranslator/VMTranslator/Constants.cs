@@ -31,6 +31,39 @@
                 public const string Uncoditional = "JMP";
             }
         }
+
+        public static class RegisterCommands
+        {
+            public static class A
+            {
+                public const string EqM = "A=M\n";
+                public const string EqDPlusM = "A=D+M\n";
+            }
+
+            public static class D
+            {
+                public const string EqA = "D=A\n";
+                public const string EqM = "D=M\n";
+                public const string EqDPlusM = "D=D+M\n";
+                public const string EqMMinusD = "D=M-D\n";
+                public const string EqDAndM = "D=D&M\n";
+                public const string EqDOrM = "D=D|M\n";
+                public const string EqExclD = "D=!D\n";
+                public const string EqExclM = "D=!M\n";
+            }
+
+            public static class M
+            {
+                public const string EqD = "M=D\n";
+                public const string EqExclD = "M=!D\n";
+                public const string EqMPlusOne = "M=M+1\n";
+                public const string EqMMinusOne = "M=M-1\n";
+                public const string EqMinusM = "M=-M\n";
+                public const string EqOne = "M=1\n";
+                public const string EqMinusOne = "M=-1\n";
+                public const string EqZero = "M=0\n";
+            }
+        }
     }
 }
 

@@ -1,9 +1,12 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using VMTranslator.Contracts;
 using VMTranslator.Enums;
 using VMTranslator.Exceptions;
 using VMTranslator.Extensions;
+
+using AReg = VMTranslator.Constants.RegisterCommands.A;
+using DReg = VMTranslator.Constants.RegisterCommands.D;
+using MReg = VMTranslator.Constants.RegisterCommands.M;
 
 namespace VMTranslator.Implementations
 {
@@ -11,29 +14,6 @@ namespace VMTranslator.Implementations
     {
         private readonly string fileName;
         private readonly StringBuilder transformed;
-
-        // TODO: idea make different extension methods over the string builder F(sb) => sb and chain them; document them in a human-readable way
-        // TODO: introduce common command store and document
-        private const string DRegEqA = "D=A\n";
-        private const string DRegEqM = "D=M\n";
-        private const string ARegEqM = "A=M\n";
-        private const string MRegEqD = "M=D\n";
-        private const string MRegEqExclD = "M=!D\n";
-
-        private const string DRegEqDPlusM = "D=D+M\n";
-        private const string DRegEqMMinusD = "D=M-D\n";
-        private const string DRegEqDAndM = "D=D&M\n";
-        private const string DRegEqDOrM = "D=D|M\n";
-        private const string DRegEqExclD = "D=!D\n";
-        private const string DRegEqExclM = "D=!M\n";
-        private const string ARegEqDPlusM = "A=D+M\n";
-
-        private const string MPlusOne = "M=M+1\n";
-        private const string MMinusOne = "M=M-1\n";
-        private const string MRegEqMinusM = "M=-M\n";
-        private const string MRegEqOne = "M=1\n";
-        private const string MRegEqMinusOne = "M=-1\n";
-        private const string MRegEqZero = "M=0\n";
 
         public CodeWriter(string fileName)
         {
@@ -97,7 +77,6 @@ namespace VMTranslator.Implementations
 
         public void WritePushPop(CommandType commandType, string segment, int index)
         {
-            // TODO: use a generalized version of HandlePushPopInMemorySegment?
             Segment memorySegment = segment.ToSegmentEnum();
 
             switch (memorySegment)
@@ -133,15 +112,15 @@ namespace VMTranslator.Implementations
             string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
 
             this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(DRegEqM);
+                            .Append(AReg.EqM)
+                            .Append(DReg.EqM);
 
             this.DecrementStackPointerCommand();
 
             this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(DRegEqDPlusM)
-                            .Append(MRegEqD);
+                            .Append(AReg.EqM)
+                            .Append(DReg.EqDPlusM)
+                            .Append(MReg.EqD);
 
             this.IncrementStackPointerCommand();
 
@@ -155,15 +134,15 @@ namespace VMTranslator.Implementations
             string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
 
             this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(DRegEqM);
+                            .Append(AReg.EqM)
+                            .Append(DReg.EqM);
 
             this.DecrementStackPointerCommand();
 
             this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(DRegEqMMinusD)
-                            .Append(MRegEqD);
+                            .Append(AReg.EqM)
+                            .Append(DReg.EqMMinusD)
+                            .Append(MReg.EqD);
 
             this.IncrementStackPointerCommand();
 
@@ -177,8 +156,8 @@ namespace VMTranslator.Implementations
             string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
 
             this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(MRegEqMinusM);
+                            .Append(AReg.EqM)
+                            .Append(MReg.EqMinusM);
 
             this.IncrementStackPointerCommand();
 
@@ -194,9 +173,9 @@ namespace VMTranslator.Implementations
             // Usually to negate a two's complement number, all the bits are inverted and 1 is added to the result.
             // However, in this case only the inverted bits are going to be kept.
             this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(DRegEqExclM) // Invert the bits
-                            .Append(MRegEqD);
+                            .Append(AReg.EqM)
+                            .Append(DReg.EqExclM) // Invert the bits
+                            .Append(MReg.EqD);
 
             this.IncrementStackPointerCommand();
 
@@ -210,15 +189,15 @@ namespace VMTranslator.Implementations
             string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
 
             this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(DRegEqM);
+                            .Append(AReg.EqM)
+                            .Append(DReg.EqM);
 
             this.DecrementStackPointerCommand();
 
             this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(DRegEqDAndM)
-                            .Append(MRegEqD);
+                            .Append(AReg.EqM)
+                            .Append(DReg.EqDAndM)
+                            .Append(MReg.EqD);
 
             this.IncrementStackPointerCommand();
 
@@ -232,15 +211,15 @@ namespace VMTranslator.Implementations
             string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
 
             this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(DRegEqM);
+                            .Append(AReg.EqM)
+                            .Append(DReg.EqM);
 
             this.DecrementStackPointerCommand();
 
             this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(DRegEqDOrM)
-                            .Append(MRegEqD);
+                            .Append(AReg.EqM)
+                            .Append(DReg.EqDOrM)
+                            .Append(MReg.EqD);
 
             this.IncrementStackPointerCommand();
 
@@ -257,8 +236,8 @@ namespace VMTranslator.Implementations
 
             // Store last value from the stack in the D register
             this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(DRegEqM);
+                            .Append(AReg.EqM)
+                            .Append(DReg.EqM);
 
             // SP--
             this.DecrementStackPointerCommand();
@@ -267,24 +246,24 @@ namespace VMTranslator.Implementations
             // Subtract the value in the D register from it
             // Store the result from the subtraction in the D register
             this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(DRegEqMMinusD);
+                            .Append(AReg.EqM)
+                            .Append(DReg.EqMMinusD);
 
             // Strip the value to either zero or one and negate it
-            this.transformed.Append(DRegEqExclD);
+            this.transformed.Append(DReg.EqExclD);
 
             // Store the value 1 to Register 13
             // Use it for logical AND to see if the integers are equal
             // If x - y == 0; then !0 == 1; 1 AND 1 will output true
             this.transformed.Append(aInstructionForR13)
-                            .Append(MRegEqOne)
-                            .Append(DRegEqDAndM);
+                            .Append(MReg.EqOne)
+                            .Append(DReg.EqDAndM);
 
             // Store the inverted result in the next address shown by the stack pointer and add 1 to retrieve actual value
             this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(MRegEqExclD)
-                            .Append(MPlusOne);
+                            .Append(AReg.EqM)
+                            .Append(MReg.EqExclD)
+                            .Append(MReg.EqMPlusOne);
 
             // SP++
             this.IncrementStackPointerCommand();
@@ -394,12 +373,12 @@ namespace VMTranslator.Implementations
 
             // Store @index in D register
             this.transformed.Append(aInstructionForIndex)
-                            .Append(DRegEqA);
+                            .Append(DReg.EqA);
 
             // RAM[SP] = index
             this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(MRegEqD);
+                            .Append(AReg.EqM)
+                            .Append(MReg.EqD);
 
             // SP++
             this.IncrementStackPointerCommand();
@@ -439,12 +418,12 @@ namespace VMTranslator.Implementations
 
             // Store RAM[Address] in D register
             this.transformed.Append(aInstructionForSegment)
-                            .Append(DRegEqM);
+                            .Append(DReg.EqM);
 
             // RAM[SP] = RAM[address]
             this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(MRegEqD);
+                            .Append(AReg.EqM)
+                            .Append(MReg.EqD);
 
             this.IncrementStackPointerCommand();
         }
@@ -458,12 +437,12 @@ namespace VMTranslator.Implementations
 
             // Store RAM[SP] in the D register
             this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(DRegEqM);
+                            .Append(AReg.EqM)
+                            .Append(DReg.EqM);
 
             // RAM[address] = RAM[SP]
             this.transformed.Append(aInstructionForSegment)
-                            .Append(MRegEqD);
+                            .Append(MReg.EqD);
         }
 
         private void HandlePushInPointerSegment(int index)
@@ -473,13 +452,13 @@ namespace VMTranslator.Implementations
 
             // Store RAM[THIS/THAT] in D register
             this.transformed.Append(aInstructionForPointer)
-                            .Append(ARegEqM)
-                            .Append(DRegEqA);
+                            .Append(AReg.EqM)
+                            .Append(DReg.EqA);
 
             // RAM[SP] = RAM[THIS/THAT] (stored in D register)
             this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(MRegEqD);
+                            .Append(AReg.EqM)
+                            .Append(MReg.EqD);
 
             // SP++
             this.IncrementStackPointerCommand();
@@ -495,12 +474,12 @@ namespace VMTranslator.Implementations
 
             // Store RAM[SP] in the D register
             this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(DRegEqM);
+                            .Append(AReg.EqM)
+                            .Append(DReg.EqM);
 
             // THIS/THAT = RAM[SP]
             this.transformed.Append(aInstructionForPointer)
-                            .Append(MRegEqD);
+                            .Append(MReg.EqD);
         }
 
         private void HandlePushInMemorySegment(int index, string segmentMnemonic)
@@ -511,15 +490,15 @@ namespace VMTranslator.Implementations
 
             // Store (LCL|ARG|THIS|THAT + Index) in D register
             this.transformed.Append(aInstructionForIndex)
-                            .Append(DRegEqA)
+                            .Append(DReg.EqA)
                             .Append(aInstructionForSegment)
-                            .Append(ARegEqDPlusM)
-                            .Append(DRegEqM);
+                            .Append(AReg.EqDPlusM)
+                            .Append(DReg.EqM);
 
             // RAM[SP] = RAM[LCL|ARG|THIS|THAT + Index]
             this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(MRegEqD);
+                            .Append(AReg.EqM)
+                            .Append(MReg.EqD);
 
             // SP++
             this.IncrementStackPointerCommand();
@@ -537,21 +516,21 @@ namespace VMTranslator.Implementations
 
             // Store (LCL|ARG|THIS|THAT + Index) in a free register R13
             this.transformed.Append(aInstructionForIndex)
-                            .Append(DRegEqA)
+                            .Append(DReg.EqA)
                             .Append(aInstructionForSegment)
-                            .Append(DRegEqDPlusM)
+                            .Append(DReg.EqDPlusM)
                             .Append(aInstructionForR13)
-                            .Append(MRegEqD);
+                            .Append(MReg.EqD);
 
             // Store RAM[SP] in the D register
             // Retrieve the pointer (LCL|ARG|THIS|THAT + Index) from R13
             // RAM[LCL|ARG|THIS|THAT + Index] = RAM[SP]
             this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(DRegEqM)
+                            .Append(AReg.EqM)
+                            .Append(DReg.EqM)
                             .Append(aInstructionForR13)
-                            .Append(ARegEqM)
-                            .Append(MRegEqD);
+                            .Append(AReg.EqM)
+                            .Append(MReg.EqD);
         }
         #endregion
 
@@ -559,13 +538,13 @@ namespace VMTranslator.Implementations
         private void IncrementStackPointerCommand()
         {
             this.transformed.Append(Constants.Mnemonics.StackPointer.ToAInstruction())
-                            .Append(MPlusOne);
+                            .Append(MReg.EqMPlusOne);
         }
 
         private void DecrementStackPointerCommand()
         {
             this.transformed.Append(Constants.Mnemonics.StackPointer.ToAInstruction())
-                            .Append(MMinusOne);
+                            .Append(MReg.EqMMinusOne);
         }
 
         // Handles GT & LT
@@ -577,14 +556,14 @@ namespace VMTranslator.Implementations
 
             // Store last value from the stack in the D register
             this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(DRegEqM);
+                            .Append(AReg.EqM)
+                            .Append(DReg.EqM);
 
             this.DecrementStackPointerCommand();
 
             this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(DRegEqMMinusD);
+                            .Append(AReg.EqM)
+                            .Append(DReg.EqMMinusD);
 
             this.ComparisonLabelTemplate(counter, jumpMnemonic);
 
@@ -617,25 +596,26 @@ namespace VMTranslator.Implementations
             this.transformed.Append(aInstructionForNegativeScenario)
                             .Append(unconditionalJumpCommand);
 
-            // TODO: these two can and should be abstracted ConstructLabelBody(x);
+            // Positive outcome
             this.transformed.Append(positiveLabelSymbolDeclaration)
                             .Append(aInstructionForR13)
-                            .Append(MRegEqMinusOne)
-                            .Append(DRegEqM)
+                            .Append(MReg.EqMinusOne) // true
+                            .Append(DReg.EqM)
                             .Append(aInstructionForEnd)
                             .Append(unconditionalJumpCommand);
 
+            // Negative outcome
             this.transformed.Append(negativeLabelSymbolDeclaration)
                             .Append(aInstructionForR13)
-                            .Append(MRegEqZero)
-                            .Append(DRegEqM)
+                            .Append(MReg.EqZero) // false
+                            .Append(DReg.EqM)
                             .Append(aInstructionForEnd)
                             .Append(unconditionalJumpCommand);
 
             this.transformed.Append(endLabelSymbolDeclaration)
                             .Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(MRegEqD);
+                            .Append(AReg.EqM)
+                            .Append(MReg.EqD);
         }
         #endregion
 
