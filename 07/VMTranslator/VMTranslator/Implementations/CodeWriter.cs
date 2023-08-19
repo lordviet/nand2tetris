@@ -480,14 +480,15 @@ namespace VMTranslator.Implementations
             string aInstructionForPointer = index.PointerIndexToMnemonicMemorySegment().ToAInstruction();
             string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
 
-            // Store THIS/THAT in D register
+            // Store RAM[THIS/THAT] in D register
             this.transformed.Append(aInstructionForPointer)
+                            .Append(ARegEqM)
                             .Append(DRegEqA);
 
-            // RAM[SP] = THIS/THAT (stored in D register)
+            // RAM[SP] = RAM[THIS/THAT] (stored in D register)
             this.transformed.Append(aInstructionForStackPointer)
                             .Append(ARegEqM)
-                            .Append(DRegEqM);
+                            .Append(MRegEqD);
 
             // SP++
             this.IncrementStackPointerCommand();
