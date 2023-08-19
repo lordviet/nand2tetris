@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using VMTranslator.Contracts;
 using VMTranslator.Enums;
 using VMTranslator.Exceptions;
@@ -111,7 +112,7 @@ namespace VMTranslator.Implementations
                     this.HandlePushPopInTempSegment(commandType, index);
                     return;
                 case Segment.Pointer:
-                    this.HandlePushPopInPointerSegment(commandType, index); // TODO: test this one
+                    this.HandlePushPopInPointerSegment(commandType, index);
                     return;
                 default:
                     this.HandlePushPopInMemorySegment(commandType, index, memorySegment.ToSegmentMnemonic());
@@ -404,52 +405,43 @@ namespace VMTranslator.Implementations
             this.IncrementStackPointerCommand();
         }
 
-        // TODO: HandlePushPop in Static and Temp Segments is identical and can be abstracted further
         private void HandlePushInStaticSegment(int index, string fileName)
         {
             string aInstructionForStaticVariable = $"{fileName}.{index}".ToAInstruction();
-            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
 
-            // Store RAM[@fileName.index] in D register
-            this.transformed.Append(aInstructionForStaticVariable)
-                            .Append(DRegEqM);
-
-            // RAM[SP] = RAM[@fileName.index]
-            this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(MRegEqD);
-
-            this.IncrementStackPointerCommand();
+            this.HandlePushInTempOrStaticSegment(aInstructionForStaticVariable);
         }
 
         private void HandlePopInStaticSegment(int index, string fileName)
         {
-            // SP--
-            this.DecrementStackPointerCommand();
-
             string aInstructionForStaticVariable = $"{fileName}.{index}".ToAInstruction();
-            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
 
-            // Store RAM[SP] in the D register
-            this.transformed.Append(aInstructionForStackPointer)
-                            .Append(ARegEqM)
-                            .Append(DRegEqM);
-
-            // RAM[@fileName.index] = RAM[SP]
-            this.transformed.Append(aInstructionForStaticVariable)
-                            .Append(MRegEqD);
+            this.HandlePopInTempOrStaticSegment(aInstructionForStaticVariable);
         }
 
         private void HandlePushInTempSegment(int index)
         {
             string aInstructionForRegister = $"R{index + Constants.DefaultTempRegisterIndex}".ToAInstruction();
+
+            this.HandlePushInTempOrStaticSegment(aInstructionForRegister);
+        }
+
+        private void HandlePopInTempSegment(int index)
+        {
+            string aInstructionForRegister = $"R{index + Constants.DefaultTempRegisterIndex}".ToAInstruction();
+
+            this.HandlePopInTempOrStaticSegment(aInstructionForRegister);
+        }
+
+        private void HandlePushInTempOrStaticSegment(string aInstructionForSegment)
+        {
             string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
 
-            // Store RAM[@R(5+index)] in D register
-            this.transformed.Append(aInstructionForRegister)
+            // Store RAM[Address] in D register
+            this.transformed.Append(aInstructionForSegment)
                             .Append(DRegEqM);
 
-            // RAM[SP] = RAM[@R(5+index)]
+            // RAM[SP] = RAM[address]
             this.transformed.Append(aInstructionForStackPointer)
                             .Append(ARegEqM)
                             .Append(MRegEqD);
@@ -457,12 +449,11 @@ namespace VMTranslator.Implementations
             this.IncrementStackPointerCommand();
         }
 
-        private void HandlePopInTempSegment(int index)
+        private void HandlePopInTempOrStaticSegment(string aInstructionForSegment)
         {
             // SP--
             this.DecrementStackPointerCommand();
 
-            string aInstructionForRegister = $"R{index + Constants.DefaultTempRegisterIndex}".ToAInstruction();
             string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
 
             // Store RAM[SP] in the D register
@@ -470,8 +461,8 @@ namespace VMTranslator.Implementations
                             .Append(ARegEqM)
                             .Append(DRegEqM);
 
-            // RAM[@R(5+index)] = RAM[SP]
-            this.transformed.Append(aInstructionForRegister)
+            // RAM[address] = RAM[SP]
+            this.transformed.Append(aInstructionForSegment)
                             .Append(MRegEqD);
         }
 
