@@ -5,8 +5,12 @@
         public const string DefaultInputFileExtension = ".vm";
         public const string DefaultOutputFileExtension = ".asm";
 
+        // TODO: Make into its own group Keywords
         public const string PushKeyword = "push";
         public const string PopKeyword = "pop";
+        public const string LabelKeyword = "label";
+        public const string GotoKeyword = "goto";
+        public const string IfKeyword = "if-goto";
 
         public const int DefaultTempRegisterIndex = 5;
 
@@ -29,6 +33,7 @@
                 public const string GreaterThan = "JGT";
                 public const string LessThan = "JLT";
                 public const string Uncoditional = "JMP";
+                public const string NotEqToZero = "JNE";
             }
         }
 

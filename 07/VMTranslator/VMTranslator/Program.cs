@@ -49,19 +49,32 @@ class Program
 
             writer.WriteCommentedOutInstruction(currentInstruction);
 
-            if (currentInstructionType == CommandType.Push)
+            switch (currentInstructionType)
             {
-                writer.WritePushPop(currentInstructionType, parser.FirstArg(), parser.SecondArg());
-            }
+                case CommandType.Push:
+                case CommandType.Pop:
+                    writer.WritePushPop(currentInstructionType, parser.FirstArg(), parser.SecondArg());
+                    break;
 
-            if (currentInstructionType == CommandType.Pop)
-            {
-                writer.WritePushPop(currentInstructionType, parser.FirstArg(), parser.SecondArg());
-            }
+                case CommandType.Arithmetic:
+                    writer.WriteArithmetic(parser.FirstArg(), parser.GetCurrentCounter());
+                    break;
 
-            if (currentInstructionType == CommandType.Arithmetic)
-            {
-                writer.WriteArithmetic(parser.FirstArg(), parser.GetCurrentCounter());
+                case CommandType.Label:
+                    writer.WriteLabel(parser.FirstArg());
+                    break;
+
+                case CommandType.Goto:
+                    writer.WriteGoto(parser.FirstArg());
+                    break;
+
+                case CommandType.If:
+                    writer.WriteIf(parser.FirstArg());
+                    break;
+
+                default:
+                    // TODO: Handle the other cases
+                    break;
             }
 
             parser.Advance();

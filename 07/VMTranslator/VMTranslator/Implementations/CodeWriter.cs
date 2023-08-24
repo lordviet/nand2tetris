@@ -99,6 +99,44 @@ namespace VMTranslator.Implementations
             }
         }
 
+        public void WriteInit()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void WriteLabel(string label)
+        {
+            this.transformed.Append(label.ToLabelSymbolDeclaration());
+        }
+
+        public void WriteGoto(string label)
+        {
+            string aInstructionForLabel = label.ToAInstruction();
+            string unconditionalJumpCommand = "0".ToJumpCommand(Constants.Mnemonics.Jumps.Uncoditional);
+
+            this.transformed.Append(aInstructionForLabel)
+                            .Append(unconditionalJumpCommand);
+        }
+
+        public void WriteIf(string label)
+        {
+            this.DecrementStackPointerCommand();
+
+            string aInstructionForLabel = label.ToAInstruction();
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
+
+            string dPostComparisonJumpCommand = "D".ToJumpCommand(Constants.Mnemonics.Jumps.NotEqToZero);
+
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(AReg.EqM)
+                            .Append(DReg.EqM);
+
+            this.transformed.Append(aInstructionForLabel)
+                            .Append(dPostComparisonJumpCommand);
+
+            this.IncrementStackPointerCommand();
+        }
+
         public string Close()
         {
             return this.transformed.ToString();
