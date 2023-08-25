@@ -133,8 +133,6 @@ namespace VMTranslator.Implementations
 
             this.transformed.Append(aInstructionForLabel)
                             .Append(dPostComparisonJumpCommand);
-
-            this.IncrementStackPointerCommand();
         }
 
         public string Close()
