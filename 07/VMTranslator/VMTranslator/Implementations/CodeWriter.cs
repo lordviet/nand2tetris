@@ -147,7 +147,70 @@ namespace VMTranslator.Implementations
 
         public void WriteFunction(string functionName, int numberOfLocals)
         {
-            throw new NotImplementedException();
+            string funcNameLabelSymbol = functionName.ToLabelSymbolDeclaration();
+
+            string loopStartFuncName = $"LOOP_START.{functionName}";
+            string loopEndFuncName = $"LOOP_END.{functionName}";
+
+            string loopStartFuncNameLabel = loopStartFuncName.ToLabelSymbolDeclaration();
+            string loopEndFuncNameLabel = loopEndFuncName.ToLabelSymbolDeclaration();
+
+            string aInstructionForLoopStartFuncNameLabel = loopStartFuncName.ToAInstruction();
+            string aInstructionForLoopEndFuncNameLabel = loopEndFuncName.ToAInstruction();
+
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
+            string aInstructionForNumberOfLocals = $"{numberOfLocals}".ToAInstruction();
+
+            string aInstructionForR13 = "R13".ToAInstruction();
+            string ainstructionForR14 = "R14".ToAInstruction();
+            string aInstructionForZero = "0".ToAInstruction();
+
+            string dPostComparisonJumpCommand = "D".ToJumpCommand(Constants.Mnemonics.Jumps.EqToZero);
+            string unconditionalJumpCommand = "0".ToJumpCommand(Constants.Mnemonics.Jumps.Uncoditional);
+
+            // Define symbol label for function
+            // Store the number of local variables (nVars) to temp register 13
+            this.transformed.Append(funcNameLabelSymbol)
+                            .Append(aInstructionForNumberOfLocals)
+                            .Append(DReg.EqA)
+                            .Append(aInstructionForR13)
+                            .Append(MReg.EqD);
+
+            // Store 0 in temp register 14 to serve as an index in the loop
+            this.transformed.Append(aInstructionForZero)
+                            .Append(DReg.EqA)
+                            .Append(ainstructionForR14)
+                            .Append(MReg.EqD);
+
+            // Begin loop and store in D register the value nVars - i
+            this.transformed.Append(loopStartFuncNameLabel)
+                            .Append(aInstructionForR13)
+                            .Append(DReg.EqM)
+                            .Append(ainstructionForR14)
+                            .Append(DReg.EqDMinusM);
+
+            // if nVars - i == 0; break the loop
+            this.transformed.Append(aInstructionForLoopEndFuncNameLabel)
+                            .Append(dPostComparisonJumpCommand);
+
+            // RAM[SP] = 0
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(AReg.EqM)
+                            .Append(MReg.EqZero);
+
+            // SP++
+            this.IncrementStackPointerCommand();
+
+            // i++
+            this.transformed.Append(ainstructionForR14)
+                            .Append(MReg.EqMPlusOne);
+
+            // start another iteration
+            this.transformed.Append(aInstructionForLoopStartFuncNameLabel)
+                            .Append(unconditionalJumpCommand);
+
+            // loop end jump location
+            this.transformed.Append(loopEndFuncNameLabel);
         }
 
         public string Close()

@@ -11,6 +11,7 @@
         public const string LabelKeyword = "label";
         public const string GotoKeyword = "goto";
         public const string IfKeyword = "if-goto";
+        public const string FunctionKeyword = "function";
 
         public const int DefaultTempRegisterIndex = 5;
 
@@ -33,6 +34,7 @@
                 public const string GreaterThan = "JGT";
                 public const string LessThan = "JLT";
                 public const string Uncoditional = "JMP";
+                public const string EqToZero = "JEQ";
                 public const string NotEqToZero = "JNE";
             }
         }
@@ -51,6 +53,7 @@
                 public const string EqM = "D=M\n";
                 public const string EqDPlusM = "D=D+M\n";
                 public const string EqMMinusD = "D=M-D\n";
+                public const string EqDMinusM = "D=D-M\n";
                 public const string EqDAndM = "D=D&M\n";
                 public const string EqDOrM = "D=D|M\n";
                 public const string EqExclD = "D=!D\n";

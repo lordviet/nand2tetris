@@ -69,6 +69,11 @@ namespace VMTranslator.Implementations
                 return Enums.CommandType.Goto;
             }
 
+            if (currentInstruction.Contains(Constants.FunctionKeyword))
+            {
+                return Enums.CommandType.Function;
+            }
+
             throw new NotSupportedException($"Could not derive command type out of the following instruction '{currentInstruction}'");
         }
 
