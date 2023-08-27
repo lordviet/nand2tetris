@@ -135,6 +135,21 @@ namespace VMTranslator.Implementations
                             .Append(dPostComparisonJumpCommand);
         }
 
+        public void WriteCall(string functionName, int numberOfArguments)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void WriteReturn()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void WriteFunction(string functionName, int numberOfLocals)
+        {
+            throw new NotImplementedException();
+        }
+
         public string Close()
         {
             return this.transformed.ToString();

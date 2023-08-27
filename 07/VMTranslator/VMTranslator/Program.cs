@@ -1,4 +1,5 @@
 ﻿using VMTranslator.Enums;
+using VMTranslator.Exceptions;
 using VMTranslator.Implementations;
 
 namespace VMTranslator;
@@ -7,6 +8,7 @@ class Program
 {
     static void Main(string[] args)
     {
+        // TODO: Handle cases in which args is a directory and traverse all .vm files there
         if (args == null || args.Length == 0)
         {
             Console.WriteLine($"Usage: VMTranslator <inputFile>{Constants.DefaultInputFileExtension}");
@@ -72,9 +74,20 @@ class Program
                     writer.WriteIf(parser.FirstArg());
                     break;
 
-                default:
-                    // TODO: Handle the other cases
+                case CommandType.Call:
+                    writer.WriteCall(parser.FirstArg(), parser.SecondArg());
                     break;
+
+                case CommandType.Return:
+                    writer.WriteReturn();
+                    break;
+
+                case CommandType.Function:
+                    writer.WriteFunction(parser.FirstArg(), parser.SecondArg());
+                    break;
+
+                default:
+                    throw new UnexpectedCommandTypeException($"Unexpected command type '{currentInstructionType}'!");
             }
 
             parser.Advance();
