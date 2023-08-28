@@ -12,8 +12,11 @@
         public const string GotoKeyword = "goto";
         public const string IfKeyword = "if-goto";
         public const string FunctionKeyword = "function";
+        public const string CallKeyword = "call";
+        public const string ReturnKeyword = "return";
 
         public const int DefaultTempRegisterIndex = 5;
+        public const int DefaultStackPushesBeforeMethodInvocation = 5;
 
         public static readonly string[] ArithmeticCommandKeywords = new string[] { "add", "sub", "neg", "eq", "gt", "lt", "and", "or", "not" };
 
@@ -54,6 +57,7 @@
                 public const string EqDPlusM = "D=D+M\n";
                 public const string EqMMinusD = "D=M-D\n";
                 public const string EqDMinusM = "D=D-M\n";
+                public const string EqAMinusD = "D=A-D\n";
                 public const string EqDAndM = "D=D&M\n";
                 public const string EqDOrM = "D=D|M\n";
                 public const string EqExclD = "D=!D\n";

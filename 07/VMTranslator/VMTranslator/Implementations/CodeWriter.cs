@@ -137,7 +137,56 @@ namespace VMTranslator.Implementations
 
         public void WriteCall(string functionName, int numberOfArguments)
         {
-            throw new NotImplementedException();
+            string returnAddress = $"RETURN_ADDRESS.{functionName}";
+            string returnAddressLabel = returnAddress.ToLabelSymbolDeclaration();
+
+            string aInstructionForReturnAddress = returnAddress.ToAInstruction();
+
+            string aInstructionForNumberOfArguments = $"{numberOfArguments}".ToAInstruction();
+            string aInstructionForStackPushesBeforeMethodInvocation = $"{Constants.DefaultStackPushesBeforeMethodInvocation}".ToAInstruction();
+
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
+            string aInstructionForLocal = Constants.Mnemonics.Segments.Local.ToAInstruction();
+            string aInstructionForArg = Constants.Mnemonics.Segments.Arg.ToAInstruction();
+            string aInstructionForThis = Constants.Mnemonics.Segments.This.ToAInstruction();
+            string aInstructionForThat = Constants.Mnemonics.Segments.That.ToAInstruction();
+
+            // Push return address
+            this.PushAInstructionValueToStack(aInstructionForReturnAddress, isIndex: false);
+
+            // Push LCL
+            this.PushAInstructionValueToStack(aInstructionForLocal, isIndex: true);
+
+            // Push ARG
+            this.PushAInstructionValueToStack(aInstructionForArg, isIndex: true);
+
+            // Push THIS
+            this.PushAInstructionValueToStack(aInstructionForThis, isIndex: true);
+
+            // Push THAT
+            this.PushAInstructionValueToStack(aInstructionForThat, isIndex: true);
+
+            // Reposition ARG = SP - DefaultPushes - nArgs
+            this.transformed.Append(aInstructionForNumberOfArguments)
+                            .Append(DReg.EqA)
+                            .Append(aInstructionForStackPushesBeforeMethodInvocation)
+                            .Append(DReg.EqAMinusD) // D = DefaultPushes - nArgs
+                            .Append(aInstructionForStackPointer)
+                            .Append(DReg.EqMMinusD) // D = SP - DefaultPushes - nArgs
+                            .Append(aInstructionForArg)
+                            .Append(MReg.EqD);
+
+            // Reposition LCL = SP
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(DReg.EqM)
+                            .Append(aInstructionForLocal)
+                            .Append(MReg.EqD);
+
+            // Jump to functionName
+            this.WriteGoto(functionName);
+
+            // Declare a label for the return address
+            this.transformed.Append(returnAddressLabel);
         }
 
         public void WriteReturn()
@@ -659,6 +708,21 @@ namespace VMTranslator.Implementations
         {
             this.transformed.Append(Constants.Mnemonics.StackPointer.ToAInstruction())
                             .Append(MReg.EqMMinusOne);
+        }
+
+        private void PushAInstructionValueToStack(string aInstruction, bool isIndex)
+        {
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
+
+            // Store aInstruction or RAM[aInstruction] in SP
+            // The boolean isIndex dictates whether an A instruction should be treated as a value or an index.
+            this.transformed.Append(aInstruction)
+                            .Append(isIndex ? DReg.EqM : DReg.EqA)
+                            .Append(aInstructionForStackPointer)
+                            .Append(AReg.EqM)
+                            .Append(MReg.EqD);
+
+            this.IncrementStackPointerCommand();
         }
 
         // Handles GT & LT
