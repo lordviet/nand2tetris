@@ -18,6 +18,9 @@
         public const int DefaultTempRegisterIndex = 5;
         public const int DefaultStackPushesBeforeMethodInvocation = 5;
 
+        public const string DefaultEndFrameVariableName = "FRAME";
+        public const string DefaultReturnVariableName = "RETURN";
+
         public static readonly string[] ArithmeticCommandKeywords = new string[] { "add", "sub", "neg", "eq", "gt", "lt", "and", "or", "not" };
 
         public static class Mnemonics
@@ -48,6 +51,7 @@
             {
                 public const string EqM = "A=M\n";
                 public const string EqDPlusM = "A=D+M\n";
+                public const string EqMMinusD = "A=M-D\n";
             }
 
             public static class D
@@ -67,6 +71,7 @@
             public static class M
             {
                 public const string EqD = "M=D\n";
+                public const string EqDPlusOne = "M=D+1\n";
                 public const string EqExclD = "M=!D\n";
                 public const string EqMPlusOne = "M=M+1\n";
                 public const string EqMMinusOne = "M=M-1\n";

@@ -191,7 +191,55 @@ namespace VMTranslator.Implementations
 
         public void WriteReturn()
         {
-            throw new NotImplementedException();
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
+            string aInstructionForLocal = Constants.Mnemonics.Segments.Local.ToAInstruction();
+            string aInstructionForArg = Constants.Mnemonics.Segments.Arg.ToAInstruction();
+            string aInstructionForThis = Constants.Mnemonics.Segments.This.ToAInstruction();
+            string aInstructionForThat = Constants.Mnemonics.Segments.That.ToAInstruction();
+
+            string aInstructionForEndFrame = Constants.DefaultEndFrameVariableName.ToAInstruction();
+            string aInstructionForReturn = Constants.DefaultReturnVariableName.ToAInstruction();
+
+            // FRAME = LCL
+            this.transformed.Append(aInstructionForLocal)
+                            .Append(DReg.EqM)
+                            .Append(aInstructionForEndFrame)
+                            .Append(MReg.EqD);
+
+            // RET = RAM[endFrame - DefaultStackPushes]
+            this.LabelEqualsPointerToEndFrameMinusOffsetTemplate(aInstructionForReturn, Constants.DefaultStackPushesBeforeMethodInvocation);
+
+            // SP--
+            this.DecrementStackPointerCommand();
+
+            // RAM[ARG] = Stack.Pop();
+            this.transformed.Append(aInstructionForStackPointer)
+                            .Append(AReg.EqM)
+                            .Append(DReg.EqM)
+                            .Append(aInstructionForArg)
+                            .Append(AReg.EqM)
+                            .Append(MReg.EqD);
+
+            // SP = ARG + 1
+            this.transformed.Append(aInstructionForArg)
+                            .Append(DReg.EqA)
+                            .Append(aInstructionForStackPointer)
+                            .Append(MReg.EqDPlusOne);
+
+            // THAT = RAM[endFrame - DefaultStackPushes - 1]
+            this.LabelEqualsPointerToEndFrameMinusOffsetTemplate(aInstructionForThat, Constants.DefaultStackPushesBeforeMethodInvocation - 1);
+
+            // THIS = RAM[endFrame - DefaultStackPushes - 2]
+            this.LabelEqualsPointerToEndFrameMinusOffsetTemplate(aInstructionForThis, Constants.DefaultStackPushesBeforeMethodInvocation - 2);
+
+            // ARG = RAM[endFrame - DefaultStackPushes - 3]
+            this.LabelEqualsPointerToEndFrameMinusOffsetTemplate(aInstructionForArg, Constants.DefaultStackPushesBeforeMethodInvocation - 3);
+
+            // LCL = RAM[endFrame - DefaultStackPushes - 4]
+            this.LabelEqualsPointerToEndFrameMinusOffsetTemplate(aInstructionForLocal, Constants.DefaultStackPushesBeforeMethodInvocation - 4);
+
+            // Jump to return
+            this.WriteGoto(Constants.DefaultReturnVariableName);
         }
 
         public void WriteFunction(string functionName, int numberOfLocals)
@@ -793,6 +841,21 @@ namespace VMTranslator.Implementations
             this.transformed.Append(endLabelSymbolDeclaration)
                             .Append(aInstructionForStackPointer)
                             .Append(AReg.EqM)
+                            .Append(MReg.EqD);
+        }
+
+        private void LabelEqualsPointerToEndFrameMinusOffsetTemplate(string aInstructionForLabel, int offset)
+        {
+            string aInstructionForEndFrame = Constants.DefaultEndFrameVariableName.ToAInstruction();
+            string aInstructionForOffset = $"{offset}".ToAInstruction();
+
+            // Label = RAM[endFrame - offset]
+            this.transformed.Append(aInstructionForOffset)
+                            .Append(DReg.EqA)
+                            .Append(aInstructionForEndFrame)
+                            .Append(AReg.EqMMinusD)
+                            .Append(DReg.EqM)
+                            .Append(aInstructionForLabel)
                             .Append(MReg.EqD);
         }
         #endregion
