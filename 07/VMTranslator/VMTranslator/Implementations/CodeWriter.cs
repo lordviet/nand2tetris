@@ -222,21 +222,21 @@ namespace VMTranslator.Implementations
 
             // SP = ARG + 1
             this.transformed.Append(aInstructionForArg)
-                            .Append(DReg.EqA)
+                            .Append(DReg.EqM)
                             .Append(aInstructionForStackPointer)
                             .Append(MReg.EqDPlusOne);
 
-            // THAT = RAM[endFrame - DefaultStackPushes - 1]
-            this.LabelEqualsPointerToEndFrameMinusOffsetTemplate(aInstructionForThat, Constants.DefaultStackPushesBeforeMethodInvocation - 1);
+            // THAT = RAM[endFrame - DefaultStackPushes - 4]
+            this.LabelEqualsPointerToEndFrameMinusOffsetTemplate(aInstructionForThat, Constants.DefaultStackPushesBeforeMethodInvocation - 4);
 
-            // THIS = RAM[endFrame - DefaultStackPushes - 2]
-            this.LabelEqualsPointerToEndFrameMinusOffsetTemplate(aInstructionForThis, Constants.DefaultStackPushesBeforeMethodInvocation - 2);
+            // THIS = RAM[endFrame - DefaultStackPushes - 3]
+            this.LabelEqualsPointerToEndFrameMinusOffsetTemplate(aInstructionForThis, Constants.DefaultStackPushesBeforeMethodInvocation - 3);
 
-            // ARG = RAM[endFrame - DefaultStackPushes - 3]
-            this.LabelEqualsPointerToEndFrameMinusOffsetTemplate(aInstructionForArg, Constants.DefaultStackPushesBeforeMethodInvocation - 3);
+            // ARG = RAM[endFrame - DefaultStackPushes - 2]
+            this.LabelEqualsPointerToEndFrameMinusOffsetTemplate(aInstructionForArg, Constants.DefaultStackPushesBeforeMethodInvocation - 2);
 
-            // LCL = RAM[endFrame - DefaultStackPushes - 4]
-            this.LabelEqualsPointerToEndFrameMinusOffsetTemplate(aInstructionForLocal, Constants.DefaultStackPushesBeforeMethodInvocation - 4);
+            // LCL = RAM[endFrame - DefaultStackPushes - 1]
+            this.LabelEqualsPointerToEndFrameMinusOffsetTemplate(aInstructionForLocal, Constants.DefaultStackPushesBeforeMethodInvocation - 1);
 
             // Jump to return
             this.WriteGoto(Constants.DefaultReturnVariableName);
