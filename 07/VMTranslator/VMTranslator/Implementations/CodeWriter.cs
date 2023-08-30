@@ -197,8 +197,10 @@ namespace VMTranslator.Implementations
             string aInstructionForThis = Constants.Mnemonics.Segments.This.ToAInstruction();
             string aInstructionForThat = Constants.Mnemonics.Segments.That.ToAInstruction();
 
-            string aInstructionForEndFrame = Constants.DefaultEndFrameVariableName.ToAInstruction();
-            string aInstructionForReturn = Constants.DefaultReturnVariableName.ToAInstruction();
+            string aInstructionForEndFrame = "R13".ToAInstruction();
+            string aInstructionForReturn = "R14".ToAInstruction();
+
+            string unconditionalJumpCommand = "0".ToJumpCommand(Constants.Mnemonics.Jumps.Uncoditional);
 
             // FRAME = LCL
             this.transformed.Append(aInstructionForLocal)
@@ -207,7 +209,7 @@ namespace VMTranslator.Implementations
                             .Append(MReg.EqD);
 
             // RET = RAM[endFrame - DefaultStackPushes]
-            this.LabelEqualsPointerToEndFrameMinusOffsetTemplate(aInstructionForReturn, Constants.DefaultStackPushesBeforeMethodInvocation);
+            this.LabelEqualsPointerToEndFrameMinusOffsetTemplate(aInstructionForEndFrame, aInstructionForReturn, Constants.DefaultStackPushesBeforeMethodInvocation);
 
             // SP--
             this.DecrementStackPointerCommand();
@@ -227,19 +229,21 @@ namespace VMTranslator.Implementations
                             .Append(MReg.EqDPlusOne);
 
             // THAT = RAM[endFrame - DefaultStackPushes - 4]
-            this.LabelEqualsPointerToEndFrameMinusOffsetTemplate(aInstructionForThat, Constants.DefaultStackPushesBeforeMethodInvocation - 4);
+            this.LabelEqualsPointerToEndFrameMinusOffsetTemplate(aInstructionForEndFrame, aInstructionForThat, Constants.DefaultStackPushesBeforeMethodInvocation - 4);
 
             // THIS = RAM[endFrame - DefaultStackPushes - 3]
-            this.LabelEqualsPointerToEndFrameMinusOffsetTemplate(aInstructionForThis, Constants.DefaultStackPushesBeforeMethodInvocation - 3);
+            this.LabelEqualsPointerToEndFrameMinusOffsetTemplate(aInstructionForEndFrame, aInstructionForThis, Constants.DefaultStackPushesBeforeMethodInvocation - 3);
 
             // ARG = RAM[endFrame - DefaultStackPushes - 2]
-            this.LabelEqualsPointerToEndFrameMinusOffsetTemplate(aInstructionForArg, Constants.DefaultStackPushesBeforeMethodInvocation - 2);
+            this.LabelEqualsPointerToEndFrameMinusOffsetTemplate(aInstructionForEndFrame, aInstructionForArg, Constants.DefaultStackPushesBeforeMethodInvocation - 2);
 
             // LCL = RAM[endFrame - DefaultStackPushes - 1]
-            this.LabelEqualsPointerToEndFrameMinusOffsetTemplate(aInstructionForLocal, Constants.DefaultStackPushesBeforeMethodInvocation - 1);
+            this.LabelEqualsPointerToEndFrameMinusOffsetTemplate(aInstructionForEndFrame, aInstructionForLocal, Constants.DefaultStackPushesBeforeMethodInvocation - 1);
 
             // Jump to return
-            this.WriteGoto(Constants.DefaultReturnVariableName);
+            this.transformed.Append(aInstructionForReturn)
+                            .Append(AReg.EqM) // Store Return Address in A Register
+                            .Append(unconditionalJumpCommand);
         }
 
         public void WriteFunction(string functionName, int numberOfLocals)
@@ -844,9 +848,8 @@ namespace VMTranslator.Implementations
                             .Append(MReg.EqD);
         }
 
-        private void LabelEqualsPointerToEndFrameMinusOffsetTemplate(string aInstructionForLabel, int offset)
+        private void LabelEqualsPointerToEndFrameMinusOffsetTemplate(string aInstructionForEndFrame, string aInstructionForLabel, int offset)
         {
-            string aInstructionForEndFrame = Constants.DefaultEndFrameVariableName.ToAInstruction();
             string aInstructionForOffset = $"{offset}".ToAInstruction();
 
             // Label = RAM[endFrame - offset]

@@ -18,9 +18,6 @@
         public const int DefaultTempRegisterIndex = 5;
         public const int DefaultStackPushesBeforeMethodInvocation = 5;
 
-        public const string DefaultEndFrameVariableName = "FRAME";
-        public const string DefaultReturnVariableName = "RETURN";
-
         public static readonly string[] ArithmeticCommandKeywords = new string[] { "add", "sub", "neg", "eq", "gt", "lt", "and", "or", "not" };
 
         public static class Mnemonics
