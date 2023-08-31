@@ -43,6 +43,9 @@ class Program
 
         CodeWriter writer = new CodeWriter(fileName);
 
+        // Bootstrap code
+        //writer.WriteInit();
+
         while (parser.HasMoreCommands())
         {
             CommandType currentInstructionType = parser.CommandType();

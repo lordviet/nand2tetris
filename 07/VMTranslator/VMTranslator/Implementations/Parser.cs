@@ -39,6 +39,21 @@ namespace VMTranslator.Implementations
         {
             string currentInstruction = this.GetCurrentInstruction();
 
+            if (currentInstruction.Contains(Constants.CallKeyword))
+            {
+                return Enums.CommandType.Call;
+            }
+
+            if (currentInstruction.Contains(Constants.FunctionKeyword))
+            {
+                return Enums.CommandType.Function;
+            }
+
+            if (currentInstruction.Contains(Constants.ReturnKeyword))
+            {
+                return Enums.CommandType.Return;
+            }
+
             if (currentInstruction.Contains(Constants.PushKeyword))
             {
                 return Enums.CommandType.Push;
@@ -67,21 +82,6 @@ namespace VMTranslator.Implementations
             if (currentInstruction.Contains(Constants.GotoKeyword))
             {
                 return Enums.CommandType.Goto;
-            }
-
-            if (currentInstruction.Contains(Constants.CallKeyword))
-            {
-                return Enums.CommandType.Call;
-            }
-
-            if (currentInstruction.Contains(Constants.FunctionKeyword))
-            {
-                return Enums.CommandType.Function;
-            }
-
-            if (currentInstruction.Contains(Constants.ReturnKeyword))
-            {
-                return Enums.CommandType.Return;
             }
 
             throw new NotSupportedException($"Could not derive command type out of the following instruction '{currentInstruction}'");

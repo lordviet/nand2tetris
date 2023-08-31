@@ -101,7 +101,17 @@ namespace VMTranslator.Implementations
 
         public void WriteInit()
         {
-            throw new NotImplementedException();
+            string aInstructionForStackPointer = Constants.Mnemonics.StackPointer.ToAInstruction();
+            string aInstructionForStackBeginning = $"{Constants.DefaultStandardMappingStackBeginningAddress}".ToAInstruction();
+
+            // Initialize SP=256 (base address of stack pointer)
+            this.transformed.Append(aInstructionForStackBeginning)
+                            .Append(DReg.EqA)
+                            .Append(aInstructionForStackPointer)
+                            .Append(MReg.EqD);
+
+
+            this.WriteCall(Constants.DefaultBootstrapFunctionName, 0);
         }
 
         public void WriteLabel(string label)

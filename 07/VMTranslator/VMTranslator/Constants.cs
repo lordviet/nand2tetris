@@ -15,8 +15,11 @@
         public const string CallKeyword = "call";
         public const string ReturnKeyword = "return";
 
+        public const string DefaultBootstrapFunctionName = "Sys.init";
+
         public const int DefaultTempRegisterIndex = 5;
         public const int DefaultStackPushesBeforeMethodInvocation = 5;
+        public const int DefaultStandardMappingStackBeginningAddress = 256;
 
         public static readonly string[] ArithmeticCommandKeywords = new string[] { "add", "sub", "neg", "eq", "gt", "lt", "and", "or", "not" };
 
