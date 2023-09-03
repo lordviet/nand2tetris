@@ -180,9 +180,9 @@ namespace VMTranslator.Implementations
             this.transformed.Append(aInstructionForNumberOfArguments)
                             .Append(DReg.EqA)
                             .Append(aInstructionForStackPushesBeforeMethodInvocation)
-                            .Append(DReg.EqAMinusD) // D = DefaultPushes - nArgs
+                            .Append(DReg.EqAPlusD) // D = DefaultPushes + nArgs
                             .Append(aInstructionForStackPointer)
-                            .Append(DReg.EqMMinusD) // D = SP - DefaultPushes - nArgs
+                            .Append(DReg.EqMMinusD) // D = SP - (DefaultPushes + nArgs)
                             .Append(aInstructionForArg)
                             .Append(MReg.EqD);
 

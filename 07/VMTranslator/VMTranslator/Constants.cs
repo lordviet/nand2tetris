@@ -61,7 +61,7 @@
                 public const string EqDPlusM = "D=D+M\n";
                 public const string EqMMinusD = "D=M-D\n";
                 public const string EqDMinusM = "D=D-M\n";
-                public const string EqAMinusD = "D=A-D\n";
+                public const string EqAPlusD = "D=A+D\n";
                 public const string EqDAndM = "D=D&M\n";
                 public const string EqDOrM = "D=D|M\n";
                 public const string EqExclD = "D=!D\n";

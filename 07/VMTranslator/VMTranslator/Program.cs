@@ -1,4 +1,5 @@
-﻿using VMTranslator.Enums;
+﻿using System.Text;
+using VMTranslator.Enums;
 using VMTranslator.Exceptions;
 using VMTranslator.Implementations;
 
@@ -8,33 +9,60 @@ class Program
 {
     static void Main(string[] args)
     {
-        // TODO: Handle cases in which args is a directory and traverse all .vm files there
         if (args == null || args.Length == 0)
         {
-            Console.WriteLine($"Usage: VMTranslator <inputFile>{Constants.DefaultInputFileExtension}");
+            Console.WriteLine($"Usage: VMTranslator <inputFile>{Constants.DefaultInputFileExtension} or VMTranslator <directory>");
             return;
         }
 
-        string fileName = args[0];
+        string input = args[0];
 
-        if (!string.Equals(Path.GetExtension(fileName), Constants.DefaultInputFileExtension, StringComparison.OrdinalIgnoreCase))
+        // TODO: Separate into methods of HandleDirectory, HandleFile, all calling translating and saving
+        if (Directory.Exists(input)) // Check if it's a directory
         {
-            Console.WriteLine($"Invalid input file. Please provide a {Constants.DefaultInputFileExtension} file.");
-            return;
+            // Get all .vm files in the directory
+            string[] vmFiles = Directory.GetFiles(input, $"*{Constants.DefaultInputFileExtension}");
+
+            if (vmFiles.Length == 0)
+            {
+                Console.WriteLine($"No '.{Constants.DefaultInputFileExtension}' files found in the directory.");
+                return;
+            }
+
+            StringBuilder concatenatedContents = new StringBuilder();
+
+            foreach (string filePath in vmFiles)
+            {
+                string fileContents = File.ReadAllText(filePath);
+                concatenatedContents.Append(fileContents);
+            }
+
+            string fileNameWithoutExtensions = Path.GetFileNameWithoutExtension(input);
+
+            string translated = TranslateIntermediateCode(concatenatedContents.ToString(), fileNameWithoutExtensions);
+
+            SaveOutputFile(input, translated);
         }
 
-        if (!File.Exists(fileName))
+        else if (File.Exists(input)) // Check if it's a file
         {
-            Console.WriteLine($"Input file '{fileName}' does not exist.");
-            return;
+            if (!string.Equals(Path.GetExtension(input), Constants.DefaultInputFileExtension, StringComparison.OrdinalIgnoreCase))
+            {
+                Console.WriteLine($"Invalid input file. Please provide a {Constants.DefaultInputFileExtension} file.");
+                return;
+            }
+
+            string fileContents = File.ReadAllText(input);
+            string fileNameWithoutExtensions = Path.GetFileNameWithoutExtension(input);
+
+            string translated = TranslateIntermediateCode(fileContents, fileNameWithoutExtensions);
+
+            SaveOutputFile(input, translated);
         }
-
-        string fileContents = File.ReadAllText(fileName);
-        string fileNameWithoutExtensions = Path.GetFileNameWithoutExtension(fileName);
-
-        string translated = TranslateIntermediateCode(fileContents, fileNameWithoutExtensions);
-
-        SaveOutputFile(fileName, translated);
+        else
+        {
+            Console.WriteLine($"Input path '{input}' does not exist.");
+        }
     }
 
     private static string TranslateIntermediateCode(string fileContents, string fileName)
@@ -44,7 +72,7 @@ class Program
         CodeWriter writer = new CodeWriter(fileName);
 
         // Bootstrap code
-        //writer.WriteInit();
+        writer.WriteInit();
 
         while (parser.HasMoreCommands())
         {
