@@ -37,6 +37,7 @@ class Program
             {
                 string fileContents = File.ReadAllText(filePath);
                 string fileNameWithoutExtensionsInternal = Path.GetFileNameWithoutExtension(filePath);
+
                 string translatedInternal = TranslateIntermediateCode(fileContents, fileNameWithoutExtensionsInternal, initialBootstrap);
 
                 initialBootstrap = false;
@@ -44,7 +45,10 @@ class Program
                 translatedFiles.Append(translatedInternal);
             }
 
-            SaveOutputFile(input, translatedFiles.ToString());
+            string? directoryName = Path.GetDirectoryName(vmFiles[0]);
+
+            SaveOutputFileDir(directoryName ?? input, input, translatedFiles.ToString());
+            //SaveOutputFile(input, translatedFiles.ToString());
         }
 
         else if (File.Exists(input)) // Check if it's a file
@@ -131,6 +135,23 @@ class Program
         }
 
         return writer.Close();
+    }
+
+    private static void SaveOutputFileDir(string directoryName, string fileName, string translatedCode)
+    {
+        try
+        {
+            // Combine the directory path with the default output file extension to create the output file path
+            string fileNameWithoutExtensions = Path.GetFileNameWithoutExtension(fileName);
+            string outputFile = Path.Combine(directoryName, $"{fileNameWithoutExtensions}{Constants.DefaultOutputFileExtension}");
+
+            File.WriteAllText(outputFile, translatedCode);
+            Console.WriteLine("Translated successfully. Output file: " + outputFile);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error saving the output file: " + ex.Message);
+        }
     }
 
     private static void SaveOutputFile(string fileName, string translatedCode)
