@@ -29,19 +29,22 @@ class Program
                 return;
             }
 
-            StringBuilder concatenatedContents = new StringBuilder();
+            StringBuilder translatedFiles = new StringBuilder();
+
+            bool initialBootstrap = true;
 
             foreach (string filePath in vmFiles)
             {
                 string fileContents = File.ReadAllText(filePath);
-                concatenatedContents.Append(fileContents);
+                string fileNameWithoutExtensionsInternal = Path.GetFileNameWithoutExtension(filePath);
+                string translatedInternal = TranslateIntermediateCode(fileContents, fileNameWithoutExtensionsInternal, initialBootstrap);
+
+                initialBootstrap = false;
+
+                translatedFiles.Append(translatedInternal);
             }
 
-            string fileNameWithoutExtensions = Path.GetFileNameWithoutExtension(input);
-
-            string translated = TranslateIntermediateCode(concatenatedContents.ToString(), fileNameWithoutExtensions);
-
-            SaveOutputFile(input, translated);
+            SaveOutputFile(input, translatedFiles.ToString());
         }
 
         else if (File.Exists(input)) // Check if it's a file
@@ -55,7 +58,7 @@ class Program
             string fileContents = File.ReadAllText(input);
             string fileNameWithoutExtensions = Path.GetFileNameWithoutExtension(input);
 
-            string translated = TranslateIntermediateCode(fileContents, fileNameWithoutExtensions);
+            string translated = TranslateIntermediateCode(fileContents, fileNameWithoutExtensions, bootstrap: false);
 
             SaveOutputFile(input, translated);
         }
@@ -65,14 +68,17 @@ class Program
         }
     }
 
-    private static string TranslateIntermediateCode(string fileContents, string fileName)
+    private static string TranslateIntermediateCode(string fileContents, string fileName, bool bootstrap)
     {
         Parser parser = new Parser(fileContents);
 
         CodeWriter writer = new CodeWriter(fileName);
 
-        // Bootstrap code
-        writer.WriteInit();
+        if (bootstrap)
+        {
+            // Bootstrap code
+            writer.WriteInit();
+        }
 
         while (parser.HasMoreCommands())
         {
