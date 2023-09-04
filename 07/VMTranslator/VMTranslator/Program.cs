@@ -106,7 +106,7 @@ class Program
                     break;
 
                 case CommandType.Call:
-                    writer.WriteCall(parser.FirstArg(), parser.SecondArg());
+                    writer.WriteCall(parser.FirstArg(), parser.SecondArg(), parser.GetCurrentCounter());
                     break;
 
                 case CommandType.Return:

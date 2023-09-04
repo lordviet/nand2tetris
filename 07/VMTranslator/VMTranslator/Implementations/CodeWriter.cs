@@ -111,7 +111,7 @@ namespace VMTranslator.Implementations
                             .Append(MReg.EqD);
 
 
-            this.WriteCall(Constants.DefaultBootstrapFunctionName, 0);
+            this.WriteCall(Constants.DefaultBootstrapFunctionName, 0, 0);
         }
 
         public void WriteLabel(string label)
@@ -145,9 +145,9 @@ namespace VMTranslator.Implementations
                             .Append(dPostComparisonJumpCommand);
         }
 
-        public void WriteCall(string functionName, int numberOfArguments)
+        public void WriteCall(string functionName, int numberOfArguments, int counter)
         {
-            string returnAddress = $"RETURN_ADDRESS.{functionName}";
+            string returnAddress = $"RETURN_ADDRESS.{functionName}.{counter}";
             string returnAddressLabel = returnAddress.ToLabelSymbolDeclaration();
 
             string aInstructionForReturnAddress = returnAddress.ToAInstruction();

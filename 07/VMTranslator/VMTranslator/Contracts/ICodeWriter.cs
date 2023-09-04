@@ -18,7 +18,7 @@ namespace VMTranslator.Contracts
 
         void WriteIf(string label);
 
-        void WriteCall(string functionName, int numberOfArguments);
+        void WriteCall(string functionName, int numberOfArguments, int counter);
 
         void WriteReturn();
 
