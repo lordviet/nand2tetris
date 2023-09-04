@@ -2,7 +2,7 @@
 D=A
 @SP
 M=D
-@RETURN_ADDRESS.Sys.init
+@RETURN_ADDRESS.Sys.init.0
 D=A
 @SP
 A=M
@@ -51,7 +51,7 @@ D=M
 M=D
 @Sys.init
 0;JMP
-(RETURN_ADDRESS.Sys.init)
+(RETURN_ADDRESS.Sys.init.0)
 // function Sys.init 0
 (Sys.init)
 @0
@@ -112,7 +112,7 @@ D=M
 @THAT
 M=D
 // call Sys.main 0
-@RETURN_ADDRESS.Sys.main
+@RETURN_ADDRESS.Sys.main.5
 D=A
 @SP
 A=M
@@ -161,7 +161,7 @@ D=M
 M=D
 @Sys.main
 0;JMP
-(RETURN_ADDRESS.Sys.main)
+(RETURN_ADDRESS.Sys.main.5)
 // pop temp 1
 @SP
 M=M-1
@@ -312,7 +312,7 @@ M=D
 @SP
 M=M+1
 // call Sys.add12 1
-@RETURN_ADDRESS.Sys.add12
+@RETURN_ADDRESS.Sys.add12.21
 D=A
 @SP
 A=M
@@ -361,7 +361,7 @@ D=M
 M=D
 @Sys.add12
 0;JMP
-(RETURN_ADDRESS.Sys.add12)
+(RETURN_ADDRESS.Sys.add12.21)
 // pop temp 0
 @SP
 M=M-1
