@@ -28,7 +28,7 @@ namespace VMTranslator.Implementations
 
         public void WriteArithmetic(string command, int counter)
         {
-            if (!Constants.ArithmeticCommandKeywords.Contains(command))
+            if (!Constants.Keywords.ArithmeticCommands.Contains(command))
             {
                 throw new ArgumentException($"Command '{command}' is not a valid artihmetic command.");
             }

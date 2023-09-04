@@ -39,53 +39,54 @@ namespace VMTranslator.Implementations
         {
             string currentInstruction = this.GetCurrentInstruction();
 
-            if (currentInstruction.Contains(Constants.CallKeyword))
+            if (currentInstruction.Contains(Constants.Keywords.Call))
             {
                 return Enums.CommandType.Call;
             }
 
-            if (currentInstruction.Contains(Constants.FunctionKeyword))
+            if (currentInstruction.Contains(Constants.Keywords.Function))
             {
                 return Enums.CommandType.Function;
             }
 
-            if (currentInstruction.Contains(Constants.ReturnKeyword))
+            if (currentInstruction.Contains(Constants.Keywords.Return))
             {
                 return Enums.CommandType.Return;
             }
 
-            if (currentInstruction.Contains(Constants.PushKeyword))
+            if (currentInstruction.Contains(Constants.Keywords.Push))
             {
                 return Enums.CommandType.Push;
             }
 
-            if (currentInstruction.Contains(Constants.PopKeyword))
+            if (currentInstruction.Contains(Constants.Keywords.Pop))
             {
                 return Enums.CommandType.Pop;
             }
 
-            if (Constants.ArithmeticCommandKeywords.Any(currentInstruction.Contains))
+            if (Constants.Keywords.ArithmeticCommands.Any(currentInstruction.Contains))
             {
                 return Enums.CommandType.Arithmetic;
             }
 
-            if (currentInstruction.Contains(Constants.LabelKeyword))
+            if (currentInstruction.Contains(Constants.Keywords.Label))
             {
                 return Enums.CommandType.Label;
             }
 
-            if (currentInstruction.Contains(Constants.IfKeyword))
+            if (currentInstruction.Contains(Constants.Keywords.If))
             {
                 return Enums.CommandType.If;
             }
 
-            if (currentInstruction.Contains(Constants.GotoKeyword))
+            if (currentInstruction.Contains(Constants.Keywords.Goto))
             {
                 return Enums.CommandType.Goto;
             }
 
             throw new NotSupportedException($"Could not derive command type out of the following instruction '{currentInstruction}'");
         }
+
 
         public string FirstArg()
         {

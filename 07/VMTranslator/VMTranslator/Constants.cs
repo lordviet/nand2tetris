@@ -5,23 +5,24 @@
         public const string DefaultInputFileExtension = ".vm";
         public const string DefaultOutputFileExtension = ".asm";
 
-        // TODO: Make into its own group Keywords
-        public const string PushKeyword = "push";
-        public const string PopKeyword = "pop";
-        public const string LabelKeyword = "label";
-        public const string GotoKeyword = "goto";
-        public const string IfKeyword = "if-goto";
-        public const string FunctionKeyword = "function";
-        public const string CallKeyword = "call";
-        public const string ReturnKeyword = "return";
-
         public const string DefaultBootstrapFunctionName = "Sys.init";
 
         public const int DefaultTempRegisterIndex = 5;
         public const int DefaultStackPushesBeforeMethodInvocation = 5;
         public const int DefaultStandardMappingStackBeginningAddress = 256;
 
-        public static readonly string[] ArithmeticCommandKeywords = new string[] { "add", "sub", "neg", "eq", "gt", "lt", "and", "or", "not" };
+        public static class Keywords
+        {
+            public const string Push = "push";
+            public const string Pop = "pop";
+            public const string Label = "label";
+            public const string Goto = "goto";
+            public const string If = "if-goto";
+            public const string Function = "function";
+            public const string Call = "call";
+            public const string Return = "return";
+            public static readonly string[] ArithmeticCommands = new string[] { "add", "sub", "neg", "eq", "gt", "lt", "and", "or", "not" };
+        }
 
         public static class Mnemonics
         {
