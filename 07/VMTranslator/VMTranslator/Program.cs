@@ -17,59 +17,73 @@ class Program
 
         string input = args[0];
 
-        // TODO: Separate into methods of HandleDirectory, HandleFile, all calling translating and saving
-        if (Directory.Exists(input)) // Check if it's a directory
+        try
         {
-            // Get all .vm files in the directory
-            string[] vmFiles = Directory.GetFiles(input, $"*{Constants.DefaultInputFileExtension}");
-
-            if (vmFiles.Length == 0)
+            if (Directory.Exists(input))
             {
-                Console.WriteLine($"No '.{Constants.DefaultInputFileExtension}' files found in the directory.");
-                return;
+                HandleDirectory(input);
             }
-
-            StringBuilder translatedFiles = new StringBuilder();
-
-            bool initialBootstrap = true;
-
-            foreach (string filePath in vmFiles)
+            else if (File.Exists(input))
             {
-                string fileContents = File.ReadAllText(filePath);
-                string fileNameWithoutExtensionsInternal = Path.GetFileNameWithoutExtension(filePath);
-
-                string translatedInternal = TranslateIntermediateCode(fileContents, fileNameWithoutExtensionsInternal, initialBootstrap);
-
-                initialBootstrap = false;
-
-                translatedFiles.Append(translatedInternal);
+                HandleFile(input);
             }
+            else
+            {
+                Console.WriteLine($"Input path '{input}' does not exist.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+        }
+    }
 
-            string? directoryName = Path.GetDirectoryName(vmFiles[0]);
+    private static void HandleDirectory(string directoryPath)
+    {
+        // Get all .vm files in the directory
+        string[] vmFiles = Directory.GetFiles(directoryPath, $"*{Constants.DefaultInputFileExtension}");
 
-            SaveOutputFileDir(directoryName ?? input, input, translatedFiles.ToString());
-            //SaveOutputFile(input, translatedFiles.ToString());
+        if (vmFiles.Length == 0)
+        {
+            Console.WriteLine($"No '.{Constants.DefaultInputFileExtension}' files found in the directory.");
+            return;
         }
 
-        else if (File.Exists(input)) // Check if it's a file
+        StringBuilder translatedFiles = new StringBuilder();
+
+        bool bootstrap = true;
+
+        foreach (string filePath in vmFiles)
         {
-            if (!string.Equals(Path.GetExtension(input), Constants.DefaultInputFileExtension, StringComparison.OrdinalIgnoreCase))
-            {
-                Console.WriteLine($"Invalid input file. Please provide a {Constants.DefaultInputFileExtension} file.");
-                return;
-            }
+            string fileContents = File.ReadAllText(filePath);
+            string fileNameWithoutExtensions = Path.GetFileNameWithoutExtension(filePath);
 
-            string fileContents = File.ReadAllText(input);
-            string fileNameWithoutExtensions = Path.GetFileNameWithoutExtension(input);
+            string translatedInternal = TranslateIntermediateCode(fileContents, fileNameWithoutExtensions, bootstrap);
+            bootstrap = false;
 
-            string translated = TranslateIntermediateCode(fileContents, fileNameWithoutExtensions, bootstrap: false);
-
-            SaveOutputFile(input, translated);
+            translatedFiles.Append(translatedInternal);
         }
-        else
+
+        // Get the inside directory by using the first element of the.vm files
+        string? saveDirectoryPath = Path.GetDirectoryName(vmFiles[0]);
+
+        SaveOutputFileDir(saveDirectoryPath ?? directoryPath, directoryPath, translatedFiles.ToString());
+    }
+
+    private static void HandleFile(string filePath)
+    {
+        if (!string.Equals(Path.GetExtension(filePath), Constants.DefaultInputFileExtension, StringComparison.OrdinalIgnoreCase))
         {
-            Console.WriteLine($"Input path '{input}' does not exist.");
+            Console.WriteLine($"Invalid input file. Please provide a '{Constants.DefaultInputFileExtension}' file or a directory containing '{Constants.DefaultInputFileExtension}' files.");
+            return;
         }
+
+        string fileContents = File.ReadAllText(filePath);
+        string fileNameWithoutExtensions = Path.GetFileNameWithoutExtension(filePath);
+
+        string translated = TranslateIntermediateCode(fileContents, fileNameWithoutExtensions, bootstrap: false);
+
+        SaveOutputFile(filePath, fileNameWithoutExtensions, translated);
     }
 
     private static string TranslateIntermediateCode(string fileContents, string fileName, bool bootstrap)
@@ -154,10 +168,10 @@ class Program
         }
     }
 
-    private static void SaveOutputFile(string fileName, string translatedCode)
+    private static void SaveOutputFile(string basePath, string fileName, string translatedCode)
     {
         // Save the compiled code to the output file
-        string? directoryName = Path.GetDirectoryName(fileName);
+        string? directoryName = Path.GetDirectoryName(basePath);
 
         if (directoryName is null)
         {
