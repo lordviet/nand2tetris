@@ -5,8 +5,10 @@ class ZeldaGame {
 
    /** Constructs a new Zelda Game. */
    constructor ZeldaGame new() {
-      // Creates a new Link sprite and positions him at the top of the screen
-      let link = Link.new(248, 230);
+      // Creates a new Link sprite
+      // Positions him at the top of the screen
+      // Spawns with 3 HP and without sword
+      let link = Link.new(248, 230, 3, true);
       let direction = 0;  // initial state is no movement
       return this;
    }
@@ -41,8 +43,7 @@ class ZeldaGame {
             do moveLink();
          }
          if (key = 81)  { let exit = true; }     // q key
-        //  if (key = 90)  { do link.attack(); } // z key
-        //  if (key = 88)  { do link.shield(); } // x key
+         if (key = 32)  { do link.attack(); }    // space key
          if (key = 131) { let direction = 1; }   // up arrow
          if (key = 133) { let direction = 2; }   // down arrow
          if (key = 130) { let direction = 3; }   // left arrow

@@ -1,11 +1,15 @@
 function Link.new 0
-push constant 2
+push constant 4
 call Memory.alloc 1
 pop pointer 0
 push argument 0
 pop this 0
 push argument 1
 pop this 1
+push argument 2
+pop this 2
+push argument 3
+pop this 3
 push pointer 0
 call Link.draw 1
 pop temp 0
@@ -86,6 +90,51 @@ add
 push constant 3696
 call Memory.poke 2
 pop temp 0
+push this 3
+push constant 0
+not
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 0
+push constant 288
+add
+push constant 2018
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 320
+add
+push constant 8186
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 352
+add
+push constant 15994
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 384
+add
+push constant 11319
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 416
+add
+push constant 11890
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 448
+add
+push constant 4082
+call Memory.poke 2
+pop temp 0
+goto IF_END0
+label IF_FALSE0
 push local 0
 push constant 288
 add
@@ -122,10 +171,478 @@ add
 push constant 4080
 call Memory.poke 2
 pop temp 0
+label IF_END0
 push local 0
 push constant 480
 add
 push constant 1632
+call Memory.poke 2
+pop temp 0
+push constant 0
+return
+function Link.drawUp 1
+push argument 0
+pop pointer 0
+push constant 16384
+push this 0
+push constant 16
+call Math.divide 2
+add
+push this 1
+push constant 32
+call Math.multiply 2
+add
+pop local 0
+push local 0
+push constant 0
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 32
+add
+push constant 2016
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 64
+add
+push constant 4080
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 96
+add
+push constant 12276
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 128
+add
+push constant 12276
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 160
+add
+push constant 16380
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 192
+add
+push constant 16380
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 224
+add
+push constant 8184
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 0
+not
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 0
+push constant 256
+add
+push constant 20464
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 288
+add
+push constant 18400
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 320
+add
+push constant 24568
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 352
+add
+push constant 24572
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 384
+add
+push constant 4108
+neg
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 416
+add
+push constant 20468
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 448
+add
+push constant 20464
+call Memory.poke 2
+pop temp 0
+goto IF_END0
+label IF_FALSE0
+push local 0
+push constant 256
+add
+push constant 4080
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 288
+add
+push constant 2016
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 320
+add
+push constant 8184
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 352
+add
+push constant 16380
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 384
+add
+push constant 12276
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 416
+add
+push constant 12276
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 448
+add
+push constant 4080
+call Memory.poke 2
+pop temp 0
+label IF_END0
+push local 0
+push constant 480
+add
+push constant 1632
+call Memory.poke 2
+pop temp 0
+push constant 0
+return
+function Link.drawRight 1
+push argument 0
+pop pointer 0
+push constant 16384
+push this 0
+push constant 16
+call Math.divide 2
+add
+push this 1
+push constant 32
+call Math.multiply 2
+add
+pop local 0
+push local 0
+push constant 0
+add
+push constant 496
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 32
+add
+push constant 1016
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 64
+add
+push constant 2044
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 96
+add
+push constant 1020
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 128
+add
+push constant 756
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 160
+add
+push constant 2034
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 192
+add
+push constant 1008
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 224
+add
+push constant 1008
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 256
+add
+push constant 992
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 0
+not
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 0
+push constant 288
+add
+push constant 31760
+neg
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 320
+add
+push constant 18296
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 352
+add
+push constant 9784
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 384
+add
+push constant 5480
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 416
+add
+push constant 3560
+call Memory.poke 2
+pop temp 0
+goto IF_END0
+label IF_FALSE0
+push local 0
+push constant 288
+add
+push constant 1008
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 320
+add
+push constant 1912
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 352
+add
+push constant 1592
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 384
+add
+push constant 1384
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 416
+add
+push constant 1512
+call Memory.poke 2
+pop temp 0
+label IF_END0
+push local 0
+push constant 448
+add
+push constant 288
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 480
+add
+push constant 288
+call Memory.poke 2
+pop temp 0
+push constant 0
+return
+function Link.drawLeft 1
+push argument 0
+pop pointer 0
+push constant 16384
+push this 0
+push constant 16
+call Math.divide 2
+add
+push this 1
+push constant 32
+call Math.multiply 2
+add
+pop local 0
+push local 0
+push constant 0
+add
+push constant 3968
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 32
+add
+push constant 8128
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 64
+add
+push constant 16352
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 96
+add
+push constant 16320
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 128
+add
+push constant 12096
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 160
+add
+push constant 20448
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 192
+add
+push constant 4032
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 224
+add
+push constant 4032
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 256
+add
+push constant 1984
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 0
+not
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 0
+push constant 288
+add
+push constant 4033
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 320
+add
+push constant 7906
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 352
+add
+push constant 7268
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 384
+add
+push constant 5800
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 416
+add
+push constant 6064
+call Memory.poke 2
+pop temp 0
+goto IF_END0
+label IF_FALSE0
+push local 0
+push constant 288
+add
+push constant 4032
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 320
+add
+push constant 7904
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 352
+add
+push constant 7264
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 384
+add
+push constant 5792
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 416
+add
+push constant 6048
+call Memory.poke 2
+pop temp 0
+label IF_END0
+push local 0
+push constant 448
+add
+push constant 1152
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 480
+add
+push constant 1152
 call Memory.poke 2
 pop temp 0
 push constant 0
@@ -254,11 +771,11 @@ push pointer 0
 call Link.erase 1
 pop temp 0
 push this 1
-push constant 1
+push constant 2
 sub
 pop this 1
 push pointer 0
-call Link.draw 1
+call Link.drawUp 1
 pop temp 0
 label IF_FALSE0
 push constant 0
@@ -276,7 +793,7 @@ push pointer 0
 call Link.erase 1
 pop temp 0
 push this 1
-push constant 1
+push constant 2
 add
 pop this 1
 push pointer 0
@@ -298,11 +815,11 @@ push pointer 0
 call Link.erase 1
 pop temp 0
 push this 0
-push constant 1
+push constant 2
 sub
 pop this 0
 push pointer 0
-call Link.draw 1
+call Link.drawLeft 1
 pop temp 0
 label IF_FALSE0
 push constant 0
@@ -320,12 +837,32 @@ push pointer 0
 call Link.erase 1
 pop temp 0
 push this 0
-push constant 1
+push constant 2
 add
 pop this 0
 push pointer 0
-call Link.draw 1
+call Link.drawRight 1
 pop temp 0
 label IF_FALSE0
+push constant 0
+return
+function Link.attack 0
+push argument 0
+pop pointer 0
+push this 3
+push constant 0
+not
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+pop this 3
+push constant 0
+return
+label IF_FALSE0
+push constant 0
+not
+pop this 3
 push constant 0
 return
