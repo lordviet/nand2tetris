@@ -9,7 +9,7 @@ push constant 0
 not
 call Link.new 4
 pop this 0
-push constant 500
+push constant 495
 push constant 2
 push constant 1
 call Moblin.new 3
@@ -108,6 +108,9 @@ call Keyboard.keyPressed 0
 pop local 0
 push pointer 0
 call ZeldaGame.moveLink 1
+pop temp 0
+push pointer 0
+call ZeldaGame.moveMoblin 1
 pop temp 0
 goto WHILE_EXP1
 label WHILE_END1

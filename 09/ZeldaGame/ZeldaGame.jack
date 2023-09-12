@@ -13,7 +13,7 @@ class ZeldaGame {
         let link = Link.new(248, 230, 3, true);
 
         // Creates a Moblin sprite
-        let moblin = Moblin.new(500, 2, 1);
+        let moblin = Moblin.new(495, 2, 1);
         let direction = 0; // initial state is no movement
         return this;
     }
@@ -61,6 +61,7 @@ class ZeldaGame {
             while (key = 0) {
                 let key = Keyboard.keyPressed();
                 do moveLink();
+                do moveMoblin();
             }
             if (key = 81) {
                 let exit = true;
