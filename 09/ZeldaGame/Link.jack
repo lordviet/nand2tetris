@@ -1,245 +1,241 @@
 /** Implements the character of Link. */
 class Link {
 
-   field int x, y, health; // screen location of Link's top-left corner and HP
-   field bool hasSword; // Link's sword status
+    field int x, y, health; // screen location of Link's top-left corner and HP
+    field bool hasSword; // Link's sword status
 
-   /** Constructs a new Link sprite with a given location. */
-   constructor Link new(int Ax, int Ay, int Hp, bool Sword) {
-      let x = Ax;
-      let y = Ay;
-      let health = Hp;
-      let hasSword = Sword;
-      do draw();
-      return this;
-   }
-
-   /** Disposes Link. */
-   method void dispose() {
-      do Memory.deAlloc(this);
-      return;
-   }
-
-   /** Draws default Link (or going down) on the screen. */
-   method void draw() {
-      var int memAddress;
-      let memAddress = 16384+(x/16)+(y*32);
-
-      do Memory.poke(memAddress+0, 0);
-      do Memory.poke(memAddress+32, 2016);
-      do Memory.poke(memAddress+64, 4080);
-      do Memory.poke(memAddress+96, 12276);
-      do Memory.poke(memAddress+128, 12276);
-      do Memory.poke(memAddress+160, 16380);
-      do Memory.poke(memAddress+192, 15804);
-      do Memory.poke(memAddress+224, 8184);
-      do Memory.poke(memAddress+256, 3696);
-
-      if(hasSword = true){
-         do Memory.poke(memAddress+288, 2018);
-	      do Memory.poke(memAddress+320, 8186);
-	      do Memory.poke(memAddress+352, 15994);
-	      do Memory.poke(memAddress+384, 11319);
-	      do Memory.poke(memAddress+416, 11890);
-	      do Memory.poke(memAddress+448, 4082);
-      }
-      else {
-         do Memory.poke(memAddress+288, 2016);
-         do Memory.poke(memAddress+320, 8184);
-         do Memory.poke(memAddress+352, 15996);
-         do Memory.poke(memAddress+384, 11316);
-         do Memory.poke(memAddress+416, 11892);
-         do Memory.poke(memAddress+448, 4080);
-      }
-     
-      do Memory.poke(memAddress+480, 1632);
-     
-      return;
-    }
-   
-   /** Draws Link going up on the screen. */
-   method void drawUp() {
-      var int memAddress;
-      let memAddress = 16384+(x/16)+(y*32);
-
-	   do Memory.poke(memAddress+0, 0);
-	   do Memory.poke(memAddress+32, 2016);
-	   do Memory.poke(memAddress+64, 4080);
-	   do Memory.poke(memAddress+96, 12276);
-	   do Memory.poke(memAddress+128, 12276);
-	   do Memory.poke(memAddress+160, 16380);
-	   do Memory.poke(memAddress+192, 16380);
-	   do Memory.poke(memAddress+224, 8184);
-      
-      if(hasSword = true){
-         do Memory.poke(memAddress+256, 20464);
-	      do Memory.poke(memAddress+288, 18400);
-	      do Memory.poke(memAddress+320, 24568);
-	      do Memory.poke(memAddress+352, 24572);
-	      do Memory.poke(memAddress+384, -4108);
-	      do Memory.poke(memAddress+416, 20468);
-	      do Memory.poke(memAddress+448, 20464);
-      }
-      else {
-	      do Memory.poke(memAddress+256, 4080);
-	      do Memory.poke(memAddress+288, 2016);
-	      do Memory.poke(memAddress+320, 8184);
-	      do Memory.poke(memAddress+352, 16380);
-	      do Memory.poke(memAddress+384, 12276);
-	      do Memory.poke(memAddress+416, 12276);
-	      do Memory.poke(memAddress+448, 4080);
-      }
-
-	   do Memory.poke(memAddress+480, 1632);
-	   
-      return;
-   }
-
-   /** Draws Link going right on the screen. */
-   method void drawRight() {
-      var int memAddress;
-      let memAddress = 16384+(x/16)+(y*32);
-
-	   do Memory.poke(memAddress+0, 496);
-	   do Memory.poke(memAddress+32, 1016);
-	   do Memory.poke(memAddress+64, 2044);
-	   do Memory.poke(memAddress+96, 1020);
-	   do Memory.poke(memAddress+128, 756);
-	   do Memory.poke(memAddress+160, 2034);
-	   do Memory.poke(memAddress+192, 1008);
-	   do Memory.poke(memAddress+224, 1008);
-	   do Memory.poke(memAddress+256, 992);
-
-      if(hasSword = true){
-         do Memory.poke(memAddress+288, -31760);
-	      do Memory.poke(memAddress+320, 18296);
-	      do Memory.poke(memAddress+352, 9784);
-	      do Memory.poke(memAddress+384, 5480);
-	      do Memory.poke(memAddress+416, 3560);
-      }
-      else {
-         do Memory.poke(memAddress+288, 1008);
-	      do Memory.poke(memAddress+320, 1912);
-	      do Memory.poke(memAddress+352, 1592);
-	      do Memory.poke(memAddress+384, 1384);
-	      do Memory.poke(memAddress+416, 1512);
-      }
-
-	   do Memory.poke(memAddress+448, 288);
-	   do Memory.poke(memAddress+480, 288);
-
-      return;
-   }
-
-   /** Draws Link going left on the screen. */
-   method void drawLeft() {
-	   var int memAddress;
-      let memAddress = 16384+(x/16)+(y*32);
-
-	   do Memory.poke(memAddress+0, 3968);
-	   do Memory.poke(memAddress+32, 8128);
-	   do Memory.poke(memAddress+64, 16352);
-	   do Memory.poke(memAddress+96, 16320);
-	   do Memory.poke(memAddress+128, 12096);
-	   do Memory.poke(memAddress+160, 20448);
-	   do Memory.poke(memAddress+192, 4032);
-	   do Memory.poke(memAddress+224, 4032);
-	   do Memory.poke(memAddress+256, 1984);
-
-      if(hasSword = true){
-	      do Memory.poke(memAddress+288, 4033);
-	      do Memory.poke(memAddress+320, 7906);
-	      do Memory.poke(memAddress+352, 7268);
-	      do Memory.poke(memAddress+384, 5800);
-	      do Memory.poke(memAddress+416, 6064);
-      }
-      else {
-         do Memory.poke(memAddress+288, 4032);
-	      do Memory.poke(memAddress+320, 7904);
-	      do Memory.poke(memAddress+352, 7264);
-	      do Memory.poke(memAddress+384, 5792);
-	      do Memory.poke(memAddress+416, 6048);
-      }
-	   
-      do Memory.poke(memAddress+448, 1152);
-	   do Memory.poke(memAddress+480, 1152);
-
-	   return;
-   }
-
-   /** Erases Link from the screen. */
-   method void erase() {
-      var int memAddress;
-      let memAddress = 16384+(x/16)+(y*32);
-
-      do Memory.poke(memAddress+0, 0);
-      do Memory.poke(memAddress+32, 0);
-      do Memory.poke(memAddress+64, 0);
-      do Memory.poke(memAddress+96, 0);
-      do Memory.poke(memAddress+128, 0);
-      do Memory.poke(memAddress+160, 0);
-      do Memory.poke(memAddress+192, 0);
-      do Memory.poke(memAddress+224, 0);
-      do Memory.poke(memAddress+256, 0);
-      do Memory.poke(memAddress+288, 0);
-      do Memory.poke(memAddress+320, 0);
-      do Memory.poke(memAddress+352, 0);
-      do Memory.poke(memAddress+384, 0);
-      do Memory.poke(memAddress+416, 0);
-      do Memory.poke(memAddress+448, 0);
-      do Memory.poke(memAddress+480, 0);
-
-      return;
+    /** Constructs a new Link sprite with a given location. */
+    constructor Link new(int Ax, int Ay, int Hp, bool Sword) {
+        let x = Ax;
+        let y = Ay;
+        let health = Hp;
+        let hasSword = Sword;
+        do draw();
+        return this;
     }
 
-   /** Moves Link up by 2 pixels. */
-   method void moveUp() {
-      if (y > 1) {
-         do erase();
-         let y = y - 2;
-         do drawUp();
-      }
-      return;
-   }
-
-   /** Moves Link down by 2 pixels. */
-   method void moveDown() {
-      if (y < 240) {
-         do erase();
-         let y = y + 2;
-         do draw();
-      }
-      return;
-   }
-
-   /** Moves Link left by 2 pixels. */
-   method void moveLeft() {
-      if (x > 1) {
-         do erase();
-         let x = x - 2;
-         do drawLeft();
-      }
-      return;
+    /** Disposes Link. */
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
     }
 
-   /** Moves Link right by 2 pixels. */
-   method void moveRight() {
-      if (x < 510) {
-         do erase();
-         let x = x + 2;
-         do drawRight();
-      }
-      return;
+    /** Draws default Link (or going down) on the screen. */
+    method void draw() {
+        var int memAddress;
+        let memAddress = 16384 + (x / 16) + (y * 32);
+
+        do Memory.poke(memAddress + 0, 0);
+        do Memory.poke(memAddress + 32, 2016);
+        do Memory.poke(memAddress + 64, 4080);
+        do Memory.poke(memAddress + 96, 12276);
+        do Memory.poke(memAddress + 128, 12276);
+        do Memory.poke(memAddress + 160, 16380);
+        do Memory.poke(memAddress + 192, 15804);
+        do Memory.poke(memAddress + 224, 8184);
+        do Memory.poke(memAddress + 256, 3696);
+
+        if (hasSword = true) {
+            do Memory.poke(memAddress + 288, 2018);
+            do Memory.poke(memAddress + 320, 8186);
+            do Memory.poke(memAddress + 352, 15994);
+            do Memory.poke(memAddress + 384, 11319);
+            do Memory.poke(memAddress + 416, 11890);
+            do Memory.poke(memAddress + 448, 4082);
+        } else {
+            do Memory.poke(memAddress + 288, 2016);
+            do Memory.poke(memAddress + 320, 8184);
+            do Memory.poke(memAddress + 352, 15996);
+            do Memory.poke(memAddress + 384, 11316);
+            do Memory.poke(memAddress + 416, 11892);
+            do Memory.poke(memAddress + 448, 4080);
+        }
+
+        do Memory.poke(memAddress + 480, 1632);
+
+        return;
     }
 
-   /** Work-in-progress to test sword functionality */
-   method void attack(){
-      if(hasSword = true){
-         let hasSword = false;
-         return;
-      }
+    /** Draws Link going up on the screen. */
+    method void drawUp() {
+        var int memAddress;
+        let memAddress = 16384 + (x / 16) + (y * 32);
 
-      let hasSword = true;
-      return;
-   }
+        do Memory.poke(memAddress + 0, 0);
+        do Memory.poke(memAddress + 32, 2016);
+        do Memory.poke(memAddress + 64, 4080);
+        do Memory.poke(memAddress + 96, 12276);
+        do Memory.poke(memAddress + 128, 12276);
+        do Memory.poke(memAddress + 160, 16380);
+        do Memory.poke(memAddress + 192, 16380);
+        do Memory.poke(memAddress + 224, 8184);
+
+        if (hasSword = true) {
+            do Memory.poke(memAddress + 256, 20464);
+            do Memory.poke(memAddress + 288, 18400);
+            do Memory.poke(memAddress + 320, 24568);
+            do Memory.poke(memAddress + 352, 24572);
+            do Memory.poke(memAddress + 384, -4108);
+            do Memory.poke(memAddress + 416, 20468);
+            do Memory.poke(memAddress + 448, 20464);
+        } else {
+            do Memory.poke(memAddress + 256, 4080);
+            do Memory.poke(memAddress + 288, 2016);
+            do Memory.poke(memAddress + 320, 8184);
+            do Memory.poke(memAddress + 352, 16380);
+            do Memory.poke(memAddress + 384, 12276);
+            do Memory.poke(memAddress + 416, 12276);
+            do Memory.poke(memAddress + 448, 4080);
+        }
+
+        do Memory.poke(memAddress + 480, 1632);
+
+        return;
+    }
+
+    /** Draws Link going right on the screen. */
+    method void drawRight() {
+        var int memAddress;
+        let memAddress = 16384 + (x / 16) + (y * 32);
+
+        do Memory.poke(memAddress + 0, 496);
+        do Memory.poke(memAddress + 32, 1016);
+        do Memory.poke(memAddress + 64, 2044);
+        do Memory.poke(memAddress + 96, 1020);
+        do Memory.poke(memAddress + 128, 756);
+        do Memory.poke(memAddress + 160, 2034);
+        do Memory.poke(memAddress + 192, 1008);
+        do Memory.poke(memAddress + 224, 1008);
+        do Memory.poke(memAddress + 256, 992);
+
+        if (hasSword = true) {
+            do Memory.poke(memAddress + 288, -31760);
+            do Memory.poke(memAddress + 320, 18296);
+            do Memory.poke(memAddress + 352, 9784);
+            do Memory.poke(memAddress + 384, 5480);
+            do Memory.poke(memAddress + 416, 3560);
+        } else {
+            do Memory.poke(memAddress + 288, 1008);
+            do Memory.poke(memAddress + 320, 1912);
+            do Memory.poke(memAddress + 352, 1592);
+            do Memory.poke(memAddress + 384, 1384);
+            do Memory.poke(memAddress + 416, 1512);
+        }
+
+        do Memory.poke(memAddress + 448, 288);
+        do Memory.poke(memAddress + 480, 288);
+
+        return;
+    }
+
+    /** Draws Link going left on the screen. */
+    method void drawLeft() {
+        var int memAddress;
+        let memAddress = 16384 + (x / 16) + (y * 32);
+
+        do Memory.poke(memAddress + 0, 3968);
+        do Memory.poke(memAddress + 32, 8128);
+        do Memory.poke(memAddress + 64, 16352);
+        do Memory.poke(memAddress + 96, 16320);
+        do Memory.poke(memAddress + 128, 12096);
+        do Memory.poke(memAddress + 160, 20448);
+        do Memory.poke(memAddress + 192, 4032);
+        do Memory.poke(memAddress + 224, 4032);
+        do Memory.poke(memAddress + 256, 1984);
+
+        if (hasSword = true) {
+            do Memory.poke(memAddress + 288, 4033);
+            do Memory.poke(memAddress + 320, 7906);
+            do Memory.poke(memAddress + 352, 7268);
+            do Memory.poke(memAddress + 384, 5800);
+            do Memory.poke(memAddress + 416, 6064);
+        } else {
+            do Memory.poke(memAddress + 288, 4032);
+            do Memory.poke(memAddress + 320, 7904);
+            do Memory.poke(memAddress + 352, 7264);
+            do Memory.poke(memAddress + 384, 5792);
+            do Memory.poke(memAddress + 416, 6048);
+        }
+
+        do Memory.poke(memAddress + 448, 1152);
+        do Memory.poke(memAddress + 480, 1152);
+
+        return;
+    }
+
+    /** Erases Link from the screen. */
+    method void erase() {
+        var int memAddress;
+        let memAddress = 16384 + (x / 16) + (y * 32);
+
+        do Memory.poke(memAddress + 0, 0);
+        do Memory.poke(memAddress + 32, 0);
+        do Memory.poke(memAddress + 64, 0);
+        do Memory.poke(memAddress + 96, 0);
+        do Memory.poke(memAddress + 128, 0);
+        do Memory.poke(memAddress + 160, 0);
+        do Memory.poke(memAddress + 192, 0);
+        do Memory.poke(memAddress + 224, 0);
+        do Memory.poke(memAddress + 256, 0);
+        do Memory.poke(memAddress + 288, 0);
+        do Memory.poke(memAddress + 320, 0);
+        do Memory.poke(memAddress + 352, 0);
+        do Memory.poke(memAddress + 384, 0);
+        do Memory.poke(memAddress + 416, 0);
+        do Memory.poke(memAddress + 448, 0);
+        do Memory.poke(memAddress + 480, 0);
+
+        return;
+    }
+
+    /** Moves Link up by 2 pixels. */
+    method void moveUp() {
+        if (y > 1) {
+            do erase();
+            let y = y - 2;
+            do drawUp();
+        }
+        return;
+    }
+
+    /** Moves Link down by 2 pixels. */
+    method void moveDown() {
+        if (y < 240) {
+            do erase();
+            let y = y + 2;
+            do draw();
+        }
+        return;
+    }
+
+    /** Moves Link left by 2 pixels. */
+    method void moveLeft() {
+        if (x > 1) {
+            do erase();
+            let x = x - 2;
+            do drawLeft();
+        }
+        return;
+    }
+
+    /** Moves Link right by 2 pixels. */
+    method void moveRight() {
+        if (x < 510) {
+            do erase();
+            let x = x + 2;
+            do drawRight();
+        }
+        return;
+    }
+
+    /** Work-in-progress to test sword functionality */
+    method void attack() {
+        if (hasSword = true) {
+            let hasSword = false;
+            return;
+        }
+
+        let hasSword = true;
+        return;
+    }
 }

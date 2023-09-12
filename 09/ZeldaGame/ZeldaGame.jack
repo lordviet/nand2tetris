@@ -1,63 +1,92 @@
 class ZeldaGame {
-   field Link link; // the sprite of Link
-   field int direction; // Link's current direction: 
-                        // 0=none, 1=up, 2=down, 3=left, 4=right
+    field Link link; // the sprite of Link
+    field int direction; // Link's current direction: 
+    // 0=none, 1=up, 2=down, 3=left, 4=right
 
-   /** Constructs a new Zelda Game. */
-   constructor ZeldaGame new() {
-      // Creates a new Link sprite
-      // Positions him at the top of the screen
-      // Spawns with 3 HP and without sword
-      let link = Link.new(248, 230, 3, true);
-      let direction = 0;  // initial state is no movement
-      return this;
-   }
+    field Moblin moblin; // the sprite of Moblin
 
-   /** Disposes this game. */
-   method void dispose() {
-      do link.dispose();
-      do Memory.deAlloc(this);
-      return;
-   }
+    /** Constructs a new Zelda Game. */
+    constructor ZeldaGame new() {
+        // Creates a new Link sprite
+        // Positions him at the top of the screen
+        // Spawns with 3 HP and without sword
+        let link = Link.new(248, 230, 3, true);
 
-   /** Moves Link in the current direction. */
-   method void moveLink() {
-      if (direction = 1) { do link.moveUp(); }
-      if (direction = 2) { do link.moveDown(); }
-      if (direction = 3) { do link.moveLeft(); }
-      if (direction = 4) { do link.moveRight(); }
-      do Sys.wait(5);  // delays the next movement
-      return;
-   }
+        // Creates a Moblin sprite
+        let moblin = Moblin.new(500, 2, 1);
+        let direction = 0; // initial state is no movement
+        return this;
+    }
 
-   /** Runs the game: handles the user's inputs and moves Link accordingly */
-   method void run() {
-      var char key;  // the key currently pressed by the user
-      var boolean exit;
-      let exit = false;
-      
-      while (~exit) {
-         // waits for a key to be pressed
-         while (key = 0) {
-            let key = Keyboard.keyPressed();
-            do moveLink();
-         }
-         if (key = 81)  { let exit = true; }     // q key
-         if (key = 32)  { do link.attack(); }    // space key
-         if (key = 131) { let direction = 1; }   // up arrow
-         if (key = 133) { let direction = 2; }   // down arrow
-         if (key = 130) { let direction = 3; }   // left arrow
-         if (key = 132) { let direction = 4; }   // right arrow
+    /** Disposes this game. */
+    method void dispose() {
+        do link.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
 
-         // waits for the key to be released
-         while (~(key = 0)) {
-            let key = Keyboard.keyPressed();
-            do moveLink();
-         }
-     } // while
-     return;
-   }
+    /** Moves Link in the current direction. */
+    method void moveLink() {
+        if (direction = 1) {
+            do link.moveUp();
+        }
+        if (direction = 2) {
+            do link.moveDown();
+        }
+        if (direction = 3) {
+            do link.moveLeft();
+        }
+        if (direction = 4) {
+            do link.moveRight();
+        }
+        do Sys.wait(5); // delays the next movement
+        return;
+    }
+
+    method void moveMoblin(){
+        do moblin.moveDown();
+
+        do Sys.wait(5); // delays the next movement
+        return;
+    }
+
+    /** Runs the game: handles the user's inputs and moves Link accordingly */
+    method void run() {
+        var char key; // the key currently pressed by the user
+        var boolean exit;
+        let exit = false;
+
+        while (~exit) {
+            // waits for a key to be pressed
+            while (key = 0) {
+                let key = Keyboard.keyPressed();
+                do moveLink();
+            }
+            if (key = 81) {
+                let exit = true;
+            } // q key
+            if (key = 32) {
+                do link.attack();
+            } // space key
+            if (key = 131) {
+                let direction = 1;
+            } // up arrow
+            if (key = 133) {
+                let direction = 2;
+            } // down arrow
+            if (key = 130) {
+                let direction = 3;
+            } // left arrow
+            if (key = 132) {
+                let direction = 4;
+            } // right arrow
+
+            // waits for the key to be released
+            while (~(key = 0)) {
+                let key = Keyboard.keyPressed();
+                do moveLink();
+            }
+        } // while
+        return;
+    }
 }
-
-
-

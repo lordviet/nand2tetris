@@ -1,0 +1,152 @@
+/** Implements the Moblin enemy. */
+class Moblin {
+
+    field int x, y, health; // screen location of Moblin's top-left corner and HP
+
+    /** Constructs a new Moblin sprite with a given location. */
+    constructor Moblin new(int Ax, int Ay, int Hp) {
+        let x = Ax;
+        let y = Ay;
+        let health = Hp;
+        do draw();
+        return this;
+    }
+
+    /** Disposes Moblin. */
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** Draws default Moblin (or going down) on the screen. */
+    method void draw() {
+        var int memAddress;
+        let memAddress = 16384 + (x / 16) + (y * 32);
+
+        do Memory.poke(memAddress + 0, 15420);
+        do Memory.poke(memAddress + 32, 8184);
+        do Memory.poke(memAddress + 64, 2016);
+        do Memory.poke(memAddress + 96, 7608);
+        do Memory.poke(memAddress + 128, 16380);
+        do Memory.poke(memAddress + 160, -385);
+        do Memory.poke(memAddress + 192, -1);
+        do Memory.poke(memAddress + 224, -17347);
+        do Memory.poke(memAddress + 256, -17443);
+        do Memory.poke(memAddress + 288, -16387);
+        do Memory.poke(memAddress + 320, -24583);
+        do Memory.poke(memAddress + 352, 8184);
+        do Memory.poke(memAddress + 384, 8184);
+        do Memory.poke(memAddress + 416, 8184);
+        do Memory.poke(memAddress + 448, 3120);
+        do Memory.poke(memAddress + 480, 3120);
+
+        return;
+    }
+
+    /** Draws Moblin going up on the screen. */
+    method void drawUp() {
+        var int memAddress;
+        let memAddress = 16384 + (x / 16) + (y * 32);
+
+        do Memory.poke(memAddress + 0, 15420);
+        do Memory.poke(memAddress + 32, 8184);
+        do Memory.poke(memAddress + 64, 2016);
+        do Memory.poke(memAddress + 96, 8184);
+        do Memory.poke(memAddress + 128, 16380);
+        do Memory.poke(memAddress + 160, -1);
+        do Memory.poke(memAddress + 192, -1);
+        do Memory.poke(memAddress + 224, -16387);
+        do Memory.poke(memAddress + 256, -16387);
+        do Memory.poke(memAddress + 288, -16387);
+        do Memory.poke(memAddress + 320, -24583);
+        do Memory.poke(memAddress + 352, 8184);
+        do Memory.poke(memAddress + 384, 8184);
+        do Memory.poke(memAddress + 416, 8184);
+        do Memory.poke(memAddress + 448, 3120);
+        do Memory.poke(memAddress + 480, 3120);
+
+        return;
+    }
+
+    // TODO: Add Moblin Sprite going right
+    /** Draws Moblin going right on the screen. */
+    method void drawRight() {
+        var int memAddress;
+        let memAddress = 16384 + (x / 16) + (y * 32);
+        return;
+    }
+
+    // TODO: Add Moblin Sprite going left
+    /** Draws Moblin going left on the screen. */
+    method void drawLeft() {
+        var int memAddress;
+        let memAddress = 16384 + (x / 16) + (y * 32);
+
+        return;
+    }
+
+    /** Erases Moblin from the screen. */
+    method void erase() {
+        var int memAddress;
+        let memAddress = 16384 + (x / 16) + (y * 32);
+
+        do Memory.poke(memAddress + 0, 0);
+        do Memory.poke(memAddress + 32, 0);
+        do Memory.poke(memAddress + 64, 0);
+        do Memory.poke(memAddress + 96, 0);
+        do Memory.poke(memAddress + 128, 0);
+        do Memory.poke(memAddress + 160, 0);
+        do Memory.poke(memAddress + 192, 0);
+        do Memory.poke(memAddress + 224, 0);
+        do Memory.poke(memAddress + 256, 0);
+        do Memory.poke(memAddress + 288, 0);
+        do Memory.poke(memAddress + 320, 0);
+        do Memory.poke(memAddress + 352, 0);
+        do Memory.poke(memAddress + 384, 0);
+        do Memory.poke(memAddress + 416, 0);
+        do Memory.poke(memAddress + 448, 0);
+        do Memory.poke(memAddress + 480, 0);
+
+        return;
+    }
+
+    /** Moves Moblin up by 1 pixels. */
+    method void moveUp() {
+        if (y > 1) {
+            do erase();
+            let y = y - 1;
+            do draw();
+        }
+        return;
+    }
+
+    /** Moves Moblin down by 1 pixels. */
+    method void moveDown() {
+        if (y < 240) {
+            do erase();
+            let y = y + 1;
+            do draw();
+        }
+        return;
+    }
+
+    /** Moves Moblin left by 1 pixels. */
+    method void moveLeft() {
+        if (x > 1) {
+            do erase();
+            let x = x - 1;
+            do draw();
+        }
+        return;
+    }
+
+    /** Moves Moblin right by 1 pixels. */
+    method void moveRight() {
+        if (x < 510) {
+            do erase();
+            let x = x + 1;
+            do draw();
+        }
+        return;
+    }
+}
