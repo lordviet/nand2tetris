@@ -5,15 +5,21 @@ class ZeldaGame {
 
     field Moblin moblin; // the sprite of Moblin
 
+    field Sword sword; // the Sword sprite
+
     /** Constructs a new Zelda Game. */
     constructor ZeldaGame new() {
         // Creates a new Link sprite
         // Positions him at the top of the screen
         // Spawns with 3 HP and without sword
-        let link = Link.new(248, 230, 3, true);
+        let link = Link.new(248, 230, 3, false);
 
         // Creates a Moblin sprite
         let moblin = Moblin.new(495, 2, 1);
+
+        // Creates a Sword sprite
+        let sword = Sword.new(300, 100);
+
         let direction = 0; // initial state is no movement
         return this;
     }
@@ -47,6 +53,20 @@ class ZeldaGame {
         do moblin.moveDown();
 
         do Sys.wait(5); // delays the next movement
+        return;
+    }
+
+    method void checkIfLinkHasPickedUpASword(){
+        var int linkX, swordX, linkY, swordY;
+        let linkX = do link.getX();
+        let swordX = do sword.getX();
+        let linkY = do link.getY();
+        let swordY = do sword.getY();
+
+        if((linkX = swordX) & (linkY = swordY)){
+            do link.pickUpSword();
+        }
+
         return;
     }
 

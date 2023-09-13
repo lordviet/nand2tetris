@@ -23,6 +23,16 @@ call Memory.deAlloc 1
 pop temp 0
 push constant 0
 return
+function Link.getX 0
+push argument 0
+pop pointer 0
+push this 0
+return
+function Link.getY 0
+push argument 0
+pop pointer 0
+push this 1
+return
 function Link.draw 1
 push argument 0
 pop pointer 0
@@ -861,6 +871,14 @@ pop this 3
 push constant 0
 return
 label IF_FALSE0
+push constant 0
+not
+pop this 3
+push constant 0
+return
+function Link.pickUpSword 0
+push argument 0
+pop pointer 0
 push constant 0
 not
 pop this 3

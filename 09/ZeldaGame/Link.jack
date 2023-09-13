@@ -20,6 +20,14 @@ class Link {
         return;
     }
 
+   method int getX(){
+        return x;
+    }
+
+    method int getY(){
+        return y;
+    }
+
     /** Draws default Link (or going down) on the screen. */
     method void draw() {
         var int memAddress;
@@ -237,5 +245,10 @@ class Link {
 
         let hasSword = true;
         return;
+    }
+
+    method void pickUpSword(){
+         let hasSword = true;
+         return;
     }
 }
