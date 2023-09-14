@@ -25,6 +25,16 @@ class Sword {
         return y;
     }
 
+    method void setX(int x){
+        let x = x;
+        return;
+    }
+
+    method void setY(int y){
+        let y = y;
+        return;
+    }
+
    /** Draws default Sword on the screen */
    method void draw() {
        var int memAddress;

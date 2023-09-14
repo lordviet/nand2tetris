@@ -33,6 +33,11 @@ push argument 0
 pop pointer 0
 push this 1
 return
+function Link.getHasSword 0
+push argument 0
+pop pointer 0
+push this 3
+return
 function Link.draw 1
 push argument 0
 pop pointer 0
@@ -871,9 +876,6 @@ pop this 3
 push constant 0
 return
 label IF_FALSE0
-push constant 0
-not
-pop this 3
 push constant 0
 return
 function Link.pickUpSword 0

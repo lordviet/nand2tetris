@@ -7,6 +7,8 @@ class ZeldaGame {
 
     field Sword sword; // the Sword sprite
 
+    field RandomNumberGenerator rng;
+
     /** Constructs a new Zelda Game. */
     constructor ZeldaGame new() {
         // Creates a new Link sprite
@@ -19,6 +21,8 @@ class ZeldaGame {
 
         // Creates a Sword sprite
         let sword = Sword.new(300, 100);
+
+        let rng = RandomNumberGenerator.new(12345);
 
         let direction = 0; // initial state is no movement
         return this;
@@ -45,6 +49,9 @@ class ZeldaGame {
         if (direction = 4) {
             do link.moveRight();
         }
+        do checkIfLinkHasPickedUpASword();
+        do spawnSwordIfLinkIsSwordless();
+
         do Sys.wait(5); // delays the next movement
         return;
     }
@@ -58,14 +65,39 @@ class ZeldaGame {
 
     method void checkIfLinkHasPickedUpASword(){
         var int linkX, swordX, linkY, swordY;
-        let linkX = do link.getX();
-        let swordX = do sword.getX();
-        let linkY = do link.getY();
-        let swordY = do sword.getY();
+        let linkX = link.getX();
+        let swordX = sword.getX();
+        let linkY = link.getY();
+        let swordY = sword.getY();
 
-        if((linkX = swordX) & (linkY = swordY)){
+        if((linkX = swordX) | (linkY = swordY)){
             do link.pickUpSword();
+            do sword.erase();
         }
+
+        return;
+    }
+
+    method void spawnSwordIfLinkIsSwordless(){
+        var bool linkHasSword;
+        var int maxX, maxY, swordX, swordY;
+
+        let linkHasSword = link.getHasSword();
+
+        if(linkHasSword = true){
+            return;
+        }
+
+        let maxX = 400;
+        let maxY = 200;
+
+        let swordX = rng.nextInt(maxX);        
+        let swordY = rng.nextInt(maxY);
+        
+        do sword.setX(swordX);
+        do sword.setY(swordY);
+
+        do sword.draw();
 
         return;
     }

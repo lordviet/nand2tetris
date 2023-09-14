@@ -1,12 +1,11 @@
 function ZeldaGame.new 0
-push constant 3
+push constant 5
 call Memory.alloc 1
 pop pointer 0
 push constant 248
 push constant 230
 push constant 3
 push constant 0
-not
 call Link.new 4
 pop this 0
 push constant 495
@@ -14,6 +13,13 @@ push constant 2
 push constant 1
 call Moblin.new 3
 pop this 2
+push constant 300
+push constant 100
+call Sword.new 2
+pop this 3
+push constant 12345
+call RandomNumberGenerator.new 1
+pop this 4
 push constant 0
 pop this 1
 push pointer 0
@@ -72,6 +78,12 @@ push this 0
 call Link.moveRight 1
 pop temp 0
 label IF_FALSE3
+push pointer 0
+call ZeldaGame.checkIfLinkHasPickedUpASword 1
+pop temp 0
+push pointer 0
+call ZeldaGame.spawnSwordIfLinkIsSwordless 1
+pop temp 0
 push constant 5
 call Sys.wait 1
 pop temp 0
@@ -85,6 +97,81 @@ call Moblin.moveDown 1
 pop temp 0
 push constant 5
 call Sys.wait 1
+pop temp 0
+push constant 0
+return
+function ZeldaGame.checkIfLinkHasPickedUpASword 4
+push argument 0
+pop pointer 0
+push this 0
+call Link.getX 1
+pop local 0
+push this 3
+call Sword.getX 1
+pop local 1
+push this 0
+call Link.getY 1
+pop local 2
+push this 3
+call Sword.getY 1
+pop local 3
+push local 0
+push local 1
+eq
+push local 2
+push local 3
+eq
+or
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push this 0
+call Link.pickUpSword 1
+pop temp 0
+push this 3
+call Sword.erase 1
+pop temp 0
+label IF_FALSE0
+push constant 0
+return
+function ZeldaGame.spawnSwordIfLinkIsSwordless 5
+push argument 0
+pop pointer 0
+push this 0
+call Link.getHasSword 1
+pop local 0
+push local 0
+push constant 0
+not
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+return
+label IF_FALSE0
+push constant 400
+pop local 1
+push constant 200
+pop local 2
+push this 4
+push local 1
+call RandomNumberGenerator.nextInt 2
+pop local 3
+push this 4
+push local 2
+call RandomNumberGenerator.nextInt 2
+pop local 4
+push this 3
+push local 3
+call Sword.setX 2
+pop temp 0
+push this 3
+push local 4
+call Sword.setY 2
+pop temp 0
+push this 3
+call Sword.draw 1
 pop temp 0
 push constant 0
 return

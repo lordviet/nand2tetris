@@ -28,6 +28,10 @@ class Link {
         return y;
     }
 
+    method bool getHasSword(){
+        return hasSword;
+    }
+
     /** Draws default Link (or going down) on the screen. */
     method void draw() {
         var int memAddress;
@@ -243,7 +247,7 @@ class Link {
             return;
         }
 
-        let hasSword = true;
+      //   let hasSword = true;
         return;
     }
 

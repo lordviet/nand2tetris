@@ -29,6 +29,20 @@ push argument 0
 pop pointer 0
 push this 1
 return
+function Sword.setX 0
+push argument 0
+pop pointer 0
+push argument 1
+pop argument 1
+push constant 0
+return
+function Sword.setY 0
+push argument 0
+pop pointer 0
+push argument 1
+pop argument 1
+push constant 0
+return
 function Sword.draw 1
 push argument 0
 pop pointer 0
