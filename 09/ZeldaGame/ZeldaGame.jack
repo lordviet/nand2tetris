@@ -20,7 +20,7 @@ class ZeldaGame {
         let moblin = Moblin.new(495, 2, 1);
 
         // Creates a Sword sprite
-        let sword = Sword.new(300, 100);
+        let sword = Sword.new(300, 100, true);
 
         let rng = RandomNumberGenerator.new(12345);
 
@@ -79,16 +79,17 @@ class ZeldaGame {
     }
 
     method void spawnSwordIfLinkIsSwordless(){
-        var bool linkHasSword;
+        var bool linkHasSword, swordIsActive;
         var int maxX, maxY, swordX, swordY;
 
         let linkHasSword = link.getHasSword();
+        let swordIsActive = sword.getIsActive();
 
-        if(linkHasSword = true){
+        if((linkHasSword = true) | (swordIsActive = true)){
             return;
         }
 
-        let maxX = 400;
+        let maxX = 240;
         let maxY = 200;
 
         let swordX = rng.nextInt(maxX);        

@@ -9,9 +9,16 @@ class RandomNumberGenerator {
     }
 
     method int nextInt(int max) {
-        var int helper;
+        var int helper, result;
         let helper = seed * 32719;
-        let seed = (helper + 3) - ((helper + 3) / max) * max;
+        let result = Math.abs(helper + 3);
+
+        // Calculate the remainder using a loop to stay within the valid memory range
+        while (result > max) {
+            let result = result - max;
+        }
+
+        let seed = result;
         return seed;
     }
 }

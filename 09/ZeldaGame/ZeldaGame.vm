@@ -15,7 +15,9 @@ call Moblin.new 3
 pop this 2
 push constant 300
 push constant 100
-call Sword.new 2
+push constant 0
+not
+call Sword.new 3
 pop this 3
 push constant 12345
 call RandomNumberGenerator.new 1
@@ -134,40 +136,48 @@ pop temp 0
 label IF_FALSE0
 push constant 0
 return
-function ZeldaGame.spawnSwordIfLinkIsSwordless 5
+function ZeldaGame.spawnSwordIfLinkIsSwordless 6
 push argument 0
 pop pointer 0
 push this 0
 call Link.getHasSword 1
 pop local 0
+push this 3
+call Sword.getIsActive 1
+pop local 1
 push local 0
 push constant 0
 not
 eq
+push local 1
+push constant 0
+not
+eq
+or
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
 push constant 0
 return
 label IF_FALSE0
-push constant 400
-pop local 1
-push constant 200
+push constant 240
 pop local 2
-push this 4
-push local 1
-call RandomNumberGenerator.nextInt 2
+push constant 200
 pop local 3
 push this 4
 push local 2
 call RandomNumberGenerator.nextInt 2
 pop local 4
-push this 3
+push this 4
 push local 3
+call RandomNumberGenerator.nextInt 2
+pop local 5
+push this 3
+push local 4
 call Sword.setX 2
 pop temp 0
 push this 3
-push local 4
+push local 5
 call Sword.setY 2
 pop temp 0
 push this 3

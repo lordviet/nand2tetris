@@ -6,7 +6,7 @@ push argument 0
 pop this 0
 push pointer 0
 return
-function RandomNumberGenerator.nextInt 1
+function RandomNumberGenerator.nextInt 2
 push argument 0
 pop pointer 0
 push this 0
@@ -16,14 +16,21 @@ pop local 0
 push local 0
 push constant 3
 add
-push local 0
-push constant 3
-add
+call Math.abs 1
+pop local 1
+label WHILE_EXP0
+push local 1
 push argument 1
-call Math.divide 2
+gt
+not
+if-goto WHILE_END0
+push local 1
+push argument 1
 sub
-push argument 1
-call Math.multiply 2
+pop local 1
+goto WHILE_EXP0
+label WHILE_END0
+push local 1
 pop this 0
 push this 0
 return
