@@ -65,12 +65,33 @@ class ZeldaGame {
 
     method void checkIfLinkHasPickedUpASword(){
         var int linkX, swordX, linkY, swordY;
+        var int collisionBoxWidth, collisionBoxHeight;
+        var int linkLeft, linkRight, linkTop, linkBottom;
+        var int swordLeft, swordRight, swordTop, swordBottom;
+        
         let linkX = link.getX();
         let swordX = sword.getX();
         let linkY = link.getY();
         let swordY = sword.getY();
 
-        if((linkX = swordX) | (linkY = swordY)){
+        // Define the collision box dimensions
+        let collisionBoxWidth = 16; // Adjust to Link's width
+        let collisionBoxHeight = 16; // Adjust to Link's height
+
+        // Calculate the boundaries of Link's collision box
+        let linkLeft = linkX;
+        let linkRight = linkX + collisionBoxWidth;
+        let linkTop = linkY;
+        let linkBottom = linkY + collisionBoxHeight;
+
+        // Calculate the boundaries of the sword's collision box
+        let swordLeft = swordX;
+        let swordRight = swordX + collisionBoxWidth;
+        let swordTop = swordY;
+        let swordBottom = swordY + collisionBoxHeight;
+
+        // Check for collision between Link and the sword
+        if ((linkRight > swordLeft) & (linkLeft < swordRight) & (linkBottom > swordTop) & (linkTop < swordBottom)) {
             do link.pickUpSword();
             do sword.erase();
         }

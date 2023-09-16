@@ -102,7 +102,7 @@ call Sys.wait 1
 pop temp 0
 push constant 0
 return
-function ZeldaGame.checkIfLinkHasPickedUpASword 4
+function ZeldaGame.checkIfLinkHasPickedUpASword 14
 push argument 0
 pop pointer 0
 push this 0
@@ -117,13 +117,49 @@ pop local 2
 push this 3
 call Sword.getY 1
 pop local 3
+push constant 16
+pop local 4
+push constant 16
+pop local 5
 push local 0
-push local 1
-eq
+pop local 6
+push local 0
+push local 4
+add
+pop local 7
 push local 2
+pop local 8
+push local 2
+push local 5
+add
+pop local 9
+push local 1
+pop local 10
+push local 1
+push local 4
+add
+pop local 11
 push local 3
-eq
-or
+pop local 12
+push local 3
+push local 5
+add
+pop local 13
+push local 7
+push local 10
+gt
+push local 6
+push local 11
+lt
+and
+push local 9
+push local 12
+gt
+and
+push local 8
+push local 13
+lt
+and
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
