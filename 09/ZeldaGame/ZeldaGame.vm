@@ -91,11 +91,22 @@ call Sys.wait 1
 pop temp 0
 push constant 0
 return
-function ZeldaGame.moveMoblin 0
+function ZeldaGame.moveMoblin 2
 push argument 0
 pop pointer 0
+push this 0
+call Link.getX 1
+pop local 0
+push this 0
+call Link.getY 1
+pop local 1
 push this 2
-call Moblin.moveDown 1
+push local 0
+push local 1
+call Moblin.updatePlayerPosition 3
+pop temp 0
+push this 2
+call Moblin.moveTowardsPlayer 1
 pop temp 0
 push constant 5
 call Sys.wait 1

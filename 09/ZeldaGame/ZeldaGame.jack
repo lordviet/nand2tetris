@@ -57,7 +57,18 @@ class ZeldaGame {
     }
 
     method void moveMoblin(){
-        do moblin.moveDown();
+        var int linkX, linkY;
+
+        let linkX = link.getX();
+        let linkY = link.getY();
+            
+        // Update Moblin with the player's position
+        do moblin.updatePlayerPosition(linkX, linkY);
+
+        // Move Moblin towards the player
+        do moblin.moveTowardsPlayer();
+        
+        // do moblin.moveDown();
 
         do Sys.wait(5); // delays the next movement
         return;

@@ -2,6 +2,7 @@
 class Moblin {
 
     field int x, y, health; // screen location of Moblin's top-left corner and HP
+    field int linkX, linkY; // screen location of Link's position
 
     /** Constructs a new Moblin sprite with a given location. */
     constructor Moblin new(int Ax, int Ay, int Hp) {
@@ -106,6 +107,38 @@ class Moblin {
         do Memory.poke(memAddress + 416, 0);
         do Memory.poke(memAddress + 448, 0);
         do Memory.poke(memAddress + 480, 0);
+
+        return;
+    }
+
+    /** Update the player's position. */
+    method void updatePlayerPosition(int playerPosX, int playerPosY) {
+        let linkX = playerPosX;
+        let linkY = playerPosY;
+
+        return;
+    }
+
+    method void moveTowardsPlayer() {
+        if (linkX < x) {
+            // Move left
+            do moveLeft();
+        } 
+        
+        if (linkX > x) {
+            // Move right
+            do moveRight();
+        }
+
+        if (linkY < y) {
+            // Move up
+            do moveUp();
+        } 
+        
+        if (linkY > y) {
+            // Move down
+            do moveDown();
+        }
 
         return;
     }
