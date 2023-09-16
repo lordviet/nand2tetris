@@ -69,19 +69,52 @@ class Moblin {
         return;
     }
 
-    // TODO: Add Moblin Sprite going right
     /** Draws Moblin going right on the screen. */
     method void drawRight() {
         var int memAddress;
         let memAddress = 16384 + (x / 16) + (y * 32);
+
+        do Memory.poke(memAddress + 0, 1022);
+        do Memory.poke(memAddress + 32, 2040);
+        do Memory.poke(memAddress + 64, 2032);
+        do Memory.poke(memAddress + 96, 3580);
+        do Memory.poke(memAddress + 128, 32766);
+        do Memory.poke(memAddress + 160, 24574);
+        do Memory.poke(memAddress + 192, 32766);
+        do Memory.poke(memAddress + 224, 5118);
+        do Memory.poke(memAddress + 256, 7678);
+        do Memory.poke(memAddress + 288, 4094);
+        do Memory.poke(memAddress + 320, -2);
+        do Memory.poke(memAddress + 352, 8191);
+        do Memory.poke(memAddress + 384, -1);
+        do Memory.poke(memAddress + 416, 4094);
+        do Memory.poke(memAddress + 448, 4094);
+        do Memory.poke(memAddress + 480, 1820);
+
         return;
     }
 
-    // TODO: Add Moblin Sprite going left
     /** Draws Moblin going left on the screen. */
     method void drawLeft() {
         var int memAddress;
         let memAddress = 16384 + (x / 16) + (y * 32);
+
+        do Memory.poke(memAddress + 0, 32704);
+        do Memory.poke(memAddress + 32, 8160);
+        do Memory.poke(memAddress + 64, 4064);
+        do Memory.poke(memAddress + 96, 16304);
+        do Memory.poke(memAddress + 128, 32766);
+        do Memory.poke(memAddress + 160, 32762);
+        do Memory.poke(memAddress + 192, 32766);
+        do Memory.poke(memAddress + 224, 32712);
+        do Memory.poke(memAddress + 256, 32696);
+        do Memory.poke(memAddress + 288, 32752);
+        do Memory.poke(memAddress + 320, 32767);
+        do Memory.poke(memAddress + 352, -8);
+        do Memory.poke(memAddress + 384, -1);
+        do Memory.poke(memAddress + 416, 32752);
+        do Memory.poke(memAddress + 448, 32752);
+        do Memory.poke(memAddress + 480, 14560);
 
         return;
     }
@@ -123,8 +156,8 @@ class Moblin {
         if (linkX < x) {
             // Move left
             do moveLeft();
-        } 
-        
+        }
+
         if (linkX > x) {
             // Move right
             do moveRight();
@@ -133,8 +166,8 @@ class Moblin {
         if (linkY < y) {
             // Move up
             do moveUp();
-        } 
-        
+        }
+
         if (linkY > y) {
             // Move down
             do moveDown();
@@ -168,7 +201,7 @@ class Moblin {
         if (x > 1) {
             do erase();
             let x = x - 1;
-            do draw();
+            do drawLeft();
         }
         return;
     }
@@ -178,7 +211,7 @@ class Moblin {
         if (x < 510) {
             do erase();
             let x = x + 1;
-            do draw();
+            do drawRight();
         }
         return;
     }
