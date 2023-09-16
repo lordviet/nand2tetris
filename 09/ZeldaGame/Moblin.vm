@@ -467,7 +467,7 @@ push constant 1
 sub
 pop this 1
 push pointer 0
-call Moblin.draw 1
+call Moblin.drawUp 1
 pop temp 0
 label IF_FALSE0
 push constant 0

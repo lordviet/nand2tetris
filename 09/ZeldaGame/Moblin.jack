@@ -148,7 +148,7 @@ class Moblin {
         if (y > 1) {
             do erase();
             let y = y - 1;
-            do draw();
+            do drawUp();
         }
         return;
     }
