@@ -56,30 +56,28 @@ class ZeldaGame {
         return;
     }
 
-    method void moveMoblin(){
+    method void moveMoblin() {
         var int linkX, linkY;
 
         let linkX = link.getX();
         let linkY = link.getY();
-            
+
         // Update Moblin with the player's position
         do moblin.updatePlayerPosition(linkX, linkY);
 
         // Move Moblin towards the player
         do moblin.moveTowardsPlayer();
-        
-        // do moblin.moveDown();
 
         do Sys.wait(5); // delays the next movement
         return;
     }
 
-    method void checkIfLinkHasPickedUpASword(){
+    method void checkIfLinkHasPickedUpASword() {
         var int linkX, swordX, linkY, swordY;
         var int collisionBoxWidth, collisionBoxHeight;
         var int linkLeft, linkRight, linkTop, linkBottom;
         var int swordLeft, swordRight, swordTop, swordBottom;
-        
+
         let linkX = link.getX();
         let swordX = sword.getX();
         let linkY = link.getY();
@@ -110,29 +108,122 @@ class ZeldaGame {
         return;
     }
 
-    method void spawnSwordIfLinkIsSwordless(){
+    method void spawnSwordIfLinkIsSwordless() {
         var bool linkHasSword, swordIsActive;
         var int maxX, maxY, swordX, swordY;
 
         let linkHasSword = link.getHasSword();
         let swordIsActive = sword.getIsActive();
 
-        if((linkHasSword = true) | (swordIsActive = true)){
+        if ((linkHasSword = true) | (swordIsActive = true)) {
             return;
         }
 
         let maxX = 240;
         let maxY = 200;
 
-        let swordX = rng.nextInt(maxX);        
+        let swordX = rng.nextInt(maxX);
         let swordY = rng.nextInt(maxY);
-        
+
         do sword.setX(swordX);
         do sword.setY(swordY);
 
         do sword.draw();
 
         return;
+    }
+
+    method void performAttack() {
+        var int linkX, originalSwordX, linkY, originalSwordY;
+        var bool isSwordFlying, swordDirection, isCollidingWithMoblin; 
+
+        let linkX = link.getX();
+        let linkY = link.getY();
+
+        // save the state of the original sword co-ordinates
+        let originalSwordX = sword.getX();
+        let originalSwordY = sword.getY();
+
+        do link.attack();
+
+        // Set sword's co-ordinates to Link's
+        do sword.setX(linkX);
+        do sword.setY(linkY);
+        
+        do sword.setIsFlying(true);
+        do sword.setFlyingDirection(direction);
+
+        let swordDirection = sword.getFlyingDirection();
+
+        while (~(swordDirection = 0)) {
+            if (direction = 1) {
+                do sword.moveUp();
+            }
+            if (direction = 2) {
+                do sword.moveDown();
+            }
+            if (direction = 3) {
+                do sword.moveLeft();
+            }
+            if (direction = 4) {
+                do sword.moveRight();
+            }
+
+            // Check for collision with Moblin
+            let isCollidingWithMoblin = checkMoblinCollision(sword.getX(), sword.getY());
+
+            // If there is a collision with Moblin
+            if (isCollidingWithMoblin) {
+                do moblin.takeDamage(); // Apply damage to Moblin
+                do sword.erase(); // Erase the sword
+                do sword.setFlyingDirection(0); // Reset sword direction
+                let swordDirection = sword.getFlyingDirection(); // Update sword direction
+            }
+
+            if((sword.getX() = 510) | (sword.getX() = 1) | (sword.getY() = 240) | (sword.getY() = 1)){
+                do Sys.wait(5);
+                do sword.erase();
+                do sword.setFlyingDirection(0);
+                let swordDirection = sword.getFlyingDirection();
+            }
+        }
+
+        do sword.setX(originalSwordX);
+        do sword.setY(originalSwordY);
+
+        return;
+    }
+
+    method boolean checkMoblinCollision(int swordX, int swordY) {
+        var int moblinX, moblinY;
+        var int moblinWidth, moblinHeight;
+        var int moblinLeft, moblinRight, moblinTop, moblinBottom;
+
+        // Define the hard-coded collision box dimensions for Moblin
+        let moblinWidth = 32; // Adjust to Moblin's width
+        let moblinHeight = 32; // Adjust to Moblin's height
+
+        // Get Moblin's position (you need to implement this)
+        let moblinX = moblin.getX();
+        let moblinY = moblin.getY();
+
+        // Calculate the boundaries of Moblin's collision box
+        let moblinLeft = moblinX;
+        let moblinRight = moblinX + moblinWidth;
+        let moblinTop = moblinY;
+        let moblinBottom = moblinY + moblinHeight;
+
+        // Check for collision
+        if (
+            (swordX < moblinRight) &   // Sword's right edge is to the left of Moblin's right edge
+            (swordX + 16 > moblinLeft) &  // Sword's left edge is to the right of Moblin's left edge
+            (swordY < moblinBottom) &  // Sword's bottom edge is above Moblin's bottom edge
+            (swordY + 16 > moblinTop)    // Sword's top edge is below Moblin's top edge
+        ) {
+            return true; // Collision detected
+        }
+
+        return false; // No collision
     }
 
     /** Runs the game: handles the user's inputs and moves Link accordingly */
@@ -152,7 +243,7 @@ class ZeldaGame {
                 let exit = true;
             } // q key
             if (key = 32) {
-                do link.attack();
+                do performAttack();
             } // space key
             if (key = 131) {
                 let direction = 1;

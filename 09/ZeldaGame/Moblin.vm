@@ -21,6 +21,41 @@ call Memory.deAlloc 1
 pop temp 0
 push constant 0
 return
+function Moblin.getX 0
+push argument 0
+pop pointer 0
+push this 0
+return
+function Moblin.getY 0
+push argument 0
+pop pointer 0
+push this 1
+return
+function Moblin.takeDamage 0
+push argument 0
+pop pointer 0
+push this 2
+push constant 1
+sub
+pop this 2
+push this 2
+push constant 0
+lt
+push this 2
+push constant 0
+eq
+or
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+pop this 2
+push pointer 0
+call Moblin.erase 1
+pop temp 0
+label IF_FALSE0
+push constant 0
+return
 function Moblin.draw 1
 push argument 0
 pop pointer 0
@@ -604,46 +639,55 @@ return
 function Moblin.moveTowardsPlayer 0
 push argument 0
 pop pointer 0
-push this 3
-push this 0
-lt
+push this 2
+push constant 0
+eq
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
-push pointer 0
-call Moblin.moveLeft 1
-pop temp 0
+push constant 0
+return
 label IF_FALSE0
 push this 3
 push this 0
-gt
+lt
 if-goto IF_TRUE1
 goto IF_FALSE1
 label IF_TRUE1
 push pointer 0
-call Moblin.moveRight 1
+call Moblin.moveLeft 1
 pop temp 0
 label IF_FALSE1
-push this 4
-push this 1
-lt
+push this 3
+push this 0
+gt
 if-goto IF_TRUE2
 goto IF_FALSE2
 label IF_TRUE2
 push pointer 0
-call Moblin.moveUp 1
+call Moblin.moveRight 1
 pop temp 0
 label IF_FALSE2
 push this 4
 push this 1
-gt
+lt
 if-goto IF_TRUE3
 goto IF_FALSE3
 label IF_TRUE3
 push pointer 0
-call Moblin.moveDown 1
+call Moblin.moveUp 1
 pop temp 0
 label IF_FALSE3
+push this 4
+push this 1
+gt
+if-goto IF_TRUE4
+goto IF_FALSE4
+label IF_TRUE4
+push pointer 0
+call Moblin.moveDown 1
+pop temp 0
+label IF_FALSE4
 push constant 0
 return
 function Moblin.moveUp 0

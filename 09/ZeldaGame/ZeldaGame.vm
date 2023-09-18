@@ -232,6 +232,217 @@ call Sword.draw 1
 pop temp 0
 push constant 0
 return
+function ZeldaGame.performAttack 7
+push argument 0
+pop pointer 0
+push this 0
+call Link.getX 1
+pop local 0
+push this 0
+call Link.getY 1
+pop local 2
+push this 3
+call Sword.getX 1
+pop local 1
+push this 3
+call Sword.getY 1
+pop local 3
+push this 0
+call Link.attack 1
+pop temp 0
+push this 3
+push local 0
+call Sword.setX 2
+pop temp 0
+push this 3
+push local 2
+call Sword.setY 2
+pop temp 0
+push this 3
+push constant 0
+not
+call Sword.setIsFlying 2
+pop temp 0
+push this 3
+push this 1
+call Sword.setFlyingDirection 2
+pop temp 0
+push this 3
+call Sword.getFlyingDirection 1
+pop local 5
+label WHILE_EXP0
+push local 5
+push constant 0
+eq
+not
+not
+if-goto WHILE_END0
+push this 1
+push constant 1
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push this 3
+call Sword.moveUp 1
+pop temp 0
+label IF_FALSE0
+push this 1
+push constant 2
+eq
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push this 3
+call Sword.moveDown 1
+pop temp 0
+label IF_FALSE1
+push this 1
+push constant 3
+eq
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push this 3
+call Sword.moveLeft 1
+pop temp 0
+label IF_FALSE2
+push this 1
+push constant 4
+eq
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
+push this 3
+call Sword.moveRight 1
+pop temp 0
+label IF_FALSE3
+push pointer 0
+push this 3
+call Sword.getX 1
+push this 3
+call Sword.getY 1
+call ZeldaGame.checkMoblinCollision 3
+pop local 6
+push local 6
+if-goto IF_TRUE4
+goto IF_FALSE4
+label IF_TRUE4
+push this 2
+call Moblin.takeDamage 1
+pop temp 0
+push this 3
+call Sword.erase 1
+pop temp 0
+push this 3
+push constant 0
+call Sword.setFlyingDirection 2
+pop temp 0
+push this 3
+call Sword.getFlyingDirection 1
+pop local 5
+label IF_FALSE4
+push this 3
+call Sword.getX 1
+push constant 510
+eq
+push this 3
+call Sword.getX 1
+push constant 1
+eq
+or
+push this 3
+call Sword.getY 1
+push constant 240
+eq
+or
+push this 3
+call Sword.getY 1
+push constant 1
+eq
+or
+if-goto IF_TRUE5
+goto IF_FALSE5
+label IF_TRUE5
+push constant 5
+call Sys.wait 1
+pop temp 0
+push this 3
+call Sword.erase 1
+pop temp 0
+push this 3
+push constant 0
+call Sword.setFlyingDirection 2
+pop temp 0
+push this 3
+call Sword.getFlyingDirection 1
+pop local 5
+label IF_FALSE5
+goto WHILE_EXP0
+label WHILE_END0
+push this 3
+push local 1
+call Sword.setX 2
+pop temp 0
+push this 3
+push local 3
+call Sword.setY 2
+pop temp 0
+push constant 0
+return
+function ZeldaGame.checkMoblinCollision 8
+push argument 0
+pop pointer 0
+push constant 32
+pop local 2
+push constant 32
+pop local 3
+push this 2
+call Moblin.getX 1
+pop local 0
+push this 2
+call Moblin.getY 1
+pop local 1
+push local 0
+pop local 4
+push local 0
+push local 2
+add
+pop local 5
+push local 1
+pop local 6
+push local 1
+push local 3
+add
+pop local 7
+push argument 1
+push local 5
+lt
+push argument 1
+push constant 16
+add
+push local 4
+gt
+and
+push argument 2
+push local 7
+lt
+and
+push argument 2
+push constant 16
+add
+push local 6
+gt
+and
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+not
+return
+label IF_FALSE0
+push constant 0
+return
 function ZeldaGame.run 2
 push argument 0
 pop pointer 0
@@ -274,8 +485,8 @@ eq
 if-goto IF_TRUE1
 goto IF_FALSE1
 label IF_TRUE1
-push this 0
-call Link.attack 1
+push pointer 0
+call ZeldaGame.performAttack 1
 pop temp 0
 label IF_FALSE1
 push local 0

@@ -3,12 +3,16 @@ class Sword {
 
     field int x, y;
     field bool isActive;
+    field bool isFlying;
+    field int flyingDirection;
 
     /** Constructs a new Sword sprite. */
     constructor Sword new(int Ax, int Ay, bool IsActive) {
         let x = Ax;
         let y = Ay;
         let isActive = IsActive;
+        let isFlying = false;
+        let flyingDirection = 0;
         do draw();
         return this;
     }
@@ -39,6 +43,24 @@ class Sword {
 
     method bool getIsActive() {
         return isActive;
+    }
+
+    method void setIsFlying(bool isSwordFlying){
+        let isFlying = isSwordFlying;
+        return;
+    }
+
+    method bool getIsFlying() {
+        return isFlying;
+    }
+
+    method int getFlyingDirection() {
+        return flyingDirection;
+    }
+
+    method void setFlyingDirection(int direction){
+        let flyingDirection = direction;
+        return;
     }
 
     /** Draws default Sword on the screen */

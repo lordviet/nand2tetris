@@ -19,6 +19,36 @@ class Moblin {
         return;
     }
 
+    method int getX() {
+        return x;
+    }
+
+    method int getY() {
+        return y;
+    }
+
+    method void takeDamage(){
+        let health = health - 1;
+        
+        if((health < 0) | (health = 0)){
+            let health = 0;
+            do erase();
+            // moblin isActive prop or somethin
+        }
+
+        return;
+    }
+
+    // method void setX(int Ax) {
+    //     let x = Ax;
+    //     return;
+    // }
+
+    // method void setY(int Ay) {
+    //     let y = Ay;
+    //     return;
+    // }
+
     /** Draws default Moblin (or going down) on the screen. */
     method void draw() {
         var int memAddress;
@@ -153,6 +183,10 @@ class Moblin {
     }
 
     method void moveTowardsPlayer() {
+        if (health = 0){
+            return;
+        }
+
         if (linkX < x) {
             // Move left
             do moveLeft();
