@@ -3,12 +3,14 @@ class Moblin {
 
     field int x, y, health; // screen location of Moblin's top-left corner and HP
     field int linkX, linkY; // screen location of Link's position
+    field bool isDead;
 
     /** Constructs a new Moblin sprite with a given location. */
     constructor Moblin new(int Ax, int Ay, int Hp) {
         let x = Ax;
         let y = Ay;
         let health = Hp;
+        let isDead = false;
         do draw();
         return this;
     }
@@ -27,27 +29,33 @@ class Moblin {
         return y;
     }
 
-    method void takeDamage(){
+    method bool getIsDead() {
+        return isDead;
+    }
+
+    method void takeDamage() {
         let health = health - 1;
-        
-        if((health < 0) | (health = 0)){
+
+        if ((health < 0) | (health = 0)) {
             let health = 0;
             do erase();
-            // moblin isActive prop or somethin
+            let isDead = true;
         }
 
         return;
     }
 
-    // method void setX(int Ax) {
-    //     let x = Ax;
-    //     return;
-    // }
+    method void respawn(int Rx, int Ry) {
+        if (isDead = true) {
+            let x = Rx;
+            let y = Ry;
+            let health = 3;
+            let isDead = false;
+            do draw();
+        }
 
-    // method void setY(int Ay) {
-    //     let y = Ay;
-    //     return;
-    // }
+        return;
+    }
 
     /** Draws default Moblin (or going down) on the screen. */
     method void draw() {
@@ -183,7 +191,7 @@ class Moblin {
     }
 
     method void moveTowardsPlayer() {
-        if (health = 0){
+        if (health = 0) {
             return;
         }
 

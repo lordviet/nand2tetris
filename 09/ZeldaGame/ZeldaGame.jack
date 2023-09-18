@@ -17,7 +17,7 @@ class ZeldaGame {
         let link = Link.new(248, 230, 3, false);
 
         // Creates a Moblin sprite
-        let moblin = Moblin.new(495, 2, 1);
+        let moblin = Moblin.new(495, 2, 3);
 
         // Creates a Sword sprite
         let sword = Sword.new(300, 100, true);
@@ -57,7 +57,17 @@ class ZeldaGame {
     }
 
     method void moveMoblin() {
+        var bool isMoblinDead;
         var int linkX, linkY;
+        var int maxX, maxY;
+
+        let isMoblinDead = moblin.getIsDead();
+        let maxX = 220;
+        let maxY = 220;
+
+        if (isMoblinDead = true) {
+            do moblin.respawn(rng.nextInt(maxX), rng.nextInt(maxY));
+        }
 
         let linkX = link.getX();
         let linkY = link.getY();
@@ -135,7 +145,7 @@ class ZeldaGame {
 
     method void performAttack() {
         var int linkX, originalSwordX, linkY, originalSwordY;
-        var bool isSwordFlying, swordDirection, isCollidingWithMoblin; 
+        var bool isSwordFlying, swordDirection, isCollidingWithMoblin;
 
         let linkX = link.getX();
         let linkY = link.getY();
@@ -149,7 +159,7 @@ class ZeldaGame {
         // Set sword's co-ordinates to Link's
         do sword.setX(linkX);
         do sword.setY(linkY);
-        
+
         do sword.setIsFlying(true);
         do sword.setFlyingDirection(direction);
 
@@ -180,7 +190,7 @@ class ZeldaGame {
                 let swordDirection = sword.getFlyingDirection(); // Update sword direction
             }
 
-            if((sword.getX() = 510) | (sword.getX() = 1) | (sword.getY() = 240) | (sword.getY() = 1)){
+            if ((sword.getX() = 510) | (sword.getX() = 1) | (sword.getY() = 240) | (sword.getY() = 1)) {
                 do Sys.wait(5);
                 do sword.erase();
                 do sword.setFlyingDirection(0);
@@ -215,10 +225,10 @@ class ZeldaGame {
 
         // Check for collision
         if (
-            (swordX < moblinRight) &   // Sword's right edge is to the left of Moblin's right edge
-            (swordX + 16 > moblinLeft) &  // Sword's left edge is to the right of Moblin's left edge
-            (swordY < moblinBottom) &  // Sword's bottom edge is above Moblin's bottom edge
-            (swordY + 16 > moblinTop)    // Sword's top edge is below Moblin's top edge
+            (swordX < moblinRight) & // Sword's right edge is to the left of Moblin's right edge
+            (swordX + 16 > moblinLeft) & // Sword's left edge is to the right of Moblin's left edge
+            (swordY < moblinBottom) & // Sword's bottom edge is above Moblin's bottom edge
+            (swordY + 16 > moblinTop) // Sword's top edge is below Moblin's top edge
         ) {
             return true; // Collision detected
         }

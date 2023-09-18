@@ -10,7 +10,7 @@ call Link.new 4
 pop this 0
 push constant 495
 push constant 2
-push constant 1
+push constant 3
 call Moblin.new 3
 pop this 2
 push constant 300
@@ -91,18 +91,42 @@ call Sys.wait 1
 pop temp 0
 push constant 0
 return
-function ZeldaGame.moveMoblin 2
+function ZeldaGame.moveMoblin 5
 push argument 0
 pop pointer 0
+push this 2
+call Moblin.getIsDead 1
+pop local 0
+push constant 220
+pop local 3
+push constant 220
+pop local 4
+push local 0
+push constant 0
+not
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push this 2
+push this 4
+push local 3
+call RandomNumberGenerator.nextInt 2
+push this 4
+push local 4
+call RandomNumberGenerator.nextInt 2
+call Moblin.respawn 3
+pop temp 0
+label IF_FALSE0
 push this 0
 call Link.getX 1
-pop local 0
+pop local 1
 push this 0
 call Link.getY 1
-pop local 1
+pop local 2
 push this 2
-push local 0
 push local 1
+push local 2
 call Moblin.updatePlayerPosition 3
 pop temp 0
 push this 2

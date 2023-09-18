@@ -1,5 +1,5 @@
 function Moblin.new 0
-push constant 5
+push constant 6
 call Memory.alloc 1
 pop pointer 0
 push argument 0
@@ -8,6 +8,8 @@ push argument 1
 pop this 1
 push argument 2
 pop this 2
+push constant 0
+pop this 5
 push pointer 0
 call Moblin.draw 1
 pop temp 0
@@ -31,6 +33,11 @@ push argument 0
 pop pointer 0
 push this 1
 return
+function Moblin.getIsDead 0
+push argument 0
+pop pointer 0
+push this 5
+return
 function Moblin.takeDamage 0
 push argument 0
 pop pointer 0
@@ -52,6 +59,33 @@ push constant 0
 pop this 2
 push pointer 0
 call Moblin.erase 1
+pop temp 0
+push constant 0
+not
+pop this 5
+label IF_FALSE0
+push constant 0
+return
+function Moblin.respawn 0
+push argument 0
+pop pointer 0
+push this 5
+push constant 0
+not
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push argument 1
+pop this 0
+push argument 2
+pop this 1
+push constant 3
+pop this 2
+push constant 0
+pop this 5
+push pointer 0
+call Moblin.draw 1
 pop temp 0
 label IF_FALSE0
 push constant 0
