@@ -77,16 +77,9 @@ push this 0
 push local 1
 call Link.setCooldownTimer 2
 pop temp 0
-label IF_FALSE1
-push this 0
-call Link.getCooldownTimer 1
-push constant 0
-lt
-push this 0
-call Link.getCooldownTimer 1
+push local 1
 push constant 0
 eq
-or
 if-goto IF_TRUE2
 goto IF_FALSE2
 label IF_TRUE2
@@ -99,6 +92,7 @@ push constant 10000
 call Link.setCooldownTimer 2
 pop temp 0
 label IF_FALSE2
+label IF_FALSE1
 push this 1
 push constant 1
 eq

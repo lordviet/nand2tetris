@@ -47,21 +47,22 @@ class ZeldaGame {
         let isLinkDead = link.getIsDead();
         let cooldownTimer = link.getCooldownTimer();
 
-        if(isLinkDead = true){
+        if (isLinkDead = true) {
             let isGameOver = true;
             return;
         }
 
         // Check if Link is invincible and decrement cooldown timer
         if (link.getIsInvincible() = true) {
+            // Decrement cooldown timer
             let cooldownTimer = cooldownTimer - 1;
             do link.setCooldownTimer(cooldownTimer);
-        }
 
-        // If cooldown timer reaches zero or less, Link loses invincibility
-        if ((link.getCooldownTimer() < 0) | (link.getCooldownTimer() = 0)) {
-            do link.setIsInvincible(false);
-            do link.setCooldownTimer(10000);
+            // If cooldown timer reaches zero or less, Link loses invincibility
+            if (cooldownTimer = 0) {
+                do link.setIsInvincible(false);
+                do link.setCooldownTimer(10000);
+            }
         }
 
         if (direction = 1) {
@@ -78,7 +79,7 @@ class ZeldaGame {
         }
         do checkIfLinkHasPickedUpASword();
 
-        if(link.getIsInvincible() = true){
+        if (link.getIsInvincible() = true) {
             do link.setIsInvincible(false);
         }
         do checkIfLinkHasCollidedWithMoblin();
