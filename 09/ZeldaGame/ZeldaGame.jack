@@ -9,6 +9,8 @@ class ZeldaGame {
 
     field RandomNumberGenerator rng;
 
+    field bool isGameOver;
+
     /** Constructs a new Zelda Game. */
     constructor ZeldaGame new() {
         // Creates a new Link sprite
@@ -24,6 +26,8 @@ class ZeldaGame {
 
         let rng = RandomNumberGenerator.new(12345);
 
+        let isGameOver = false;
+
         let direction = 0; // initial state is no movement
         return this;
     }
@@ -37,6 +41,29 @@ class ZeldaGame {
 
     /** Moves Link in the current direction. */
     method void moveLink() {
+        var bool isLinkDead;
+        var int cooldownTimer;
+
+        let isLinkDead = link.getIsDead();
+        let cooldownTimer = link.getCooldownTimer();
+
+        if(isLinkDead = true){
+            let isGameOver = true;
+            return;
+        }
+
+        // Check if Link is invincible and decrement cooldown timer
+        if (link.getIsInvincible() = true) {
+            let cooldownTimer = cooldownTimer - 1;
+            do link.setCooldownTimer(cooldownTimer);
+        }
+
+        // If cooldown timer reaches zero or less, Link loses invincibility
+        if ((link.getCooldownTimer() < 0) | (link.getCooldownTimer() = 0)) {
+            do link.setIsInvincible(false);
+            do link.setCooldownTimer(10000);
+        }
+
         if (direction = 1) {
             do link.moveUp();
         }
@@ -50,6 +77,12 @@ class ZeldaGame {
             do link.moveRight();
         }
         do checkIfLinkHasPickedUpASword();
+
+        if(link.getIsInvincible() = true){
+            do link.setIsInvincible(false);
+        }
+        do checkIfLinkHasCollidedWithMoblin();
+
         do spawnSwordIfLinkIsSwordless();
 
         do Sys.wait(5); // delays the next movement
@@ -113,6 +146,42 @@ class ZeldaGame {
         if ((linkRight > swordLeft) & (linkLeft < swordRight) & (linkBottom > swordTop) & (linkTop < swordBottom)) {
             do link.pickUpSword();
             do sword.erase();
+        }
+
+        return;
+    }
+
+    method void checkIfLinkHasCollidedWithMoblin() {
+        var int linkX, moblinX, linkY, moblinY;
+        var int collisionBoxWidth, collisionBoxHeight;
+        var int linkLeft, linkRight, linkTop, linkBottom;
+        var int moblinLeft, moblinRight, moblinTop, moblinBottom;
+
+        let linkX = link.getX();
+        let moblinX = moblin.getX();
+        let linkY = link.getY();
+        let moblinY = moblin.getY();
+
+        // Define the collision box dimensions
+        let collisionBoxWidth = 16; // Adjust to Link's width
+        let collisionBoxHeight = 16; // Adjust to Link's height
+
+        // Calculate the boundaries of Link's collision box
+        let linkLeft = linkX;
+        let linkRight = linkX + collisionBoxWidth;
+        let linkTop = linkY;
+        let linkBottom = linkY + collisionBoxHeight;
+
+        // Calculate the boundaries of Moblin's collision box
+        let moblinLeft = moblinX;
+        let moblinRight = moblinX + collisionBoxWidth;
+        let moblinTop = moblinY;
+        let moblinBottom = moblinY + collisionBoxHeight;
+
+        // Check for collision between Link and the Moblin
+        if ((linkRight > moblinLeft) & (linkLeft < moblinRight) & (linkBottom > moblinTop) & (linkTop < moblinBottom)) {
+            do link.takeDamage();
+            do link.setIsInvincible(true);
         }
 
         return;
