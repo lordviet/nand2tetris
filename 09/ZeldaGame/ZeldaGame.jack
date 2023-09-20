@@ -9,7 +9,10 @@ class ZeldaGame {
 
     field RandomNumberGenerator rng;
 
+    field int enemiesLeft;
+
     field bool isGameOver;
+    field bool isLevelCleared;
 
     /** Constructs a new Zelda Game. */
     constructor ZeldaGame new() {
@@ -20,6 +23,9 @@ class ZeldaGame {
 
         // Creates a Moblin sprite
         let moblin = Moblin.new(495, 2, 3);
+        
+        // Define how many enemies are needed to clear the level
+        let enemiesLeft = 2;
 
         // Creates a Sword sprite
         let sword = Sword.new(300, 100, true);
@@ -27,6 +33,7 @@ class ZeldaGame {
         let rng = RandomNumberGenerator.new(12345);
 
         let isGameOver = false;
+        let isLevelCleared = false;
 
         let direction = 0; // initial state is no movement
         return this;
@@ -98,8 +105,15 @@ class ZeldaGame {
         let isMoblinDead = moblin.getIsDead();
         let maxX = 220;
         let maxY = 220;
-
+        
         if (isMoblinDead = true) {
+            let enemiesLeft = enemiesLeft - 1;
+
+            if(enemiesLeft = 0){
+                let isLevelCleared = true;
+                return;
+            }
+
             do moblin.respawn(rng.nextInt(maxX), rng.nextInt(maxY));
         }
 
@@ -317,7 +331,9 @@ class ZeldaGame {
             while (key = 0) {
                 let key = Keyboard.keyPressed();
                 do moveLink();
-                do moveMoblin();
+                if(enemiesLeft > 0){
+                    do moveMoblin();
+                }
             }
             if (key = 81) {
                 let exit = true;
