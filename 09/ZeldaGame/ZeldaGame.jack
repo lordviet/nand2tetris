@@ -6,7 +6,7 @@ class ZeldaGame {
     field Moblin moblin; // the sprite of Moblin
 
     field Sword sword; // the Sword sprite
-
+    field Wall wall; // the Wall sprite
     field RandomNumberGenerator rng;
 
     field int enemiesLeft;
@@ -29,6 +29,8 @@ class ZeldaGame {
 
         // Creates a Sword sprite
         let sword = Sword.new(300, 100, true);
+
+        let wall = Wall.new();
 
         let rng = RandomNumberGenerator.new(12345);
 
@@ -237,6 +239,10 @@ class ZeldaGame {
         // save the state of the original sword co-ordinates
         let originalSwordX = sword.getX();
         let originalSwordY = sword.getY();
+
+        if (link.getHasSword() = false){
+            return;
+        }
 
         do link.attack();
 
