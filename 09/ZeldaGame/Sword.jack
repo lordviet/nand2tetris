@@ -191,7 +191,7 @@ class Sword {
 
     /** Moves Sword up by 1 pixels. */
     method void moveUp() {
-        if (y > 1) {
+        if (y > 16) {
             do erase();
             let y = y - 1;
             do draw();
@@ -201,7 +201,7 @@ class Sword {
 
     /** Moves Sword down by 1 pixels. */
     method void moveDown() {
-        if (y < 240) {
+        if (y < 224) {
             do erase();
             let y = y + 1;
             do drawDown();
@@ -211,7 +211,7 @@ class Sword {
 
     /** Moves Sword left by 1 pixels. */
     method void moveLeft() {
-        if (x > 1) {
+        if (x > 16) {
             do erase();
             let x = x - 1;
             do drawLeft();
@@ -221,7 +221,7 @@ class Sword {
 
     /** Moves Sword right by 1 pixels. */
     method void moveRight() {
-        if (x < 510) {
+        if (x < 494) {
             do erase();
             let x = x + 1;
             do drawRight();

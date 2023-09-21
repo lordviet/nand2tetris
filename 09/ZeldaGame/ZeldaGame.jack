@@ -19,10 +19,10 @@ class ZeldaGame {
         // Creates a new Link sprite
         // Positions him at the top of the screen
         // Spawns with 3 HP and without sword
-        let link = Link.new(248, 230, 3, false);
+        let link = Link.new(248, 214, 3, false);
 
         // Creates a Moblin sprite
-        let moblin = Moblin.new(495, 2, 3);
+        let moblin = Moblin.new(495, 20, 3);
         
         // Define how many enemies are needed to clear the level
         let enemiesLeft = 2;
@@ -280,7 +280,7 @@ class ZeldaGame {
                 let swordDirection = sword.getFlyingDirection(); // Update sword direction
             }
 
-            if ((sword.getX() = 510) | (sword.getX() = 1) | (sword.getY() = 240) | (sword.getY() = 1)) {
+            if ((sword.getX() = 494) | (sword.getX() = 16) | (sword.getY() = 224) | (sword.getY() = 16)) {
                 do Sys.wait(5);
                 do sword.erase();
                 do sword.setFlyingDirection(0);

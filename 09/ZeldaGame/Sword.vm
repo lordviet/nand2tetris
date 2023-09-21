@@ -642,7 +642,7 @@ function Sword.moveUp 0
 push argument 0
 pop pointer 0
 push this 1
-push constant 1
+push constant 16
 gt
 if-goto IF_TRUE0
 goto IF_FALSE0
@@ -664,7 +664,7 @@ function Sword.moveDown 0
 push argument 0
 pop pointer 0
 push this 1
-push constant 240
+push constant 224
 lt
 if-goto IF_TRUE0
 goto IF_FALSE0
@@ -686,7 +686,7 @@ function Sword.moveLeft 0
 push argument 0
 pop pointer 0
 push this 0
-push constant 1
+push constant 16
 gt
 if-goto IF_TRUE0
 goto IF_FALSE0
@@ -708,7 +708,7 @@ function Sword.moveRight 0
 push argument 0
 pop pointer 0
 push this 0
-push constant 510
+push constant 494
 lt
 if-goto IF_TRUE0
 goto IF_FALSE0

@@ -3,13 +3,13 @@ push constant 9
 call Memory.alloc 1
 pop pointer 0
 push constant 248
-push constant 230
+push constant 214
 push constant 3
 push constant 0
 call Link.new 4
 pop this 0
 push constant 495
-push constant 2
+push constant 20
 push constant 3
 call Moblin.new 3
 pop this 2
@@ -541,21 +541,21 @@ pop local 5
 label IF_FALSE5
 push this 3
 call Sword.getX 1
-push constant 510
+push constant 494
 eq
 push this 3
 call Sword.getX 1
-push constant 1
+push constant 16
 eq
 or
 push this 3
 call Sword.getY 1
-push constant 240
+push constant 224
 eq
 or
 push this 3
 call Sword.getY 1
-push constant 1
+push constant 16
 eq
 or
 if-goto IF_TRUE6
