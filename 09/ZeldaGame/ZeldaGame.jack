@@ -1,15 +1,16 @@
 class ZeldaGame {
     field Link link; // the sprite of Link
-    field int direction; // Link's current direction: 
-    // 0=none, 1=up, 2=down, 3=left, 4=right
-
     field Moblin moblin; // the sprite of Moblin
 
     field Sword sword; // the Sword sprite
     field Wall wall; // the Wall sprite
+    field Gate gate; // the Gate sprite
+
     field RandomNumberGenerator rng;
 
     field int enemiesLeft;
+    field int direction; // Link's current direction: 
+    // 0=none, 1=up, 2=down, 3=left, 4=right
 
     field bool isGameOver;
     field bool isLevelCleared;
@@ -24,20 +25,20 @@ class ZeldaGame {
         // Creates a Moblin sprite
         let moblin = Moblin.new(495, 20, 3);
 
-        // Define how many enemies are needed to clear the level
-        let enemiesLeft = 2;
-
         // Creates a Sword sprite
         let sword = Sword.new(300, 100, true);
-
         let wall = Wall.new();
+        let gate = Gate.new();
 
         let rng = RandomNumberGenerator.new(12345);
+
+        // Define how many enemies are needed to clear the level
+        let enemiesLeft = 2;
+        let direction = 0; // initial state is no movement
 
         let isGameOver = false;
         let isLevelCleared = false;
 
-        let direction = 0; // initial state is no movement
         return this;
     }
 
