@@ -206,7 +206,7 @@ class ZeldaGame {
 
     method void spawnSwordIfLinkIsSwordless() {
         var bool linkHasSword, swordIsActive;
-        var int maxX, maxY, swordX, swordY;
+        var int minX, minY, maxX, maxY, swordX, swordY;
 
         let linkHasSword = link.getHasSword();
         let swordIsActive = sword.getIsActive();
@@ -215,11 +215,15 @@ class ZeldaGame {
             return;
         }
 
+        // Define the minimum values for X and Y
+        let minX = 16;
+        let minY = 16;
+
         let maxX = 240;
         let maxY = 200;
 
-        let swordX = rng.nextInt(maxX);
-        let swordY = rng.nextInt(maxY);
+        let swordX = rng.nextInt(maxX - minX) + minX;
+        let swordY = rng.nextInt(maxY - minY) + minY;
 
         do sword.setX(swordX);
         do sword.setY(swordY);

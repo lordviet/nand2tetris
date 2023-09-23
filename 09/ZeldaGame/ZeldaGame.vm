@@ -370,7 +370,7 @@ pop temp 0
 label IF_FALSE0
 push constant 0
 return
-function ZeldaGame.spawnSwordIfLinkIsSwordless 6
+function ZeldaGame.spawnSwordIfLinkIsSwordless 8
 push argument 0
 pop pointer 0
 push this 0
@@ -394,24 +394,36 @@ label IF_TRUE0
 push constant 0
 return
 label IF_FALSE0
-push constant 240
+push constant 16
 pop local 2
-push constant 200
+push constant 16
 pop local 3
-push this 5
-push local 2
-call RandomNumberGenerator.nextInt 2
+push constant 240
 pop local 4
-push this 5
-push local 3
-call RandomNumberGenerator.nextInt 2
+push constant 200
 pop local 5
-push this 3
+push this 5
 push local 4
+push local 2
+sub
+call RandomNumberGenerator.nextInt 2
+push local 2
+add
+pop local 6
+push this 5
+push local 5
+push local 3
+sub
+call RandomNumberGenerator.nextInt 2
+push local 3
+add
+pop local 7
+push this 3
+push local 6
 call Sword.setX 2
 pop temp 0
 push this 3
-push local 5
+push local 7
 call Sword.setY 2
 pop temp 0
 push this 3
