@@ -33,13 +33,40 @@ class ZeldaGame {
         let rng = RandomNumberGenerator.new(12345);
 
         // Define how many enemies are needed to clear the level
-        let enemiesLeft = 2;
+        let enemiesLeft = 1;
         let direction = 0; // initial state is no movement
 
         let isGameOver = false;
         let isLevelCleared = false;
 
         return this;
+    }
+
+    method void restartGame () {
+        do link.dispose();
+        do link.erase();
+        let link = Link.new(248, 214, 3, false);
+
+        do moblin.dispose();
+        do moblin.erase();
+        let moblin = Moblin.new(495, 20, 3);
+
+        do sword.dispose();
+        do sword.erase();
+        let sword = Sword.new(300, 100, true);
+        
+        do wall.dispose();
+        let wall = Wall.new();
+
+        do gate.setIsOpen(false);
+
+        let enemiesLeft = 1;
+        let direction = 0; // initial state is no movement
+
+        let isGameOver = false;
+        let isLevelCleared = false;
+
+        return;
     }
 
     /** Disposes this game. */
@@ -114,6 +141,9 @@ class ZeldaGame {
 
             if (enemiesLeft = 0) {
                 do moblin.nullify();
+                do gate.setIsOpen(true);
+
+                // TODO: Clear level only when Link interacts with Zelda
                 let isLevelCleared = true;
                 return;
             }
@@ -350,6 +380,9 @@ class ZeldaGame {
             if (key = 81) {
                 let exit = true;
             } // q key
+            if (key = 82){
+                do restartGame();
+            }
             if (key = 32) {
                 do performAttack();
             } // space key
