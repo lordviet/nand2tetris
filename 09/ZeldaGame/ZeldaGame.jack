@@ -1,5 +1,6 @@
 class ZeldaGame {
     field Link link; // the sprite of Link
+    field Zelda zelda; // the sprite of Zelda
     field Moblin moblin; // the sprite of Moblin
 
     field Sword sword; // the Sword sprite
@@ -46,6 +47,9 @@ class ZeldaGame {
         do link.dispose();
         do link.erase();
         let link = Link.new(248, 214, 3, false);
+
+        do zelda.dispose();
+        do zelda.erase();
 
         do moblin.dispose();
         do moblin.erase();
@@ -142,6 +146,8 @@ class ZeldaGame {
             if (enemiesLeft = 0) {
                 do moblin.nullify();
                 do gate.setIsOpen(true);
+
+                let zelda = Zelda.new();
 
                 // TODO: Clear level only when Link interacts with Zelda
                 let isLevelCleared = true;

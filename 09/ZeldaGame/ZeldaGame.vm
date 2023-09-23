@@ -1,5 +1,5 @@
 function ZeldaGame.new 0
-push constant 10
+push constant 11
 call Memory.alloc 1
 pop pointer 0
 push constant 248
@@ -12,28 +12,28 @@ push constant 495
 push constant 20
 push constant 3
 call Moblin.new 3
-pop this 1
+pop this 2
 push constant 300
 push constant 100
 push constant 0
 not
 call Sword.new 3
-pop this 2
-call Wall.new 0
 pop this 3
-call Gate.new 0
+call Wall.new 0
 pop this 4
+call Gate.new 0
+pop this 5
 push constant 12345
 call RandomNumberGenerator.new 1
-pop this 5
-push constant 1
 pop this 6
-push constant 0
+push constant 1
 pop this 7
 push constant 0
 pop this 8
 push constant 0
 pop this 9
+push constant 0
+pop this 10
 push pointer 0
 return
 function ZeldaGame.restartGame 0
@@ -51,21 +51,21 @@ push constant 3
 push constant 0
 call Link.new 4
 pop this 0
-push this 1
+push this 2
 call Moblin.dispose 1
 pop temp 0
-push this 1
+push this 2
 call Moblin.erase 1
 pop temp 0
 push constant 495
 push constant 20
 push constant 3
 call Moblin.new 3
-pop this 1
-push this 2
+pop this 2
+push this 3
 call Sword.dispose 1
 pop temp 0
-push this 2
+push this 3
 call Sword.erase 1
 pop temp 0
 push constant 300
@@ -73,24 +73,24 @@ push constant 100
 push constant 0
 not
 call Sword.new 3
-pop this 2
-push this 3
+pop this 3
+push this 4
 call Wall.dispose 1
 pop temp 0
 call Wall.new 0
-pop this 3
-push this 4
+pop this 4
+push this 5
 push constant 0
 call Gate.setIsOpen 2
 pop temp 0
 push constant 1
-pop this 6
-push constant 0
 pop this 7
 push constant 0
 pop this 8
 push constant 0
 pop this 9
+push constant 0
+pop this 10
 push constant 0
 return
 function ZeldaGame.dispose 0
@@ -122,7 +122,7 @@ goto IF_FALSE0
 label IF_TRUE0
 push constant 0
 not
-pop this 8
+pop this 9
 push constant 0
 return
 label IF_FALSE0
@@ -158,7 +158,7 @@ call Link.setCooldownTimer 2
 pop temp 0
 label IF_FALSE2
 label IF_FALSE1
-push this 7
+push this 8
 push constant 1
 eq
 if-goto IF_TRUE3
@@ -168,7 +168,7 @@ push this 0
 call Link.moveUp 1
 pop temp 0
 label IF_FALSE3
-push this 7
+push this 8
 push constant 2
 eq
 if-goto IF_TRUE4
@@ -178,7 +178,7 @@ push this 0
 call Link.moveDown 1
 pop temp 0
 label IF_FALSE4
-push this 7
+push this 8
 push constant 3
 eq
 if-goto IF_TRUE5
@@ -188,7 +188,7 @@ push this 0
 call Link.moveLeft 1
 pop temp 0
 label IF_FALSE5
-push this 7
+push this 8
 push constant 4
 eq
 if-goto IF_TRUE6
@@ -228,7 +228,7 @@ return
 function ZeldaGame.moveMoblin 5
 push argument 0
 pop pointer 0
-push this 1
+push this 2
 call Moblin.getIsDead 1
 pop local 0
 push constant 220
@@ -242,35 +242,37 @@ eq
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
-push this 6
+push this 7
 push constant 1
 sub
-pop this 6
-push this 6
+pop this 7
+push this 7
 push constant 0
 eq
 if-goto IF_TRUE1
 goto IF_FALSE1
 label IF_TRUE1
-push this 1
+push this 2
 call Moblin.nullify 1
 pop temp 0
-push this 4
+push this 5
 push constant 0
 not
 call Gate.setIsOpen 2
 pop temp 0
+call Zelda.new 0
+pop this 1
 push constant 0
 not
-pop this 9
+pop this 10
 push constant 0
 return
 label IF_FALSE1
-push this 1
-push this 5
+push this 2
+push this 6
 push local 3
 call RandomNumberGenerator.nextInt 2
-push this 5
+push this 6
 push local 4
 call RandomNumberGenerator.nextInt 2
 call Moblin.respawn 3
@@ -282,12 +284,12 @@ pop local 1
 push this 0
 call Link.getY 1
 pop local 2
-push this 1
+push this 2
 push local 1
 push local 2
 call Moblin.updatePlayerPosition 3
 pop temp 0
-push this 1
+push this 2
 call Moblin.moveTowardsPlayer 1
 pop temp 0
 push constant 5
@@ -301,13 +303,13 @@ pop pointer 0
 push this 0
 call Link.getX 1
 pop local 0
-push this 2
+push this 3
 call Sword.getX 1
 pop local 1
 push this 0
 call Link.getY 1
 pop local 2
-push this 2
+push this 3
 call Sword.getY 1
 pop local 3
 push constant 16
@@ -359,7 +361,7 @@ label IF_TRUE0
 push this 0
 call Link.pickUpSword 1
 pop temp 0
-push this 2
+push this 3
 call Sword.erase 1
 pop temp 0
 label IF_FALSE0
@@ -371,13 +373,13 @@ pop pointer 0
 push this 0
 call Link.getX 1
 pop local 0
-push this 1
+push this 2
 call Moblin.getX 1
 pop local 1
 push this 0
 call Link.getY 1
 pop local 2
-push this 1
+push this 2
 call Moblin.getY 1
 pop local 3
 push constant 16
@@ -443,7 +445,7 @@ pop pointer 0
 push this 0
 call Link.getHasSword 1
 pop local 0
-push this 2
+push this 3
 call Sword.getIsActive 1
 pop local 1
 push local 0
@@ -469,7 +471,7 @@ push constant 240
 pop local 4
 push constant 200
 pop local 5
-push this 5
+push this 6
 push local 4
 push local 2
 sub
@@ -477,7 +479,7 @@ call RandomNumberGenerator.nextInt 2
 push local 2
 add
 pop local 6
-push this 5
+push this 6
 push local 5
 push local 3
 sub
@@ -485,15 +487,15 @@ call RandomNumberGenerator.nextInt 2
 push local 3
 add
 pop local 7
-push this 2
+push this 3
 push local 6
 call Sword.setX 2
 pop temp 0
-push this 2
+push this 3
 push local 7
 call Sword.setY 2
 pop temp 0
-push this 2
+push this 3
 call Sword.draw 1
 pop temp 0
 push constant 0
@@ -507,10 +509,10 @@ pop local 0
 push this 0
 call Link.getY 1
 pop local 2
-push this 2
+push this 3
 call Sword.getX 1
 pop local 1
-push this 2
+push this 3
 call Sword.getY 1
 pop local 3
 push this 0
@@ -526,24 +528,24 @@ label IF_FALSE0
 push this 0
 call Link.attack 1
 pop temp 0
-push this 2
+push this 3
 push local 0
 call Sword.setX 2
 pop temp 0
-push this 2
+push this 3
 push local 2
 call Sword.setY 2
 pop temp 0
-push this 2
+push this 3
 push constant 0
 not
 call Sword.setIsFlying 2
 pop temp 0
-push this 2
-push this 7
+push this 3
+push this 8
 call Sword.setFlyingDirection 2
 pop temp 0
-push this 2
+push this 3
 call Sword.getFlyingDirection 1
 pop local 5
 label WHILE_EXP0
@@ -553,50 +555,50 @@ eq
 not
 not
 if-goto WHILE_END0
-push this 7
+push this 8
 push constant 1
 eq
 if-goto IF_TRUE1
 goto IF_FALSE1
 label IF_TRUE1
-push this 2
+push this 3
 call Sword.moveUp 1
 pop temp 0
 label IF_FALSE1
-push this 7
+push this 8
 push constant 2
 eq
 if-goto IF_TRUE2
 goto IF_FALSE2
 label IF_TRUE2
-push this 2
+push this 3
 call Sword.moveDown 1
 pop temp 0
 label IF_FALSE2
-push this 7
+push this 8
 push constant 3
 eq
 if-goto IF_TRUE3
 goto IF_FALSE3
 label IF_TRUE3
-push this 2
+push this 3
 call Sword.moveLeft 1
 pop temp 0
 label IF_FALSE3
-push this 7
+push this 8
 push constant 4
 eq
 if-goto IF_TRUE4
 goto IF_FALSE4
 label IF_TRUE4
-push this 2
+push this 3
 call Sword.moveRight 1
 pop temp 0
 label IF_FALSE4
 push pointer 0
-push this 2
+push this 3
 call Sword.getX 1
-push this 2
+push this 3
 call Sword.getY 1
 call ZeldaGame.checkMoblinCollision 3
 pop local 6
@@ -604,35 +606,35 @@ push local 6
 if-goto IF_TRUE5
 goto IF_FALSE5
 label IF_TRUE5
-push this 1
+push this 2
 call Moblin.takeDamage 1
 pop temp 0
-push this 2
+push this 3
 call Sword.erase 1
 pop temp 0
-push this 2
+push this 3
 push constant 0
 call Sword.setFlyingDirection 2
 pop temp 0
-push this 2
+push this 3
 call Sword.getFlyingDirection 1
 pop local 5
 label IF_FALSE5
-push this 2
+push this 3
 call Sword.getX 1
 push constant 494
 eq
-push this 2
+push this 3
 call Sword.getX 1
 push constant 16
 eq
 or
-push this 2
+push this 3
 call Sword.getY 1
 push constant 224
 eq
 or
-push this 2
+push this 3
 call Sword.getY 1
 push constant 16
 eq
@@ -643,24 +645,24 @@ label IF_TRUE6
 push constant 5
 call Sys.wait 1
 pop temp 0
-push this 2
+push this 3
 call Sword.erase 1
 pop temp 0
-push this 2
+push this 3
 push constant 0
 call Sword.setFlyingDirection 2
 pop temp 0
-push this 2
+push this 3
 call Sword.getFlyingDirection 1
 pop local 5
 label IF_FALSE6
 goto WHILE_EXP0
 label WHILE_END0
-push this 2
+push this 3
 push local 1
 call Sword.setX 2
 pop temp 0
-push this 2
+push this 3
 push local 3
 call Sword.setY 2
 pop temp 0
@@ -673,10 +675,10 @@ push constant 32
 pop local 2
 push constant 32
 pop local 3
-push this 1
+push this 2
 call Moblin.getX 1
 pop local 0
-push this 1
+push this 2
 call Moblin.getY 1
 pop local 1
 push local 0
@@ -740,7 +742,7 @@ pop local 0
 push pointer 0
 call ZeldaGame.moveLink 1
 pop temp 0
-push this 6
+push this 7
 push constant 0
 gt
 if-goto IF_TRUE0
@@ -789,7 +791,7 @@ if-goto IF_TRUE4
 goto IF_FALSE4
 label IF_TRUE4
 push constant 1
-pop this 7
+pop this 8
 label IF_FALSE4
 push local 0
 push constant 133
@@ -798,7 +800,7 @@ if-goto IF_TRUE5
 goto IF_FALSE5
 label IF_TRUE5
 push constant 2
-pop this 7
+pop this 8
 label IF_FALSE5
 push local 0
 push constant 130
@@ -807,7 +809,7 @@ if-goto IF_TRUE6
 goto IF_FALSE6
 label IF_TRUE6
 push constant 3
-pop this 7
+pop this 8
 label IF_FALSE6
 push local 0
 push constant 132
@@ -816,7 +818,7 @@ if-goto IF_TRUE7
 goto IF_FALSE7
 label IF_TRUE7
 push constant 4
-pop this 7
+pop this 8
 label IF_FALSE7
 label WHILE_EXP2
 push local 0
