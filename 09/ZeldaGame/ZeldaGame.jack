@@ -23,7 +23,7 @@ class ZeldaGame {
 
         // Creates a Moblin sprite
         let moblin = Moblin.new(495, 20, 3);
-        
+
         // Define how many enemies are needed to clear the level
         let enemiesLeft = 2;
 
@@ -107,11 +107,12 @@ class ZeldaGame {
         let isMoblinDead = moblin.getIsDead();
         let maxX = 220;
         let maxY = 220;
-        
+
         if (isMoblinDead = true) {
             let enemiesLeft = enemiesLeft - 1;
 
-            if(enemiesLeft = 0){
+            if (enemiesLeft = 0) {
+                do moblin.nullify();
                 let isLevelCleared = true;
                 return;
             }
@@ -244,7 +245,7 @@ class ZeldaGame {
         let originalSwordX = sword.getX();
         let originalSwordY = sword.getY();
 
-        if (link.getHasSword() = false){
+        if (link.getHasSword() = false) {
             return;
         }
 
@@ -341,7 +342,7 @@ class ZeldaGame {
             while (key = 0) {
                 let key = Keyboard.keyPressed();
                 do moveLink();
-                if(enemiesLeft > 0){
+                if (enemiesLeft > 0) {
                     do moveMoblin();
                 }
             }

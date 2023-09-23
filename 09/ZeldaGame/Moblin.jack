@@ -29,6 +29,12 @@ class Moblin {
         return y;
     }
 
+    method void nullify(){
+        let x = 0;
+        let y = 0;
+        return;
+    }
+
     method bool getIsDead() {
         return isDead;
     }
@@ -220,7 +226,7 @@ class Moblin {
 
     /** Moves Moblin up by 1 pixels. */
     method void moveUp() {
-        if (y > 1) {
+        if (y > 16) {
             do erase();
             let y = y - 1;
             do drawUp();
@@ -230,7 +236,7 @@ class Moblin {
 
     /** Moves Moblin down by 1 pixels. */
     method void moveDown() {
-        if (y < 240) {
+        if (y < 224) {
             do erase();
             let y = y + 1;
             do draw();
@@ -240,7 +246,7 @@ class Moblin {
 
     /** Moves Moblin left by 1 pixels. */
     method void moveLeft() {
-        if (x > 1) {
+        if (x > 16) {
             do erase();
             let x = x - 1;
             do drawLeft();
@@ -250,7 +256,7 @@ class Moblin {
 
     /** Moves Moblin right by 1 pixels. */
     method void moveRight() {
-        if (x < 510) {
+        if (x < 494) {
             do erase();
             let x = x + 1;
             do drawRight();
