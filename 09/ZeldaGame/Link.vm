@@ -1,5 +1,5 @@
 function Link.new 0
-push constant 7
+push constant 5
 call Memory.alloc 1
 pop pointer 0
 push argument 0
@@ -12,10 +12,6 @@ push argument 3
 pop this 3
 push constant 0
 pop this 4
-push constant 0
-pop this 5
-push constant 10000
-pop this 6
 push pointer 0
 call Link.draw 1
 pop temp 0
@@ -53,30 +49,6 @@ function Link.getIsDead 0
 push argument 0
 pop pointer 0
 push this 4
-return
-function Link.getIsInvincible 0
-push argument 0
-pop pointer 0
-push this 5
-return
-function Link.setIsInvincible 0
-push argument 0
-pop pointer 0
-push argument 1
-pop this 5
-push constant 0
-return
-function Link.getCooldownTimer 0
-push argument 0
-pop pointer 0
-push this 6
-return
-function Link.setCooldownTimer 0
-push argument 0
-pop pointer 0
-push argument 1
-pop this 6
-push constant 0
 return
 function Link.draw 1
 push argument 0
@@ -929,16 +901,6 @@ return
 function Link.takeDamage 0
 push argument 0
 pop pointer 0
-push this 5
-push constant 0
-not
-eq
-if-goto IF_TRUE0
-goto IF_FALSE0
-label IF_TRUE0
-push constant 0
-return
-label IF_FALSE0
 push this 2
 push constant 1
 sub
@@ -950,9 +912,9 @@ push this 2
 push constant 0
 eq
 or
-if-goto IF_TRUE1
-goto IF_FALSE1
-label IF_TRUE1
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
 push constant 0
 pop this 2
 push pointer 0
@@ -961,6 +923,6 @@ pop temp 0
 push constant 0
 not
 pop this 4
-label IF_FALSE1
+label IF_FALSE0
 push constant 0
 return

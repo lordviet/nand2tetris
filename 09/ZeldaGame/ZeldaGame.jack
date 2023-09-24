@@ -14,7 +14,7 @@ class ZeldaGame {
     // 0=none, 1=up, 2=down, 3=left, 4=right
 
     field bool isGameOver;
-    field bool isLevelCleared;
+    field bool isGameCleared;
 
     /** Constructs a new Zelda Game. */
     constructor ZeldaGame new() {
@@ -24,7 +24,7 @@ class ZeldaGame {
         let link = Link.new(248, 214, 3, false);
 
         // Creates a Moblin sprite
-        let moblin = Moblin.new(495, 20, 3);
+        let moblin = Moblin.new(495, 20, 1);
 
         // Creates a Sword sprite
         let sword = Sword.new(300, 100, true);
@@ -38,25 +38,29 @@ class ZeldaGame {
         let direction = 0; // initial state is no movement
 
         let isGameOver = false;
-        let isLevelCleared = false;
+        let isGameCleared = false;
 
         return this;
     }
 
     method void restartGame () {
-        do link.dispose();
+        do Screen.clearScreen();
+
         do link.erase();
-        let link = Link.new(248, 214, 3, false);
+        do link.dispose();
+        let link = Link.new(248, 214, 1, false);
 
-        do zelda.dispose();
-        do zelda.erase();
+        if(isGameCleared = true){
+            do zelda.erase();
+            do zelda.dispose();
+        }
 
-        do moblin.dispose();
         do moblin.erase();
+        do moblin.dispose();
         let moblin = Moblin.new(495, 20, 3);
 
-        do sword.dispose();
         do sword.erase();
+        do sword.dispose();
         let sword = Sword.new(300, 100, true);
         
         do wall.dispose();
@@ -68,7 +72,7 @@ class ZeldaGame {
         let direction = 0; // initial state is no movement
 
         let isGameOver = false;
-        let isLevelCleared = false;
+        let isGameCleared = false;
 
         return;
     }
@@ -83,27 +87,22 @@ class ZeldaGame {
     /** Moves Link in the current direction. */
     method void moveLink() {
         var bool isLinkDead;
-        var int cooldownTimer;
 
-        let isLinkDead = link.getIsDead();
-        let cooldownTimer = link.getCooldownTimer();
-
-        if (isLinkDead = true) {
-            let isGameOver = true;
+        if((isGameCleared = true) | (isGameOver = true)){
             return;
         }
 
-        // Check if Link is invincible and decrement cooldown timer
-        if (link.getIsInvincible() = true) {
-            // Decrement cooldown timer
-            let cooldownTimer = cooldownTimer - 1;
-            do link.setCooldownTimer(cooldownTimer);
+        let isLinkDead = link.getIsDead();
 
-            // If cooldown timer reaches zero or less, Link loses invincibility
-            if (cooldownTimer = 0) {
-                do link.setIsInvincible(false);
-                do link.setCooldownTimer(10000);
-            }
+        if (isLinkDead = true) {
+            let isGameOver = true;
+
+            do moblin.erase();
+            do moblin.dispose();
+
+            do gameOverScreen();
+
+            return;
         }
 
         if (direction = 1) {
@@ -119,11 +118,11 @@ class ZeldaGame {
             do link.moveRight();
         }
         do checkIfLinkHasPickedUpASword();
-
-        if (link.getIsInvincible() = true) {
-            do link.setIsInvincible(false);
-        }
         do checkIfLinkHasCollidedWithMoblin();
+
+        if(enemiesLeft = 0){
+            do checkIfLinkHasCollidedWithZelda();
+        }
 
         do spawnSwordIfLinkIsSwordless();
 
@@ -150,7 +149,7 @@ class ZeldaGame {
                 let zelda = Zelda.new();
 
                 // TODO: Clear level only when Link interacts with Zelda
-                let isLevelCleared = true;
+                // let isGameCleared = true;
                 return;
             }
 
@@ -236,7 +235,42 @@ class ZeldaGame {
         // Check for collision between Link and the Moblin
         if ((linkRight > moblinLeft) & (linkLeft < moblinRight) & (linkBottom > moblinTop) & (linkTop < moblinBottom)) {
             do link.takeDamage();
-            do link.setIsInvincible(true);
+        }
+
+        return;
+    }
+
+    method void checkIfLinkHasCollidedWithZelda() {
+        var int linkX, zeldaX, linkY, zeldaY;
+        var int collisionBoxWidth, collisionBoxHeight;
+        var int linkLeft, linkRight, linkTop, linkBottom;
+        var int zeldaLeft, zeldaRight, zeldaTop, zeldaBottom;
+
+        let linkX = link.getX();
+        let zeldaX = zelda.getX();
+        let linkY = link.getY();
+        let zeldaY = zelda.getY();
+
+        // Define the collision box dimensions
+        let collisionBoxWidth = 16; // Adjust to Link's width
+        let collisionBoxHeight = 16; // Adjust to Link's height
+
+        // Calculate the boundaries of Link's collision box
+        let linkLeft = linkX;
+        let linkRight = linkX + collisionBoxWidth;
+        let linkTop = linkY;
+        let linkBottom = linkY + collisionBoxHeight;
+
+        // Calculate the boundaries of Zelda's collision box
+        let zeldaLeft = zeldaX;
+        let zeldaRight = zeldaX + collisionBoxWidth;
+        let zeldaTop = zeldaY;
+        let zeldaBottom = zeldaY + collisionBoxHeight;
+
+        // Check for collision between Link and Zelda
+        if ((linkRight > zeldaLeft) & (linkLeft < zeldaRight) & (linkBottom > zeldaTop) & (linkTop < zeldaBottom)) {
+            let isGameCleared = true;
+            do endGameScreen();
         }
 
         return;
@@ -368,6 +402,34 @@ class ZeldaGame {
         return false; // No collision
     }
 
+    method void startGameScreen(){
+        do Screen.clearScreen();
+        do Output.moveCursor(12, 20);
+        do Output.printString("THE LEGEND OF ZELDA: LITE");
+
+        return;
+    }
+
+    method void endGameScreen(){
+        do Screen.clearScreen();
+        do Output.moveCursor(10, 14);
+        do Output.printString("THANKS LINK, YOU'RE THE HERO OF HYRULE.");
+
+        return;
+    }
+
+    method void gameOverScreen(){
+        do Screen.clearScreen();
+        
+        do Output.moveCursor(10, 27);
+        do Output.printString("GAME OVER!");
+
+        do Output.moveCursor(14, 22);
+        do Output.printString("PRESS 'R' TO RESTART.");
+
+        return;
+    }
+
     /** Runs the game: handles the user's inputs and moves Link accordingly */
     method void run() {
         var char key; // the key currently pressed by the user
@@ -375,12 +437,14 @@ class ZeldaGame {
         let exit = false;
 
         while (~exit) {
-            // waits for a key to be pressed
             while (key = 0) {
                 let key = Keyboard.keyPressed();
                 do moveLink();
                 if (enemiesLeft > 0) {
                     do moveMoblin();
+                }
+                if(isGameOver = true){
+                    do moblin.erase();
                 }
             }
             if (key = 81) {

@@ -2,8 +2,7 @@
 class Link {
 
     field int x, y, health; // screen location of Link's top-left corner and HP
-    field bool hasSword, isDead, isInvincible;
-    field int cooldownTimer;
+    field bool hasSword, isDead;
 
     /** Constructs a new Link sprite with a given location. */
     constructor Link new(int Ax, int Ay, int Hp, bool Sword) {
@@ -12,8 +11,6 @@ class Link {
         let health = Hp;
         let hasSword = Sword;
         let isDead = false;
-        let isInvincible = false;
-        let cooldownTimer = 10000;
 
         do draw();
         return this;
@@ -44,27 +41,7 @@ class Link {
     method bool getIsDead(){
         return isDead;
     }
-
-    method bool getIsInvincible(){
-        return isInvincible;
-    }
-
-    method void setIsInvincible(bool status){
-        let isInvincible = status;
-
-        return;
-    }
-
-    method int getCooldownTimer() {
-        return cooldownTimer;
-    }
-
-    method void setCooldownTimer(int value) {
-        let cooldownTimer = value;
-
-        return;
-    }
-
+    
     /** Draws default Link (or going down) on the screen. */
     method void draw() {
         var int memAddress;
@@ -288,10 +265,6 @@ class Link {
     }
 
     method void takeDamage() {
-        if(isInvincible = true){
-            return;
-        }
-
         let health = health - 1;
 
         if ((health < 0) | (health = 0)) {

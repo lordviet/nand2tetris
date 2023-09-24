@@ -15,6 +15,14 @@ class Zelda {
         return;
     }
 
+    method int getX(){
+        return x;
+    }
+
+    method int getY(){
+        return y;
+    }
+
      /** Draws Zelda on the screen. */
     method void draw() {
         var int memAddress;
