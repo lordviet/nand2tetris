@@ -18,7 +18,7 @@ class ZeldaGame {
     field bool isGameJustStarted;
 
     /** Constructs a new Zelda Game. */
-    constructor ZeldaGame new() {        
+    constructor ZeldaGame new() {
         let isGameOver = false;
         let isGameCleared = false;
         let isGameJustStarted = true;
@@ -30,16 +30,16 @@ class ZeldaGame {
         return this;
     }
 
-    method void initializeGame(){
+    method void initializeGame() {
         // Creates a new Link sprite
         // Positions him at the top of the screen
         // Spawns with 3 HP and without sword
         do Screen.clearScreen();
 
-        let link = Link.new(248, 214, 3, false);
+        let link = Link.new(248, 214, 1, false);
 
         // Creates a Moblin sprite
-        let moblin = Moblin.new(495, 20, 1);
+        let moblin = Moblin.new(495, 20, 3);
 
         // Creates a Sword sprite
         let sword = Sword.new(300, 100, true);
@@ -47,7 +47,7 @@ class ZeldaGame {
         let gate = Gate.new();
 
         // Define how many enemies are needed to clear the level
-        let enemiesLeft = 1;
+        let enemiesLeft = 3;
         let direction = 0; // initial state is no movement
 
         let isGameOver = false;
@@ -56,13 +56,13 @@ class ZeldaGame {
         return;
     }
 
-    method void restartGame () {
+    method void restartGame() {
         do Screen.clearScreen();
 
         do link.erase();
         do link.dispose();
 
-        if(isGameCleared = true){
+        if (isGameCleared = true) {
             do zelda.erase();
             do zelda.dispose();
         }
@@ -72,7 +72,7 @@ class ZeldaGame {
 
         do sword.erase();
         do sword.dispose();
-        
+
         do wall.dispose();
 
         do initializeGame();
@@ -93,7 +93,7 @@ class ZeldaGame {
     method void moveLink() {
         var bool isLinkDead;
 
-        if((isGameCleared = true) | (isGameOver = true) | (isGameJustStarted = true)){
+        if ((isGameCleared = true) | (isGameOver = true) | (isGameJustStarted = true)) {
             return;
         }
 
@@ -125,7 +125,7 @@ class ZeldaGame {
         do checkIfLinkHasPickedUpASword();
         do checkIfLinkHasCollidedWithMoblin();
 
-        if(enemiesLeft = 0){
+        if (enemiesLeft = 0) {
             do checkIfLinkHasCollidedWithZelda();
         }
 
@@ -199,7 +199,7 @@ class ZeldaGame {
         let swordTop = swordY;
         let swordBottom = swordY + collisionBoxHeight;
 
-        if(enemiesLeft = 0){
+        if (enemiesLeft = 0) {
             return;
         }
 
@@ -210,7 +210,7 @@ class ZeldaGame {
         }
 
         return;
-    } 
+    }
 
     method void checkIfLinkHasCollidedWithMoblin() {
         var int linkX, moblinX, linkY, moblinY;
@@ -290,7 +290,7 @@ class ZeldaGame {
         let linkHasSword = link.getHasSword();
         let swordIsActive = sword.getIsActive();
 
-        if(enemiesLeft = 0){
+        if (enemiesLeft = 0) {
             do sword.erase();
             do sword.dispose();
             return;
@@ -415,7 +415,7 @@ class ZeldaGame {
         return false; // No collision
     }
 
-    method void startGameScreen(){
+    method void startGameScreen() {
         do Screen.clearScreen();
         do Output.moveCursor(12, 20);
         do Output.printString("THE LEGEND OF ZELDA: LITE");
@@ -423,7 +423,7 @@ class ZeldaGame {
         return;
     }
 
-    method void endGameScreen(){
+    method void endGameScreen() {
         do Screen.clearScreen();
         do Output.moveCursor(12, 14);
         do Output.printString("THANKS LINK, YOU'RE THE HERO OF HYRULE.");
@@ -431,9 +431,9 @@ class ZeldaGame {
         return;
     }
 
-    method void gameOverScreen(){
+    method void gameOverScreen() {
         do Screen.clearScreen();
-        
+
         do Output.moveCursor(12, 27);
         do Output.printString("GAME OVER!");
 
@@ -456,23 +456,22 @@ class ZeldaGame {
                 if ((enemiesLeft > 0) & (isGameJustStarted = false)) {
                     do moveMoblin();
                 }
-                if(isGameOver = true){
+                if (isGameOver = true) {
                     do moblin.erase();
                 }
             }
             if (key = 81) {
                 let exit = true;
             } // q key
-            if (key = 82){
-                if((isGameOver = true) | (isGameCleared = true)){
+            if (key = 82) {
+                if ((isGameOver = true) | (isGameCleared = true)) {
                     do restartGame();
                 }
             }
             if (key = 32) {
-                if(isGameJustStarted = false){
+                if (isGameJustStarted = false) {
                     do performAttack();
-                }
-                else {
+                } else {
                     let isGameJustStarted = false;
                     do initializeGame();
                 }

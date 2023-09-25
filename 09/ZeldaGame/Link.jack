@@ -22,26 +22,26 @@ class Link {
         return;
     }
 
-   method int getX(){
+    method int getX() {
         return x;
     }
 
-    method int getY(){
+    method int getY() {
         return y;
     }
 
-    method int getHealth(){
+    method int getHealth() {
         return health;
     }
 
-    method bool getHasSword(){
+    method bool getHasSword() {
         return hasSword;
     }
 
-    method bool getIsDead(){
+    method bool getIsDead() {
         return isDead;
     }
-    
+
     /** Draws default Link (or going down) on the screen. */
     method void draw() {
         var int memAddress;
@@ -259,9 +259,9 @@ class Link {
         return;
     }
 
-    method void pickUpSword(){
-         let hasSword = true;
-         return;
+    method void pickUpSword() {
+        let hasSword = true;
+        return;
     }
 
     method void takeDamage() {

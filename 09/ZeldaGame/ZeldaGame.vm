@@ -24,13 +24,13 @@ call Screen.clearScreen 0
 pop temp 0
 push constant 248
 push constant 214
-push constant 3
+push constant 1
 push constant 0
 call Link.new 4
 pop this 0
 push constant 495
 push constant 20
-push constant 1
+push constant 3
 call Moblin.new 3
 pop this 2
 push constant 300
@@ -43,7 +43,7 @@ call Wall.new 0
 pop this 4
 call Gate.new 0
 pop this 5
-push constant 1
+push constant 3
 pop this 7
 push constant 0
 pop this 8

@@ -2,7 +2,7 @@
 class RandomNumberGenerator {
 
     field int seed;
-    
+
     constructor RandomNumberGenerator new(int seedVal) {
         let seed = seedVal;
         return this;

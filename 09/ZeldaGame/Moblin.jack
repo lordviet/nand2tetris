@@ -29,7 +29,7 @@ class Moblin {
         return y;
     }
 
-    method void nullify(){
+    method void nullify() {
         let x = 0;
         let y = 0;
         return;

@@ -1,7 +1,7 @@
 class Zelda {
     field int x, y;
 
-    constructor Zelda new(){
+    constructor Zelda new() {
         let x = 248;
         let y = 16;
 
@@ -15,35 +15,35 @@ class Zelda {
         return;
     }
 
-    method int getX(){
+    method int getX() {
         return x;
     }
 
-    method int getY(){
+    method int getY() {
         return y;
     }
 
-     /** Draws Zelda on the screen. */
+    /** Draws Zelda on the screen. */
     method void draw() {
         var int memAddress;
         let memAddress = 16384 + (x / 16) + (y * 32);
 
-        do Memory.poke(memAddress+0, 0);
-	    do Memory.poke(memAddress+32, 2016);
-	    do Memory.poke(memAddress+64, 3024);
-	    do Memory.poke(memAddress+96, 3120);
-	    do Memory.poke(memAddress+128, 4080);
-	    do Memory.poke(memAddress+160, 7608);
-	    do Memory.poke(memAddress+192, 8184);
-	    do Memory.poke(memAddress+224, 15996);
-	    do Memory.poke(memAddress+256, 13260);
-	    do Memory.poke(memAddress+288, 12300);
-	    do Memory.poke(memAddress+320, 14364);
-	    do Memory.poke(memAddress+352, 12300);
-	    do Memory.poke(memAddress+384, 9156);
-	    do Memory.poke(memAddress+416, 8196);
-	    do Memory.poke(memAddress+448, 16386);
-	    do Memory.poke(memAddress+480, -1);
+        do Memory.poke(memAddress + 0, 0);
+        do Memory.poke(memAddress + 32, 2016);
+        do Memory.poke(memAddress + 64, 3024);
+        do Memory.poke(memAddress + 96, 3120);
+        do Memory.poke(memAddress + 128, 4080);
+        do Memory.poke(memAddress + 160, 7608);
+        do Memory.poke(memAddress + 192, 8184);
+        do Memory.poke(memAddress + 224, 15996);
+        do Memory.poke(memAddress + 256, 13260);
+        do Memory.poke(memAddress + 288, 12300);
+        do Memory.poke(memAddress + 320, 14364);
+        do Memory.poke(memAddress + 352, 12300);
+        do Memory.poke(memAddress + 384, 9156);
+        do Memory.poke(memAddress + 416, 8196);
+        do Memory.poke(memAddress + 448, 16386);
+        do Memory.poke(memAddress + 480, -1);
 
         return;
     }
