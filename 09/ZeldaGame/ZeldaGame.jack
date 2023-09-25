@@ -15,12 +15,27 @@ class ZeldaGame {
 
     field bool isGameOver;
     field bool isGameCleared;
+    field bool isGameJustStarted;
 
     /** Constructs a new Zelda Game. */
-    constructor ZeldaGame new() {
+    constructor ZeldaGame new() {        
+        let isGameOver = false;
+        let isGameCleared = false;
+        let isGameJustStarted = true;
+
+        let rng = RandomNumberGenerator.new(12345);
+
+        do startGameScreen();
+
+        return this;
+    }
+
+    method void initializeGame(){
         // Creates a new Link sprite
         // Positions him at the top of the screen
         // Spawns with 3 HP and without sword
+        do Screen.clearScreen();
+
         let link = Link.new(248, 214, 3, false);
 
         // Creates a Moblin sprite
@@ -31,8 +46,6 @@ class ZeldaGame {
         let wall = Wall.new();
         let gate = Gate.new();
 
-        let rng = RandomNumberGenerator.new(12345);
-
         // Define how many enemies are needed to clear the level
         let enemiesLeft = 1;
         let direction = 0; // initial state is no movement
@@ -40,7 +53,7 @@ class ZeldaGame {
         let isGameOver = false;
         let isGameCleared = false;
 
-        return this;
+        return;
     }
 
     method void restartGame () {
@@ -48,7 +61,6 @@ class ZeldaGame {
 
         do link.erase();
         do link.dispose();
-        let link = Link.new(248, 214, 1, false);
 
         if(isGameCleared = true){
             do zelda.erase();
@@ -57,22 +69,15 @@ class ZeldaGame {
 
         do moblin.erase();
         do moblin.dispose();
-        let moblin = Moblin.new(495, 20, 3);
 
         do sword.erase();
         do sword.dispose();
-        let sword = Sword.new(300, 100, true);
         
         do wall.dispose();
-        let wall = Wall.new();
+
+        do initializeGame();
 
         do gate.setIsOpen(false);
-
-        let enemiesLeft = 1;
-        let direction = 0; // initial state is no movement
-
-        let isGameOver = false;
-        let isGameCleared = false;
 
         return;
     }
@@ -88,7 +93,7 @@ class ZeldaGame {
     method void moveLink() {
         var bool isLinkDead;
 
-        if((isGameCleared = true) | (isGameOver = true)){
+        if((isGameCleared = true) | (isGameOver = true) | (isGameJustStarted = true)){
             return;
         }
 
@@ -148,8 +153,6 @@ class ZeldaGame {
 
                 let zelda = Zelda.new();
 
-                // TODO: Clear level only when Link interacts with Zelda
-                // let isGameCleared = true;
                 return;
             }
 
@@ -196,6 +199,10 @@ class ZeldaGame {
         let swordTop = swordY;
         let swordBottom = swordY + collisionBoxHeight;
 
+        if(enemiesLeft = 0){
+            return;
+        }
+
         // Check for collision between Link and the sword
         if ((linkRight > swordLeft) & (linkLeft < swordRight) & (linkBottom > swordTop) & (linkTop < swordBottom)) {
             do link.pickUpSword();
@@ -203,7 +210,7 @@ class ZeldaGame {
         }
 
         return;
-    }
+    } 
 
     method void checkIfLinkHasCollidedWithMoblin() {
         var int linkX, moblinX, linkY, moblinY;
@@ -282,6 +289,12 @@ class ZeldaGame {
 
         let linkHasSword = link.getHasSword();
         let swordIsActive = sword.getIsActive();
+
+        if(enemiesLeft = 0){
+            do sword.erase();
+            do sword.dispose();
+            return;
+        }
 
         if ((linkHasSword = true) | (swordIsActive = true)) {
             return;
@@ -440,7 +453,7 @@ class ZeldaGame {
             while (key = 0) {
                 let key = Keyboard.keyPressed();
                 do moveLink();
-                if (enemiesLeft > 0) {
+                if ((enemiesLeft > 0) & (isGameJustStarted = false)) {
                     do moveMoblin();
                 }
                 if(isGameOver = true){
@@ -451,10 +464,18 @@ class ZeldaGame {
                 let exit = true;
             } // q key
             if (key = 82){
-                do restartGame();
+                if((isGameOver = true) | (isGameCleared = true)){
+                    do restartGame();
+                }
             }
             if (key = 32) {
-                do performAttack();
+                if(isGameJustStarted = false){
+                    do performAttack();
+                }
+                else {
+                    let isGameJustStarted = false;
+                    do initializeGame();
+                }
             } // space key
             if (key = 131) {
                 let direction = 1;
