@@ -128,7 +128,6 @@ namespace VMTranslator.Implementations
                 .Select(line => line.Trim())
                 .ToArray();
         }
-
     }
 }
 

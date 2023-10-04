@@ -1,13 +1,17 @@
 ﻿using JackAnalyzer.Contracts;
 using JackAnalyzer.Enums;
+using JackAnalyzer.Extensions;
 
 namespace JackAnalyzer.Implementations
 {
     public class JackTokenizer : IJackTokenizer
 	{
-		public JackTokenizer()
+        private readonly string[] fileContents;
+
+		public JackTokenizer(string fileContents)
 		{
-		}
+            this.fileContents = PreprocessFileContents(fileContents);
+        }
 
         public bool HasMoreTokens()
         {
@@ -47,6 +51,17 @@ namespace JackAnalyzer.Implementations
         public string StringValue()
         {
             throw new NotImplementedException();
+        }
+
+        private static string[] PreprocessFileContents(string fileContents)
+        {
+            return fileContents
+                .Split(Environment.NewLine)
+                .Select(line => line.StripComment())
+                .Where(line => !string.IsNullOrWhiteSpace(line))
+                .Select(line => line.TrimEnd('\r', '\n'))
+                .Select(line => line.Trim())
+                .ToArray();
         }
     }
 }

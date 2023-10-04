@@ -77,6 +77,18 @@ namespace JackAnalyzer.Implementations
         {
             throw new NotImplementedException();
         }
+
+        //private void Eat(string expectedToken)
+        //{
+        //    if(currentToken != expectedToken)
+        //    {
+        //        throw new Exception("Unexpected token ...");
+        //    }
+
+        //    // TODO: Advance
+
+        //    return;
+        //}
     }
 }
 
