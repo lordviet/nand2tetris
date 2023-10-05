@@ -1,11 +1,15 @@
 ﻿using JackAnalyzer.Contracts;
+using JackAnalyzer.Extensions;
 
 namespace JackAnalyzer.Implementations
 {
     public class CompilationEngine : ICompilationEngine
     {
-        public CompilationEngine()
+        IJackTokenizer tokenizer;
+
+        public CompilationEngine(IJackTokenizer tokenizer)
         {
+            this.tokenizer = tokenizer;
         }
 
         public void CompileClass()
@@ -50,6 +54,24 @@ namespace JackAnalyzer.Implementations
 
         public void CompileWhile()
         {
+            // TODO: where do these hard-coded strings come from, do they live in both states?
+
+            this.Eat("while");
+
+            this.Eat("(");
+
+            "(".ConstructSymbolNode();
+
+            this.CompileExpression();
+
+            this.Eat(")");
+
+            this.Eat("{");
+
+            this.CompileStatements();
+
+            this.Eat("}");
+
             throw new NotImplementedException();
         }
 
@@ -78,17 +100,19 @@ namespace JackAnalyzer.Implementations
             throw new NotImplementedException();
         }
 
-        //private void Eat(string expectedToken)
-        //{
-        //    if(currentToken != expectedToken)
-        //    {
-        //        throw new Exception("Unexpected token ...");
-        //    }
+        private void Eat(string expectedToken)
+        {
+            //if (tokenizer.T currentToken != expectedToken)
+            //{
+            //    throw new Exception("Unexpected token ...");
+            //}
 
-        //    // TODO: Advance
+            // TODO: Advance
 
-        //    return;
-        //}
+            tokenizer.Advance();
+
+            return;
+        }
     }
 }
 

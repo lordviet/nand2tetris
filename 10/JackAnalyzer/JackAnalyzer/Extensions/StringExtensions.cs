@@ -10,6 +10,17 @@
                 ? source
                 : source[0..commentStart];
         }
+
+        public static string ConstructSymbolNode(this string source)
+        {
+            // TODO: if source is symbol, what is a symbol
+            return source.ConstructNode("symbol");
+        }
+
+        private static string ConstructNode(this string source, string tagName)
+        {
+            return $"<{tagName}> {source} </{tagName}>";
+        }
     }
 }
 
