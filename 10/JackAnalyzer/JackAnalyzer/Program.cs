@@ -1,9 +1,6 @@
-﻿using System.Data;
-using System.Text;
+﻿using System.Text;
 using JackAnalyzer;
 using JackAnalyzer.Contracts;
-using JackAnalyzer.Enums;
-using JackAnalyzer.Exceptions;
 using JackAnalyzer.Implementations;
 
 class Program
@@ -86,21 +83,8 @@ class Program
 
     private static string AnalyzeFile(string fileContents, string fileName)
     {
-        IJackTokenizer tokenizer = new JackTokenizer();
-        ICompilationEngine engine = new CompilationEngine();
-
-        while (tokenizer.HasMoreTokens())
-        {
-            TokenType currentTokenType = tokenizer.TokenType();
-
-            switch (currentTokenType)
-            {
-                default:
-                    throw new UnexpectedTokenTypeException($"Unexpected token type '{currentTokenType}'!");
-            }
-
-            tokenizer.Advance();
-        }
+        IJackTokenizer tokenizer = new JackTokenizer(fileContents);
+        ICompilationEngine engine = new CompilationEngine(tokenizer);
 
         return "";
     }

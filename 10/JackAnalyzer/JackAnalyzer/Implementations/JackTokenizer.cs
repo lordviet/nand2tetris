@@ -30,6 +30,12 @@ namespace JackAnalyzer.Implementations
 
         public Keyword Keyword()
         {
+            if(this.TokenType() != Enums.TokenType.Keyword)
+            {
+                throw new Exception("Token type must be keyword");
+            }
+
+
             throw new NotImplementedException();
         }
 

@@ -1,4 +1,6 @@
 ﻿using JackAnalyzer.Contracts;
+using JackAnalyzer.Enums;
+using JackAnalyzer.Exceptions;
 using JackAnalyzer.Extensions;
 
 namespace JackAnalyzer.Implementations
@@ -10,10 +12,35 @@ namespace JackAnalyzer.Implementations
         public CompilationEngine(IJackTokenizer tokenizer)
         {
             this.tokenizer = tokenizer;
+
+            this.CompileClass();
         }
 
         public void CompileClass()
         {
+            string classTag = "<class>";
+
+            "class".ConstructKeywordNode();
+
+            this.tokenizer.Advance();
+
+            // TODO: handle classname
+            // + tokenizer>Advance();
+
+            this.Eat("{");
+
+            "{".ConstructSymbolNode();
+
+            // ?
+            this.CompileClassVarDec();
+
+            // ??
+            this.CompileSubroutine();
+
+            this.Eat("}");
+
+            "}".ConstructSymbolNode();
+
             throw new NotImplementedException();
         }
 
@@ -55,8 +82,10 @@ namespace JackAnalyzer.Implementations
         public void CompileWhile()
         {
             // TODO: where do these hard-coded strings come from, do they live in both states?
-
+             
             this.Eat("while");
+
+            "while".ConstructKeywordNode();
 
             this.Eat("(");
 
@@ -66,11 +95,17 @@ namespace JackAnalyzer.Implementations
 
             this.Eat(")");
 
+            ")".ConstructSymbolNode();
+
             this.Eat("{");
+
+            "{".ConstructSymbolNode();
 
             this.CompileStatements();
 
             this.Eat("}");
+
+            "}".ConstructSymbolNode();
 
             throw new NotImplementedException();
         }
@@ -109,7 +144,7 @@ namespace JackAnalyzer.Implementations
 
             // TODO: Advance
 
-            tokenizer.Advance();
+            this.tokenizer.Advance();
 
             return;
         }

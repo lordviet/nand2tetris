@@ -17,6 +17,11 @@
             return source.ConstructNode("symbol");
         }
 
+        public static string ConstructKeywordNode(this string source)
+        {
+            return source.ConstructNode("keyword");
+        }
+
         private static string ConstructNode(this string source, string tagName)
         {
             return $"<{tagName}> {source} </{tagName}>";
