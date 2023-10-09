@@ -1,6 +1,4 @@
 ﻿using JackAnalyzer.Contracts;
-using JackAnalyzer.Enums;
-using JackAnalyzer.Exceptions;
 using JackAnalyzer.Extensions;
 
 namespace JackAnalyzer.Implementations

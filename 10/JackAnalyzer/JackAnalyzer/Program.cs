@@ -78,7 +78,7 @@ class Program
 
         string analyzed = AnalyzeFile(fileContents, fileNameWithoutExtensions);
 
-        SaveOutputFile(filePath, fileNameWithoutExtensions, analyzed);
+        //SaveOutputFile(filePath, fileNameWithoutExtensions, analyzed);
     }
 
     private static string AnalyzeFile(string fileContents, string fileName)

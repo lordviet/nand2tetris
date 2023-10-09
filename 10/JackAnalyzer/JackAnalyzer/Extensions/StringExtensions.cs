@@ -4,7 +4,16 @@
     {
         public static string StripComment(this string source)
         {
-            int commentStart = source.IndexOf("//");
+            string forwardSlashSyntax = "//";
+            string slashStarSyntax = "/*";
+
+            string initialStrip = source.StripCommentCore(forwardSlashSyntax);
+            return initialStrip.StripCommentCore(slashStarSyntax);
+        }
+
+        public static string StripCommentCore(this string source, string commentSyntax)
+        {
+            int commentStart = source.IndexOf(commentSyntax);
 
             return commentStart == -1
                 ? source
