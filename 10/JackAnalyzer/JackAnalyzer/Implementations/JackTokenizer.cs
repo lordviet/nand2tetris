@@ -7,21 +7,28 @@ namespace JackAnalyzer.Implementations
 {
     public class JackTokenizer : IJackTokenizer
     {
-        private readonly string[][] fileContents;
+        private readonly string[] fileContents;
+        private int counter;
 
         public JackTokenizer(string fileContents)
         {
             this.fileContents = PreprocessFileContents(fileContents);
+            this.counter = 0;
+        }
+
+        public string GetCurrentToken()
+        {
+            return this.fileContents[this.counter];
         }
 
         public bool HasMoreTokens()
         {
-            throw new NotImplementedException();
+            return this.counter < this.fileContents.Length;
         }
 
         public void Advance()
         {
-            throw new NotImplementedException();
+            this.counter++;
         }
 
         public TokenType TokenType()
@@ -60,21 +67,23 @@ namespace JackAnalyzer.Implementations
             throw new NotImplementedException();
         }
 
-        private static string[][] PreprocessFileContents(string fileContents)
+        // TODO: Handle parameterList
+        private static string[] PreprocessFileContents(string fileContents)
         {
+            string pattern = @"(""[^""]*""|\s+|\b|\W|[,\.])";
+
             return fileContents
                 .Split(Environment.NewLine)
                 .Select(line => line.StripComment())
                 .Where(line => !string.IsNullOrWhiteSpace(line))
                 .Select(line => line.TrimEnd('\r', '\n'))
                 .Select(line => line.Trim())
-                .Select(line => Regex.Split(line, @"(\s+|\b|\W|[,\.])")
+                .Select(line => Regex.Split(line, pattern)
                                      .Where(str => !string.IsNullOrWhiteSpace(str))
                                      .ToArray())
+                .SelectMany(line => line)
                 .ToArray();
         }
-
-        // TODO: Handle various edge cases full strings and various symbols (look behind/ahead logic in regex)
     }
 }
 

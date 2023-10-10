@@ -4,6 +4,8 @@ namespace JackAnalyzer.Contracts
 {
     public interface IJackTokenizer
 	{
+		string GetCurrentToken();
+
 		bool HasMoreTokens();
 
 		void Advance();
