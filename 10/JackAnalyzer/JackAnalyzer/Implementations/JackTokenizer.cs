@@ -33,6 +33,23 @@ namespace JackAnalyzer.Implementations
 
         public TokenType TokenType()
         {
+            if (!this.HasMoreTokens())
+            {
+                throw new Exception("There are no more tokens");
+            }
+
+            string currentToken = this.GetCurrentToken();
+
+            if (Constants.LexicalElements.KeywordMap.ContainsKey(currentToken))
+            {
+                return Enums.TokenType.Keyword;
+            }
+
+            if (Constants.LexicalElements.AvailableSymbols.Contains(currentToken))
+            {
+                return Enums.TokenType.Symbol;
+            }
+
             throw new NotImplementedException();
         }
 
