@@ -1,11 +1,12 @@
 ﻿using System.Text.RegularExpressions;
 using JackAnalyzer.Contracts;
 using JackAnalyzer.Enums;
+using JackAnalyzer.Exceptions;
 using JackAnalyzer.Extensions;
 
 namespace JackAnalyzer.Implementations
 {
-    public class JackTokenizer : IJackTokenizer
+    public partial class JackTokenizer : IJackTokenizer
     {
         private readonly string[] fileContents;
         private int counter;
@@ -13,32 +14,32 @@ namespace JackAnalyzer.Implementations
         public JackTokenizer(string fileContents)
         {
             this.fileContents = PreprocessFileContents(fileContents);
-            this.counter = 0;
+            counter = 0;
         }
 
         public string GetCurrentToken()
         {
-            return this.fileContents[this.counter];
+            return fileContents[counter];
         }
 
         public bool HasMoreTokens()
         {
-            return this.counter < this.fileContents.Length;
+            return counter < fileContents.Length;
         }
 
         public void Advance()
         {
-            this.counter++;
+            counter++;
         }
 
         public TokenType TokenType()
         {
-            if (!this.HasMoreTokens())
+            if (!HasMoreTokens())
             {
-                throw new Exception("There are no more tokens");
+                throw new InvalidOperationException("There are no more tokens to process.");
             }
 
-            string currentToken = this.GetCurrentToken();
+            string currentToken = GetCurrentToken();
 
             if (Constants.LexicalElements.KeywordMap.ContainsKey(currentToken))
             {
@@ -50,38 +51,65 @@ namespace JackAnalyzer.Implementations
                 return Enums.TokenType.Symbol;
             }
 
-            throw new NotImplementedException();
+            if (StringRegex().IsMatch(currentToken))
+            {
+                return Enums.TokenType.StringConstant;
+            }
+
+            if (short.TryParse(currentToken, out short _))
+            {
+                return Enums.TokenType.IntegerConstant;
+            }
+
+            if (IdentifierRegex().IsMatch(currentToken))
+            {
+                return Enums.TokenType.Identifier;
+            }
+
+            throw new InvalidTokenException(currentToken);
         }
 
         public Keyword Keyword()
         {
-            if (this.TokenType() != Enums.TokenType.Keyword)
-            {
-                throw new Exception("Token type must be keyword");
-            }
-
+            this.ThrowIfTokenTypeDoesNotMatchExpected(Enums.TokenType.Keyword, TokenType());
 
             throw new NotImplementedException();
         }
 
         public char Symbol()
         {
+            this.ThrowIfTokenTypeDoesNotMatchExpected(Enums.TokenType.Symbol, TokenType());
+
             throw new NotImplementedException();
         }
 
         public string Identifier()
         {
+            this.ThrowIfTokenTypeDoesNotMatchExpected(Enums.TokenType.Identifier, TokenType());
+
             throw new NotImplementedException();
         }
 
         public int IntegerValue()
         {
+            this.ThrowIfTokenTypeDoesNotMatchExpected(Enums.TokenType.IntegerConstant, TokenType());
+
             throw new NotImplementedException();
         }
 
         public string StringValue()
         {
             throw new NotImplementedException();
+        }
+
+        private void ThrowIfTokenTypeDoesNotMatchExpected(TokenType expected, TokenType received)
+        {
+            if (expected == received)
+            {
+                return;
+            }
+
+            throw new UnexpectedTokenTypeException(expected, received);
         }
 
         // TODO: Handle parameterList
@@ -101,6 +129,11 @@ namespace JackAnalyzer.Implementations
                 .SelectMany(line => line)
                 .ToArray();
         }
+
+        [GeneratedRegex("^\"[^\"]*\"")]
+        private static partial Regex StringRegex();
+        [GeneratedRegex("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b")]
+        private static partial Regex IdentifierRegex();
     }
 }
 
