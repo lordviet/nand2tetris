@@ -35,6 +35,10 @@ namespace JackAnalyzer
             };
 
             public static readonly string[] AvailableSymbols = { "{", "}", "(", ")", "[", "]", ".", ",", ";", "+", "-", "*", "/", "&", "|", "<", ">", "=", "~" };
+
+            public const string StringPattern = @"^""[^""]*""";
+
+            public const string IdentifierPattern = @"\b[a-zA-Z_][a-zA-Z0-9_]*\b";
         }
     }
 }
