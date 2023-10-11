@@ -34,7 +34,28 @@ namespace JackAnalyzer
                 { "this", Keyword.This }
             };
 
-            public static readonly string[] AvailableSymbols = { "{", "}", "(", ")", "[", "]", ".", ",", ";", "+", "-", "*", "/", "&", "|", "<", ">", "=", "~" };
+            public static readonly Dictionary<string, char> SymbolMap = new()
+            {
+                { "{", '{' },
+                { "}", '}' },
+                { "(", '(' },
+                { ")", ')' },
+                { "[", '[' },
+                { "]", ']' },
+                { ".", '.' },
+                { ",", ',' },
+                { ";", ';' },
+                { "+", '+' },
+                { "-", '-' },
+                { "*", '*' },
+                { "/", '/' },
+                { "&", '&' },
+                { "|", '|' },
+                { "<", '<' },
+                { ">", '>' },
+                { "=", '=' },
+                { "~", '~' }
+            };
 
             public const string StringPattern = @"^""[^""]*""";
 

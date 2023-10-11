@@ -46,7 +46,7 @@ namespace JackAnalyzer.Implementations
                 return Enums.TokenType.Keyword;
             }
 
-            if (Constants.LexicalElements.AvailableSymbols.Contains(currentToken))
+            if (Constants.LexicalElements.SymbolMap.ContainsKey(currentToken))
             {
                 return Enums.TokenType.Symbol;
             }
@@ -73,14 +73,18 @@ namespace JackAnalyzer.Implementations
         {
             this.ThrowIfTokenTypeDoesNotMatchExpected(Enums.TokenType.Keyword, TokenType());
 
-            throw new NotImplementedException();
+            string currentToken = GetCurrentToken();
+
+            return Constants.LexicalElements.KeywordMap[currentToken];
         }
 
         public char Symbol()
         {
             this.ThrowIfTokenTypeDoesNotMatchExpected(Enums.TokenType.Symbol, TokenType());
 
-            throw new NotImplementedException();
+            string currentToken = GetCurrentToken();
+
+            return Constants.LexicalElements.SymbolMap[currentToken];
         }
 
         public string Identifier()
@@ -94,12 +98,23 @@ namespace JackAnalyzer.Implementations
         {
             this.ThrowIfTokenTypeDoesNotMatchExpected(Enums.TokenType.IntegerConstant, TokenType());
 
-            throw new NotImplementedException();
+            string currentToken = GetCurrentToken();
+
+            if (!short.TryParse(currentToken, out short numericCurrentToken))
+            {
+                throw new InvalidOperationException($"Could not parse token {currentToken} to a 16-bit numeric value");
+            }
+
+            return numericCurrentToken;
         }
 
         public string StringValue()
         {
-            throw new NotImplementedException();
+            this.ThrowIfTokenTypeDoesNotMatchExpected(Enums.TokenType.IntegerConstant, TokenType());
+
+            string currentToken = GetCurrentToken();
+
+            return currentToken;
         }
 
         private void ThrowIfTokenTypeDoesNotMatchExpected(TokenType expected, TokenType received)
