@@ -1,15 +1,19 @@
-﻿using JackAnalyzer.Contracts;
+﻿using System.Text;
+using JackAnalyzer.Contracts;
+using JackAnalyzer.Enums;
 using JackAnalyzer.Extensions;
 
 namespace JackAnalyzer.Implementations
 {
     public class CompilationEngine : ICompilationEngine
     {
-        IJackTokenizer tokenizer;
+        private readonly IJackTokenizer tokenizer;
+        private readonly StringBuilder compiled;
 
         public CompilationEngine(IJackTokenizer tokenizer)
         {
             this.tokenizer = tokenizer;
+            this.compiled = new StringBuilder();
 
             this.CompileClass();
         }
@@ -80,32 +84,41 @@ namespace JackAnalyzer.Implementations
         public void CompileWhile()
         {
             // TODO: where do these hard-coded strings come from, do they live in both states?
-             
-            this.Eat("while");
 
-            "while".ConstructKeywordNode();
+            AppendKeywordToCompiled(Keyword.While);
 
-            this.Eat("(");
-
-            "(".ConstructSymbolNode();
+            AppendTokenToCompiled("(");
 
             this.CompileExpression();
 
-            this.Eat(")");
+            AppendTokenToCompiled(")");
 
-            ")".ConstructSymbolNode();
-
-            this.Eat("{");
-
-            "{".ConstructSymbolNode();
+            AppendTokenToCompiled("{");
 
             this.CompileStatements();
 
-            this.Eat("}");
+            AppendTokenToCompiled("}");
 
-            "}".ConstructSymbolNode();
+        }
 
-            throw new NotImplementedException();
+        private void AppendKeywordToCompiled(Keyword key)
+        {
+            string keyword = Constants.LexicalElements.ReverseKeywordMap[key];
+
+            this.AppendTokenToCompiled(keyword);
+
+            return;
+        }
+
+        private void AppendTokenToCompiled(string token)
+        {
+            this.Eat(token);
+
+            string node = token.ConstructKeywordNode();
+
+            this.compiled.Append(node);
+
+            return;
         }
 
         public void CompileReturn()
@@ -135,12 +148,19 @@ namespace JackAnalyzer.Implementations
 
         private void Eat(string expectedToken)
         {
-            //if (tokenizer.T currentToken != expectedToken)
-            //{
-            //    throw new Exception("Unexpected token ...");
-            //}
+            if (!tokenizer.HasMoreTokens())
+            {
+                // TODO: Maybe throw?
+                return;
+            }
 
-            // TODO: Advance
+            string currentToken = tokenizer.GetCurrentToken();
+
+            if (tokenizer.GetCurrentToken() != expectedToken)
+            {
+                // TODO: Introduce unexpected token exception
+                throw new Exception($"Expected token {expectedToken} but got {currentToken} instead.");
+            }
 
             this.tokenizer.Advance();
 
