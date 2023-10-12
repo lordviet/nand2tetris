@@ -34,6 +34,32 @@ namespace JackAnalyzer
                 { "this", Keyword.This }
             };
 
+            public static readonly Dictionary<Keyword, string> ReverseKeywordMap = new()
+            {
+                { Keyword.Class, "class" },
+                { Keyword.Function, "function" },
+                { Keyword.Method, "method" },
+                { Keyword.Constructor, "constructor" },
+                { Keyword.Integer, "integer" },
+                { Keyword.Boolean, "boolean" },
+                { Keyword.Char, "char" },
+                { Keyword.Void, "void" },
+                { Keyword.Var, "var" },
+                { Keyword.Static, "static" },
+                { Keyword.Field, "field" },
+                { Keyword.Let, "let" },
+                { Keyword.Do, "do" },
+                { Keyword.If, "if" },
+                { Keyword.Else, "else" },
+                { Keyword.While, "while" },
+                { Keyword.Return, "return" },
+                { Keyword.True, "true" },
+                { Keyword.False, "false" },
+                { Keyword.Null, "null" },
+                { Keyword.This, "this" }
+            };
+
+
             public static readonly Dictionary<string, char> SymbolMap = new()
             {
                 { "{", '{' },
