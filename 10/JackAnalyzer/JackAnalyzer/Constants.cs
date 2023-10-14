@@ -87,6 +87,14 @@ namespace JackAnalyzer
 
             public const string IdentifierPattern = @"\b[a-zA-Z_][a-zA-Z0-9_]*\b";
         }
+
+        public static class Symbols
+        {
+            public const string LeftParenthesis = "(";
+            public const string RightParenthesis = ")";
+            public const string LeftCurlyBrace = "{";
+            public const string RightCurlyBrace = "}";
+        }
     }
 }
 

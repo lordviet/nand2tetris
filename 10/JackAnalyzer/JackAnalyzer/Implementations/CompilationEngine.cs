@@ -20,18 +20,13 @@ namespace JackAnalyzer.Implementations
 
         public void CompileClass()
         {
-            string classTag = "<class>";
+            "class".ConstructOpeningTag();
 
-            "class".ConstructKeywordNode();
+            AppendKeywordToCompiled(Keyword.Class);
 
-            this.tokenizer.Advance();
+            // Name
 
-            // TODO: handle classname
-            // + tokenizer>Advance();
-
-            this.Eat("{");
-
-            "{".ConstructSymbolNode();
+            AppendTokenToCompiled(Constants.Symbols.LeftCurlyBrace);
 
             // ?
             this.CompileClassVarDec();
@@ -39,11 +34,7 @@ namespace JackAnalyzer.Implementations
             // ??
             this.CompileSubroutine();
 
-            this.Eat("}");
-
-            "}".ConstructSymbolNode();
-
-            throw new NotImplementedException();
+            this.AppendTokenToCompiled(Constants.Symbols.RightCurlyBrace);
         }
 
         public void CompileClassVarDec()
@@ -83,42 +74,19 @@ namespace JackAnalyzer.Implementations
 
         public void CompileWhile()
         {
-            // TODO: where do these hard-coded strings come from, do they live in both states?
+            this.AppendKeywordToCompiled(Keyword.While);
 
-            AppendKeywordToCompiled(Keyword.While);
-
-            AppendTokenToCompiled("(");
+            this.AppendTokenToCompiled(Constants.Symbols.LeftParenthesis);
 
             this.CompileExpression();
 
-            AppendTokenToCompiled(")");
+            this.AppendTokenToCompiled(Constants.Symbols.RightParenthesis);
 
-            AppendTokenToCompiled("{");
+            this.AppendTokenToCompiled(Constants.Symbols.LeftCurlyBrace);
 
             this.CompileStatements();
 
-            AppendTokenToCompiled("}");
-
-        }
-
-        private void AppendKeywordToCompiled(Keyword key)
-        {
-            string keyword = Constants.LexicalElements.ReverseKeywordMap[key];
-
-            this.AppendTokenToCompiled(keyword);
-
-            return;
-        }
-
-        private void AppendTokenToCompiled(string token)
-        {
-            this.Eat(token);
-
-            string node = token.ConstructKeywordNode();
-
-            this.compiled.Append(node);
-
-            return;
+            this.AppendTokenToCompiled(Constants.Symbols.RightCurlyBrace);
         }
 
         public void CompileReturn()
@@ -163,6 +131,26 @@ namespace JackAnalyzer.Implementations
             }
 
             this.tokenizer.Advance();
+
+            return;
+        }
+
+        private void AppendKeywordToCompiled(Keyword key)
+        {
+            string keyword = Constants.LexicalElements.ReverseKeywordMap[key];
+
+            this.AppendTokenToCompiled(keyword);
+
+            return;
+        }
+
+        private void AppendTokenToCompiled(string token)
+        {
+            this.Eat(token);
+
+            string node = token.ConstructKeywordNode();
+
+            this.compiled.Append(node);
 
             return;
         }

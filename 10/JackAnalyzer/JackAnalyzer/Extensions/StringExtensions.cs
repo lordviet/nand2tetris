@@ -31,9 +31,24 @@
             return source.ConstructNode("keyword");
         }
 
+        public static string ConstructIdentifierNode(this string source)
+        {
+            return source.ConstructNode("identifier");
+        }
+
         private static string ConstructNode(this string source, string tagName)
         {
             return $"<{tagName}> {source} </{tagName}>";
+        }
+
+        public static string ConstructOpeningTag(this string tagName)
+        {
+            return $"<{tagName}>";
+        }
+
+        public static string ConstructClosingTag(this string tagName)
+        {
+            return $"</{tagName}>";
         }
     }
 }
