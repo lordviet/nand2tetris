@@ -20,13 +20,16 @@ namespace JackAnalyzer.Implementations
 
         public void CompileClass()
         {
-            "class".ConstructOpeningTag();
+            string classKeyword = Constants.LexicalElements.ReverseKeywordMap[Keyword.Class];
 
-            AppendKeywordToCompiled(Keyword.Class);
+            classKeyword.ConstructOpeningTag();
 
-            // Name
+            this.AppendKeywordToCompiled(Keyword.Class);
 
-            AppendTokenToCompiled(Constants.Symbols.LeftCurlyBrace);
+            // className
+            this.AppendNextIdentifierToCompiled();
+
+            this.AppendTokenToCompiled(Constants.Symbols.LeftCurlyBrace, TokenType.Symbol);
 
             // ?
             this.CompileClassVarDec();
@@ -34,7 +37,9 @@ namespace JackAnalyzer.Implementations
             // ??
             this.CompileSubroutine();
 
-            this.AppendTokenToCompiled(Constants.Symbols.RightCurlyBrace);
+            this.AppendTokenToCompiled(Constants.Symbols.RightCurlyBrace, TokenType.Symbol);
+
+            classKeyword.ConstructClosingTag();
         }
 
         public void CompileClassVarDec()
@@ -69,6 +74,20 @@ namespace JackAnalyzer.Implementations
 
         public void CompileLet()
         {
+            // What about let statement tag, should I do it here?
+            //string letKeyword = Constants.LexicalElements.ReverseKeywordMap[Keyword.Let];
+            this.AppendKeywordToCompiled(Keyword.Let);
+
+            this.AppendNextIdentifierToCompiled();
+
+            // TODO: optional Expression in-between?
+
+            this.AppendTokenToCompiled(Constants.Symbols.EqualitySign, TokenType.Symbol);
+
+            this.CompileExpression();
+
+            this.AppendTokenToCompiled(Constants.Symbols.Semicolon, TokenType.Symbol);
+
             throw new NotImplementedException();
         }
 
@@ -76,17 +95,17 @@ namespace JackAnalyzer.Implementations
         {
             this.AppendKeywordToCompiled(Keyword.While);
 
-            this.AppendTokenToCompiled(Constants.Symbols.LeftParenthesis);
+            this.AppendTokenToCompiled(Constants.Symbols.LeftParenthesis, TokenType.Symbol);
 
             this.CompileExpression();
 
-            this.AppendTokenToCompiled(Constants.Symbols.RightParenthesis);
+            this.AppendTokenToCompiled(Constants.Symbols.RightParenthesis, TokenType.Symbol);
 
-            this.AppendTokenToCompiled(Constants.Symbols.LeftCurlyBrace);
+            this.AppendTokenToCompiled(Constants.Symbols.LeftCurlyBrace, TokenType.Symbol);
 
             this.CompileStatements();
 
-            this.AppendTokenToCompiled(Constants.Symbols.RightCurlyBrace);
+            this.AppendTokenToCompiled(Constants.Symbols.RightCurlyBrace, TokenType.Symbol);
         }
 
         public void CompileReturn()
@@ -114,6 +133,28 @@ namespace JackAnalyzer.Implementations
             throw new NotImplementedException();
         }
 
+        private string RetrieveNextExpectedOfType(TokenType expectedTokenType)
+        {
+            if (!tokenizer.HasMoreTokens())
+            {
+                // TODO: better error message
+                throw new Exception("No more tokens in tokenizer");
+            }
+
+            TokenType currentTokenType = tokenizer.TokenType();
+
+            if (currentTokenType != expectedTokenType)
+            {
+                throw new Exception($"Expected token type {expectedTokenType} but got {currentTokenType} instead.");
+            }
+
+            string token = tokenizer.GetCurrentToken();
+
+            this.tokenizer.Advance();
+
+            return token;
+        }
+
         private void Eat(string expectedToken)
         {
             if (!tokenizer.HasMoreTokens())
@@ -124,7 +165,7 @@ namespace JackAnalyzer.Implementations
 
             string currentToken = tokenizer.GetCurrentToken();
 
-            if (tokenizer.GetCurrentToken() != expectedToken)
+            if (currentToken != expectedToken)
             {
                 // TODO: Introduce unexpected token exception
                 throw new Exception($"Expected token {expectedToken} but got {currentToken} instead.");
@@ -135,20 +176,33 @@ namespace JackAnalyzer.Implementations
             return;
         }
 
+        private void AppendNextIdentifierToCompiled()
+        {
+            string token = this.RetrieveNextExpectedOfType(TokenType.Identifier);
+
+            this.AppendTokenToCompiled(token, TokenType.Identifier);
+        }
+
         private void AppendKeywordToCompiled(Keyword key)
         {
             string keyword = Constants.LexicalElements.ReverseKeywordMap[key];
 
-            this.AppendTokenToCompiled(keyword);
+            this.AppendTokenToCompiled(keyword, TokenType.Keyword);
 
             return;
         }
 
-        private void AppendTokenToCompiled(string token)
+        private void AppendTokenToCompiled(string token, TokenType type)
         {
             this.Eat(token);
 
-            string node = token.ConstructKeywordNode();
+            string node = type switch
+            {
+                TokenType.Keyword => token.ConstructKeywordNode(),
+                TokenType.Symbol => token.ConstructSymbolNode(),
+                TokenType.Identifier => token.ConstructIdentifierNode(),
+                _ => throw new NotSupportedException("") // TODO: Exception message
+            };
 
             this.compiled.Append(node);
 

@@ -94,6 +94,8 @@ namespace JackAnalyzer
             public const string RightParenthesis = ")";
             public const string LeftCurlyBrace = "{";
             public const string RightCurlyBrace = "}";
+            public const string EqualitySign = "=";
+            public const string Semicolon = ";";
         }
     }
 }
