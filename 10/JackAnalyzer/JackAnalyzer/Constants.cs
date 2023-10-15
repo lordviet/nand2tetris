@@ -97,6 +97,15 @@ namespace JackAnalyzer
             public const string EqualitySign = "=";
             public const string Semicolon = ";";
         }
+
+        public static class Statements
+        {
+            public const string Let = "letStatement";
+            public const string If = "ifStatement";
+            public const string While = "whileStatement";
+            public const string Do = "doStatement";
+            public const string Return = "returnStatement";
+        }
     }
 }
 

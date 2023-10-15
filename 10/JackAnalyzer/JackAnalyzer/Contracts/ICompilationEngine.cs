@@ -29,6 +29,8 @@
 		void CompileTerm();
 
 		void CompileExpressionList();
+
+		string Close();
     }
 }
 

@@ -15,14 +15,14 @@ namespace JackAnalyzer.Implementations
             this.tokenizer = tokenizer;
             this.compiled = new StringBuilder();
 
-            this.CompileClass();
+            //this.CompileClass();
         }
 
         public void CompileClass()
         {
             string classKeyword = Constants.LexicalElements.ReverseKeywordMap[Keyword.Class];
 
-            classKeyword.ConstructOpeningTag();
+            this.compiled.Append(classKeyword.ConstructOpeningTag());
 
             this.AppendKeywordToCompiled(Keyword.Class);
 
@@ -39,7 +39,7 @@ namespace JackAnalyzer.Implementations
 
             this.AppendTokenToCompiled(Constants.Symbols.RightCurlyBrace, TokenType.Symbol);
 
-            classKeyword.ConstructClosingTag();
+            this.compiled.Append(classKeyword.ConstructClosingTag());
         }
 
         public void CompileClassVarDec()
@@ -64,7 +64,8 @@ namespace JackAnalyzer.Implementations
 
         public void CompileStatements()
         {
-            throw new NotImplementedException();
+            return;
+            //throw new NotImplementedException();
         }
 
         public void CompileDo()
@@ -74,8 +75,10 @@ namespace JackAnalyzer.Implementations
 
         public void CompileLet()
         {
-            // What about let statement tag, should I do it here?
-            //string letKeyword = Constants.LexicalElements.ReverseKeywordMap[Keyword.Let];
+            string letStatement = Constants.Statements.Let;
+
+            this.compiled.Append(letStatement.ConstructOpeningTag());
+
             this.AppendKeywordToCompiled(Keyword.Let);
 
             this.AppendNextIdentifierToCompiled();
@@ -88,11 +91,15 @@ namespace JackAnalyzer.Implementations
 
             this.AppendTokenToCompiled(Constants.Symbols.Semicolon, TokenType.Symbol);
 
-            throw new NotImplementedException();
+            this.compiled.Append(letStatement.ConstructClosingTag());
         }
 
         public void CompileWhile()
         {
+            string whileStatement = Constants.Statements.While;
+
+            this.compiled.Append(whileStatement.ConstructOpeningTag());
+
             this.AppendKeywordToCompiled(Keyword.While);
 
             this.AppendTokenToCompiled(Constants.Symbols.LeftParenthesis, TokenType.Symbol);
@@ -106,6 +113,8 @@ namespace JackAnalyzer.Implementations
             this.CompileStatements();
 
             this.AppendTokenToCompiled(Constants.Symbols.RightCurlyBrace, TokenType.Symbol);
+
+            this.compiled.Append(whileStatement.ConstructClosingTag());
         }
 
         public void CompileReturn()
@@ -120,7 +129,8 @@ namespace JackAnalyzer.Implementations
 
         public void CompileExpression()
         {
-            throw new NotImplementedException();
+            return;
+            //throw new NotImplementedException();
         }
 
         public void CompileTerm()
@@ -130,7 +140,13 @@ namespace JackAnalyzer.Implementations
 
         public void CompileExpressionList()
         {
-            throw new NotImplementedException();
+            return;
+            //throw new NotImplementedException();
+        }
+
+        public string Close()
+        {
+            return this.compiled.ToString();
         }
 
         private string RetrieveNextExpectedOfType(TokenType expectedTokenType)
