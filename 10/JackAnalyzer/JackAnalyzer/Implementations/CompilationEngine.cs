@@ -2,6 +2,7 @@
 using JackAnalyzer.Contracts;
 using JackAnalyzer.Enums;
 using JackAnalyzer.Extensions;
+using static JackAnalyzer.Constants;
 
 namespace JackAnalyzer.Implementations
 {
@@ -20,7 +21,7 @@ namespace JackAnalyzer.Implementations
 
         public void CompileClass()
         {
-            string classKeyword = Constants.LexicalElements.ReverseKeywordMap[Keyword.Class];
+            string classKeyword = LexicalElements.ReverseKeywordMap[Keyword.Class];
 
             this.compiled.Append(classKeyword.ConstructOpeningTag());
 
@@ -29,7 +30,7 @@ namespace JackAnalyzer.Implementations
             // className
             this.AppendNextIdentifierToCompiled();
 
-            this.AppendTokenToCompiled(Constants.Symbols.LeftCurlyBrace, TokenType.Symbol);
+            this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
 
             // ?
             this.CompileClassVarDec();
@@ -37,14 +38,47 @@ namespace JackAnalyzer.Implementations
             // ??
             this.CompileSubroutine();
 
-            this.AppendTokenToCompiled(Constants.Symbols.RightCurlyBrace, TokenType.Symbol);
+            this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
 
             this.compiled.Append(classKeyword.ConstructClosingTag());
         }
 
         public void CompileClassVarDec()
         {
-            throw new NotImplementedException();
+            //('static' | 'field') type varName (', ' varName)* ';'
+
+            string classVarDecTag = Tags.ClassVarDec;
+
+            this.compiled.Append(classVarDecTag.ConstructOpeningTag());
+
+            TokenType currentToken = this.tokenizer.TokenType();
+
+            if (currentToken != TokenType.Keyword)
+            {
+                throw new Exception("");
+            }
+
+            Keyword currentKeyword = this.tokenizer.Keyword();
+
+            if (currentKeyword != Keyword.Static && currentKeyword != Keyword.Static)
+            {
+                throw new Exception("");
+            }
+
+            this.AppendKeywordToCompiled(currentKeyword);
+
+            // TODO: Append type to compiled
+            // type is int | char | boolean | className
+            //  <keyword> boolean </keyword>
+
+            // TODO: this is not entirely correct since it may be one or several varNames so it needs to be accounted for.
+            this.AppendNextIdentifierToCompiled();
+            //  <identifier> test </identifier>
+
+
+            this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
+
+            this.compiled.Append(classVarDecTag.ConstructClosingTag());
         }
 
         public void CompileSubroutine()
@@ -75,7 +109,7 @@ namespace JackAnalyzer.Implementations
 
         public void CompileLet()
         {
-            string letStatement = Constants.Statements.Let;
+            string letStatement = Statements.Let;
 
             this.compiled.Append(letStatement.ConstructOpeningTag());
 
@@ -85,34 +119,34 @@ namespace JackAnalyzer.Implementations
 
             // TODO: optional Expression in-between?
 
-            this.AppendTokenToCompiled(Constants.Symbols.EqualitySign, TokenType.Symbol);
+            this.AppendTokenToCompiled(Symbols.EqualitySign, TokenType.Symbol);
 
             this.CompileExpression();
 
-            this.AppendTokenToCompiled(Constants.Symbols.Semicolon, TokenType.Symbol);
+            this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
 
             this.compiled.Append(letStatement.ConstructClosingTag());
         }
 
         public void CompileWhile()
         {
-            string whileStatement = Constants.Statements.While;
+            string whileStatement = Statements.While;
 
             this.compiled.Append(whileStatement.ConstructOpeningTag());
 
             this.AppendKeywordToCompiled(Keyword.While);
 
-            this.AppendTokenToCompiled(Constants.Symbols.LeftParenthesis, TokenType.Symbol);
+            this.AppendTokenToCompiled(Symbols.LeftParenthesis, TokenType.Symbol);
 
             this.CompileExpression();
 
-            this.AppendTokenToCompiled(Constants.Symbols.RightParenthesis, TokenType.Symbol);
+            this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
 
-            this.AppendTokenToCompiled(Constants.Symbols.LeftCurlyBrace, TokenType.Symbol);
+            this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
 
             this.CompileStatements();
 
-            this.AppendTokenToCompiled(Constants.Symbols.RightCurlyBrace, TokenType.Symbol);
+            this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
 
             this.compiled.Append(whileStatement.ConstructClosingTag());
         }
@@ -201,7 +235,7 @@ namespace JackAnalyzer.Implementations
 
         private void AppendKeywordToCompiled(Keyword key)
         {
-            string keyword = Constants.LexicalElements.ReverseKeywordMap[key];
+            string keyword = LexicalElements.ReverseKeywordMap[key];
 
             this.AppendTokenToCompiled(keyword, TokenType.Keyword);
 

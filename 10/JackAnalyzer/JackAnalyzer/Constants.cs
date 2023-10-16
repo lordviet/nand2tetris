@@ -106,6 +106,11 @@ namespace JackAnalyzer
             public const string Do = "doStatement";
             public const string Return = "returnStatement";
         }
+
+        public static class Tags
+        {
+            public const string ClassVarDec = "classVarDec";
+        }
     }
 }
 
