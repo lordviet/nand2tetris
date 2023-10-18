@@ -101,6 +101,14 @@ namespace JackAnalyzer.Implementations
 
         public void CompileParameterList()
         {
+            //((type varName) (',' type varName)*)?
+            string parameterListTag = Tags.ParameterList;
+
+            this.compiled.Append(parameterListTag.ConstructOpeningTag());
+
+            // TODO: Handle type varName, first extract function that checks if next is a type and then use it here, also use the loop.
+
+            this.compiled.Append(parameterListTag.ConstructClosingTag());
             throw new NotImplementedException();
         }
 

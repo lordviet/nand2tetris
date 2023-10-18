@@ -112,6 +112,7 @@ namespace JackAnalyzer
         {
             public const string ClassVarDec = "classVarDec";
             public const string VarDec = "varDec";
+            public const string ParameterList = "parameterList";
         }
     }
 }
