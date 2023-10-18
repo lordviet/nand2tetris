@@ -1,4 +1,5 @@
-﻿using JackAnalyzer.Contracts;
+﻿using System.Xml.Linq;
+using JackAnalyzer.Contracts;
 using JackAnalyzer.Implementations;
 
 namespace JackAnalyzer.UnitTests;
@@ -33,7 +34,7 @@ public class Tests
     [Test]
     public void TestCompileClassVarDec()
     {
-        string classVarDecExpression = "static boolean test;";
+        string classVarDecExpression = "static boolean test, test2, test3;";
 
         IJackTokenizer tokenizer = new JackTokenizer(classVarDecExpression);
         ICompilationEngine engine = new CompilationEngine(tokenizer);
@@ -42,6 +43,8 @@ public class Tests
 
         string compiled = engine.Close();
 
-        Assert.NotNull(compiled);
+        XDocument formatted = XDocument.Parse(compiled);
+
+        Assert.NotNull(formatted.ToString());
     }
 }
