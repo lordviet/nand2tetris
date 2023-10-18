@@ -111,6 +111,7 @@ namespace JackAnalyzer
         public static class Tags
         {
             public const string ClassVarDec = "classVarDec";
+            public const string VarDec = "varDec";
         }
     }
 }
