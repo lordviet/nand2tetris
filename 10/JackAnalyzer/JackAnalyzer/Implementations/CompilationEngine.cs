@@ -67,14 +67,30 @@ namespace JackAnalyzer.Implementations
 
             this.AppendKeywordToCompiled(currentKeyword);
 
-            // TODO: Append type to compiled
+            Keyword typeKeyword = this.tokenizer.Keyword();
+
+            // TODO: This can become a method
             // type is int | char | boolean | className
             //  <keyword> boolean </keyword>
+            if (typeKeyword != Keyword.Integer && typeKeyword != Keyword.Char && typeKeyword != Keyword.Boolean && typeKeyword != Keyword.Class)
+            {
+                throw new Exception("");
+            }
+
+            this.AppendKeywordToCompiled(typeKeyword);
+
 
             // TODO: this is not entirely correct since it may be one or several varNames so it needs to be accounted for.
             this.AppendNextIdentifierToCompiled();
             //  <identifier> test </identifier>
 
+            while(this.tokenizer.TokenType() == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.Comma])
+            {
+                this.AppendTokenToCompiled(Symbols.Comma, TokenType.Symbol);
+
+
+                this.AppendNextIdentifierToCompiled();
+            }
 
             this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
 
@@ -183,6 +199,7 @@ namespace JackAnalyzer.Implementations
             return this.compiled.ToString();
         }
 
+        // TODO: I dislike the name since it does not what the method does really
         private string RetrieveNextExpectedOfType(TokenType expectedTokenType)
         {
             if (!tokenizer.HasMoreTokens())
@@ -200,7 +217,7 @@ namespace JackAnalyzer.Implementations
 
             string token = tokenizer.GetCurrentToken();
 
-            this.tokenizer.Advance();
+            //this.tokenizer.Advance();
 
             return token;
         }

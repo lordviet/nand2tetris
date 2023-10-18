@@ -96,6 +96,7 @@ namespace JackAnalyzer
             public const string RightCurlyBrace = "}";
             public const string EqualitySign = "=";
             public const string Semicolon = ";";
+            public const string Comma = ",";
         }
 
         public static class Statements

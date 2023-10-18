@@ -29,4 +29,19 @@ public class Tests
 
         Assert.NotNull(compiled);
     }
+
+    [Test]
+    public void TestCompileClassVarDec()
+    {
+        string classVarDecExpression = "static boolean test;";
+
+        IJackTokenizer tokenizer = new JackTokenizer(classVarDecExpression);
+        ICompilationEngine engine = new CompilationEngine(tokenizer);
+
+        engine.CompileClassVarDec();
+
+        string compiled = engine.Close();
+
+        Assert.NotNull(compiled);
+    }
 }
