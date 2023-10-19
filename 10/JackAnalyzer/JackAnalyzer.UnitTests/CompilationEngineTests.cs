@@ -47,4 +47,22 @@ public class Tests
 
         Assert.NotNull(formatted.ToString());
     }
+
+    [TestCase("int x, char y, boolean z)")]
+    [TestCase("int x)")]
+    public void TestCompileParameterList(string parameterListExpression)
+    {
+        IJackTokenizer tokenizer = new JackTokenizer(parameterListExpression);
+        ICompilationEngine engine = new CompilationEngine(tokenizer);
+
+        engine.CompileParameterList();
+
+        string compiled = engine.Close();
+
+        XDocument formatted = XDocument.Parse(compiled);
+
+        // Example assertion (modify as needed):
+        Assert.NotNull(formatted.ToString());
+    }
+
 }

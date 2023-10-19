@@ -69,23 +69,15 @@ namespace JackAnalyzer.Implementations
 
             Keyword typeKeyword = this.tokenizer.Keyword();
 
-            // TODO: This can become a method
-            // type is int | char | boolean | className
-            //  <keyword> boolean </keyword>
-            if (typeKeyword != Keyword.Integer && typeKeyword != Keyword.Char && typeKeyword != Keyword.Boolean && typeKeyword != Keyword.Class)
-            {
-                throw new Exception("");
-            }
+            this.EnsureKeywordIsType(typeKeyword);
 
             this.AppendKeywordToCompiled(typeKeyword);
 
             this.AppendNextIdentifierToCompiled();
 
-            while(this.tokenizer.TokenType() == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.Comma])
+            while (this.tokenizer.TokenType() == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.Comma])
             {
                 this.AppendTokenToCompiled(Symbols.Comma, TokenType.Symbol);
-
-
                 this.AppendNextIdentifierToCompiled();
             }
 
@@ -106,10 +98,42 @@ namespace JackAnalyzer.Implementations
 
             this.compiled.Append(parameterListTag.ConstructOpeningTag());
 
-            // TODO: Handle type varName, first extract function that checks if next is a type and then use it here, also use the loop.
+            // NOTE: Gateway to a recursive method
+            this.CompileParameterListInner();
 
             this.compiled.Append(parameterListTag.ConstructClosingTag());
-            throw new NotImplementedException();
+        }
+
+        // TODO: needs to be thouroughly tested
+        private void CompileParameterListInner()
+        {
+            TokenType currentToken = this.tokenizer.TokenType();
+
+            if (currentToken != TokenType.Keyword)
+            {
+                return;
+            }
+
+            Keyword typeKeyword = this.tokenizer.Keyword();
+
+            this.EnsureKeywordIsType(typeKeyword);
+
+            this.AppendKeywordToCompiled(typeKeyword);
+
+            this.AppendNextIdentifierToCompiled();
+
+            if (this.tokenizer.TokenType() == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.Comma])
+            {
+                this.AppendTokenToCompiled(Symbols.Comma, TokenType.Symbol);
+
+                if (this.tokenizer.TokenType() != TokenType.Keyword)
+                {
+                    // TODO: Refactor this by introducing an exception and making the code more readable.
+                    throw new Exception(", can be followed only by a keyword in the case of param lists");
+                }
+            }
+
+            this.CompileParameterListInner();
         }
 
         public void CompileVarDec()
@@ -138,13 +162,7 @@ namespace JackAnalyzer.Implementations
 
             Keyword typeKeyword = this.tokenizer.Keyword();
 
-            // TODO: This can become a method
-            // type is int | char | boolean | className
-            //  <keyword> boolean </keyword>
-            if (typeKeyword != Keyword.Integer && typeKeyword != Keyword.Char && typeKeyword != Keyword.Boolean && typeKeyword != Keyword.Class)
-            {
-                throw new Exception("");
-            }
+            this.EnsureKeywordIsType(typeKeyword);
 
             this.AppendKeywordToCompiled(typeKeyword);
 
@@ -153,8 +171,6 @@ namespace JackAnalyzer.Implementations
             while (this.tokenizer.TokenType() == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.Comma])
             {
                 this.AppendTokenToCompiled(Symbols.Comma, TokenType.Symbol);
-
-
                 this.AppendNextIdentifierToCompiled();
             }
 
@@ -340,6 +356,14 @@ namespace JackAnalyzer.Implementations
             this.compiled.Append(node);
 
             return;
+        }
+
+        private void EnsureKeywordIsType(Keyword keyword)
+        {
+            if (!keyword.IsType())
+            {
+                throw new Exception($"Keyword '{keyword}' is not a valid type.");
+            }
         }
     }
 }
