@@ -91,6 +91,7 @@ namespace JackAnalyzer.Implementations
         {
             this.ThrowIfTokenTypeDoesNotMatchExpected(Enums.TokenType.Identifier, TokenType());
 
+            // TODO: Missing implementation
             throw new NotImplementedException();
         }
 
@@ -110,7 +111,7 @@ namespace JackAnalyzer.Implementations
 
         public string StringValue()
         {
-            this.ThrowIfTokenTypeDoesNotMatchExpected(Enums.TokenType.IntegerConstant, TokenType());
+            this.ThrowIfTokenTypeDoesNotMatchExpected(Enums.TokenType.StringConstant, TokenType());
 
             string currentToken = GetCurrentToken();
 
