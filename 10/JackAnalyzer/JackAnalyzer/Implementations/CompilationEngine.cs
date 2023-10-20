@@ -251,7 +251,19 @@ namespace JackAnalyzer.Implementations
 
         public void CompileReturn()
         {
-            throw new NotImplementedException();
+            // 'return' expression? ';'
+
+            string returnStatement = Statements.Return;
+
+            this.compiled.Append(returnStatement.ConstructOpeningTag());
+
+            this.AppendKeywordToCompiled(Keyword.Return);
+
+            // TODO: compile expression
+
+            this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
+
+            this.compiled.Append(returnStatement.ConstructClosingTag());
         }
 
         public void CompileIf()
