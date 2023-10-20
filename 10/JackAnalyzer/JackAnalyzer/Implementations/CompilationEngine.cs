@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using JackAnalyzer.Contracts;
 using JackAnalyzer.Enums;
+using JackAnalyzer.Exceptions;
 using JackAnalyzer.Extensions;
 using static JackAnalyzer.Constants;
 
@@ -51,21 +52,9 @@ namespace JackAnalyzer.Implementations
 
             this.compiled.Append(classVarDecTag.ConstructOpeningTag());
 
-            TokenType currentToken = this.tokenizer.TokenType();
+            this.CheckIfCurrentTokenIsAmongExpectedKeywords(new Keyword[] { Keyword.Static, Keyword.Field });
 
-            if (currentToken != TokenType.Keyword)
-            {
-                throw new Exception("");
-            }
-
-            Keyword currentKeyword = this.tokenizer.Keyword();
-
-            if (currentKeyword != Keyword.Static && currentKeyword != Keyword.Static)
-            {
-                throw new Exception("");
-            }
-
-            this.AppendKeywordToCompiled(currentKeyword);
+            this.AppendKeywordToCompiled(this.tokenizer.Keyword());
 
             Keyword typeKeyword = this.tokenizer.Keyword();
 
@@ -86,9 +75,61 @@ namespace JackAnalyzer.Implementations
             this.compiled.Append(classVarDecTag.ConstructClosingTag());
         }
 
+        private void CheckIfCurrentTokenIsAmongExpectedKeywords(Keyword[] expectedKeywords)
+        {
+            TokenType currentToken = this.tokenizer.TokenType();
+
+            if (currentToken != TokenType.Keyword)
+            {
+                throw new Exception("");
+            }
+
+            Keyword currentKeyword = this.tokenizer.Keyword();
+
+            if (!expectedKeywords.Contains(currentKeyword))
+            {
+                throw new Exception("");
+            }
+        }
+
         public void CompileSubroutine()
         {
-            throw new NotImplementedException();
+            // ('constructor' | 'function' | 'method') ('void' | type) subroutineName '(' paramList ')' subroutineBody
+
+            string subroutineDecTag = Tags.SubroutineDec;
+
+            this.compiled.Append(subroutineDecTag.ConstructOpeningTag());
+
+            this.CheckIfCurrentTokenIsAmongExpectedKeywords(new Keyword[] { Keyword.Constructor, Keyword.Function, Keyword.Method });
+            this.AppendKeywordToCompiled(this.tokenizer.Keyword());
+
+            // TODO: ('void' | type)
+            TokenType currentToken = this.tokenizer.TokenType();
+
+            if (currentToken != TokenType.Keyword)
+            {
+                throw new UnexpectedTokenTypeException(TokenType.Keyword, currentToken);
+            }
+
+            Keyword typeKeyword = this.tokenizer.Keyword();
+
+            if(typeKeyword != Keyword.Void || !typeKeyword.IsType())
+            {
+                throw new Exception("Must be only void or a type");
+            }
+
+            // subroutineName
+            this.AppendNextIdentifierToCompiled();
+
+            this.AppendTokenToCompiled(Symbols.LeftParenthesis, TokenType.Symbol);
+
+            this.CompileParameterList();
+
+            this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
+
+            // TODO: subroutineBody
+
+            this.compiled.Append(subroutineDecTag.ConstructClosingTag());
         }
 
         public void CompileParameterList()
@@ -177,8 +218,6 @@ namespace JackAnalyzer.Implementations
             this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
 
             this.compiled.Append(classVarDecTag.ConstructClosingTag());
-
-            throw new NotImplementedException();
         }
 
         public void CompileStatements()
