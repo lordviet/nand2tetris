@@ -1,5 +1,4 @@
-﻿using System;
-using JackAnalyzer.Enums;
+﻿using JackAnalyzer.Enums;
 
 namespace JackAnalyzer.Extensions
 {

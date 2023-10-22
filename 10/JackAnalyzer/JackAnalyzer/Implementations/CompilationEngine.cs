@@ -337,7 +337,35 @@ namespace JackAnalyzer.Implementations
 
         public void CompileTerm()
         {
+            string termTag = Tags.Term;
+
+            this.compiled.Append(termTag.ConstructOpeningTag());
+
+            TokenType currentTokenType = this.tokenizer.TokenType();
+            string token = this.tokenizer.GetCurrentToken();
+
+            switch (currentTokenType)
+            {
+                case TokenType.IntegerConstant:
+                case TokenType.StringConstant:
+                    // TODO: Not exactly correct since I need tags defining if it's a string constant maybe the body of the Append function is wrong
+                    this.AppendTokenToCompiled(token, currentTokenType);
+                    break;
+                case TokenType.Keyword:
+                    //this.HandleKeywordInTerm();
+                default:
+                    throw new Exception("");
+            }
+
+            this.compiled.Append(termTag.ConstructClosingTag());
+
             throw new NotImplementedException();
+        }
+
+        private void HandleIdentifierInTerm()
+        {
+            string identifier = this.tokenizer.Identifier();
+
         }
 
         public void CompileExpressionList()
@@ -376,13 +404,13 @@ namespace JackAnalyzer.Implementations
 
         private void Eat(string expectedToken)
         {
-            if (!tokenizer.HasMoreTokens())
+            if (!this.tokenizer.HasMoreTokens())
             {
                 // TODO: Maybe throw?
                 return;
             }
 
-            string currentToken = tokenizer.GetCurrentToken();
+            string currentToken = this.tokenizer.GetCurrentToken();
 
             if (currentToken != expectedToken)
             {

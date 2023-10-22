@@ -1,4 +1,6 @@
-﻿namespace JackAnalyzer.Extensions
+﻿using JackAnalyzer.Enums;
+
+namespace JackAnalyzer.Extensions
 {
     public static class StringExtensions
     {
@@ -50,6 +52,24 @@
         {
             return $"</{tagName}>";
         }
+
+        public static bool IsKeywordConstant(this string source)
+        {
+            Dictionary<string, Keyword> keywordMap = Constants.LexicalElements.KeywordMap;
+
+            if (!keywordMap.ContainsKey(source))
+            {
+                return false;
+            }
+
+            Keyword[] constants = new Keyword[] {
+                Keyword.True,
+                Keyword.False,
+                Keyword.Null,
+                Keyword.This
+            };
+
+            return constants.Contains(keywordMap[source]);
+        }
     }
 }
-
