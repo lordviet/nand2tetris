@@ -103,7 +103,7 @@ namespace JackAnalyzer.Implementations
             this.CheckIfCurrentTokenIsAmongExpectedKeywords(new Keyword[] { Keyword.Constructor, Keyword.Function, Keyword.Method });
             this.AppendKeywordToCompiled(this.tokenizer.Keyword());
 
-            // TODO: ('void' | type)
+            // TODO: ('void' | type) fn?
             TokenType currentToken = this.tokenizer.TokenType();
 
             if (currentToken != TokenType.Keyword)
@@ -113,7 +113,7 @@ namespace JackAnalyzer.Implementations
 
             Keyword typeKeyword = this.tokenizer.Keyword();
 
-            if(typeKeyword != Keyword.Void || !typeKeyword.IsType())
+            if (typeKeyword != Keyword.Void || !typeKeyword.IsType())
             {
                 throw new Exception("Must be only void or a type");
             }
@@ -127,9 +127,28 @@ namespace JackAnalyzer.Implementations
 
             this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
 
-            // TODO: subroutineBody
+            this.CompileSubroutineBody();
 
             this.compiled.Append(subroutineDecTag.ConstructClosingTag());
+        }
+
+        // TODO: needs to be thouroughly tested
+        private void CompileSubroutineBody()
+        {
+            // '{' varDec* statements '}'
+            this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
+
+            // varDec
+            while (this.tokenizer.TokenType() == TokenType.Keyword && this.tokenizer.Keyword().IsType())
+            {
+                this.CompileVarDec();
+            }
+
+            this.CompileStatements();
+
+            this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
+
+            throw new NotImplementedException();
         }
 
         public void CompileParameterList()
@@ -181,9 +200,9 @@ namespace JackAnalyzer.Implementations
         {
             // var type varName (', ' varName)* ';'
 
-            string classVarDecTag = Tags.ClassVarDec;
+            string varDecTag = Tags.VarDec;
 
-            this.compiled.Append(classVarDecTag.ConstructOpeningTag());
+            this.compiled.Append(varDecTag.ConstructOpeningTag());
 
             TokenType currentToken = this.tokenizer.TokenType();
 
@@ -217,7 +236,7 @@ namespace JackAnalyzer.Implementations
 
             this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
 
-            this.compiled.Append(classVarDecTag.ConstructClosingTag());
+            this.compiled.Append(varDecTag.ConstructClosingTag());
         }
 
         public void CompileStatements()
