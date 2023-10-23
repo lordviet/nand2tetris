@@ -255,12 +255,20 @@ namespace JackAnalyzer.Implementations
 
             this.AppendKeywordToCompiled(Keyword.Do);
 
-            // TODO this should be subroutineCall
-            this.CompileSubroutine();
+            this.CompileSubroutineCall();
 
             this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
 
             this.compiled.Append(doStatement.ConstructClosingTag());
+        }
+
+        private void CompileSubroutineCall()
+        {
+            // subroutineName '(' expressionList ')' | (className | varName) '.' subroutineName '(' expressionList ')'
+            // NOTE: all of subroutineName, className and varName are identifiers
+            this.AppendNextIdentifierToCompiled();
+
+            // TODO: Check if the next symbol is '(' or '." and follow accordingly
         }
 
         public void CompileLet()
@@ -326,7 +334,41 @@ namespace JackAnalyzer.Implementations
 
         public void CompileIf()
         {
-            throw new NotImplementedException();
+            string ifStatement = Statements.If;
+
+            this.compiled.Append(ifStatement.ConstructOpeningTag());
+
+            this.AppendKeywordToCompiled(Keyword.If);
+
+            this.AppendTokenToCompiled(Symbols.LeftParenthesis, TokenType.Symbol);
+
+            this.CompileExpression();
+
+            this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
+
+            this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
+
+            this.CompileStatements();
+
+            this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
+
+            if (this.tokenizer.TokenType() == TokenType.Keyword && this.tokenizer.Keyword() == Keyword.Else)
+            {
+                this.CompileElse();
+            }
+
+            this.compiled.Append(ifStatement.ConstructClosingTag());
+        }
+
+        private void CompileElse()
+        {
+            this.AppendKeywordToCompiled(Keyword.Else);
+
+            this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
+
+            this.CompileStatements();
+
+            this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
         }
 
         public void CompileExpression()
@@ -352,7 +394,7 @@ namespace JackAnalyzer.Implementations
                     this.AppendTokenToCompiled(token, currentTokenType);
                     break;
                 case TokenType.Keyword:
-                    //this.HandleKeywordInTerm();
+                //this.HandleKeywordInTerm();
                 default:
                     throw new Exception("");
             }
@@ -370,6 +412,14 @@ namespace JackAnalyzer.Implementations
 
         public void CompileExpressionList()
         {
+            string expressionListTag = Tags.ExpressionList;
+
+            this.compiled.Append(expressionListTag.ConstructOpeningTag());
+
+            //  TODO: How to check if the next token is an expression?
+
+            this.compiled.Append(expressionListTag.ConstructClosingTag());
+
             return;
             //throw new NotImplementedException();
         }
@@ -382,20 +432,20 @@ namespace JackAnalyzer.Implementations
         // TODO: I dislike the name since it does not what the method does really
         private string RetrieveNextExpectedOfType(TokenType expectedTokenType)
         {
-            if (!tokenizer.HasMoreTokens())
+            if (!this.tokenizer.HasMoreTokens())
             {
                 // TODO: better error message
                 throw new Exception("No more tokens in tokenizer");
             }
 
-            TokenType currentTokenType = tokenizer.TokenType();
+            TokenType currentTokenType = this.tokenizer.TokenType();
 
             if (currentTokenType != expectedTokenType)
             {
                 throw new Exception($"Expected token type {expectedTokenType} but got {currentTokenType} instead.");
             }
 
-            string token = tokenizer.GetCurrentToken();
+            string token = this.tokenizer.GetCurrentToken();
 
             //this.tokenizer.Advance();
 
