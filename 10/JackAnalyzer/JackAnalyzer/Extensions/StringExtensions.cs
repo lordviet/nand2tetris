@@ -55,13 +55,6 @@ namespace JackAnalyzer.Extensions
 
         public static bool IsKeywordConstant(this string source)
         {
-            Dictionary<string, Keyword> keywordMap = Constants.LexicalElements.KeywordMap;
-
-            if (!keywordMap.ContainsKey(source))
-            {
-                return false;
-            }
-
             Keyword[] constants = new Keyword[] {
                 Keyword.True,
                 Keyword.False,
@@ -69,7 +62,34 @@ namespace JackAnalyzer.Extensions
                 Keyword.This
             };
 
-            return constants.Contains(keywordMap[source]);
+            return source.IsInCollection(Constants.LexicalElements.KeywordMap, constants);
+        }
+
+        public static bool IsOp(this string source)
+        {
+            char[] operators = new char[]
+            {
+                '+', '-', '*', '/', '&', '|', '<', '>', '='
+            };
+
+            return source.IsInCollection(Constants.LexicalElements.SymbolMap, operators);
+        }
+
+        public static bool IsInCollection<T>(this string source, Dictionary<string, T> referenceMap, T[] collection)
+        {
+            //if (!map.ContainsKey(source))
+            //{
+            //    return false;
+            //}
+
+            //return constants.Contains(map[source]);
+
+            if (referenceMap.TryGetValue(source, out T? value))
+            {
+                return collection.Contains(value);
+            }
+
+            return false;
         }
     }
 }

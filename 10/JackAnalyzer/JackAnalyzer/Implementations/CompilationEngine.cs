@@ -33,10 +33,10 @@ namespace JackAnalyzer.Implementations
 
             this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
 
-            // ?
+            // TODO: Check if it's a proper classVarDec and compile it if it is
             this.CompileClassVarDec();
 
-            // ??
+            // TODO: Check if it's a proper subroutine dec
             this.CompileSubroutine();
 
             this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
@@ -401,8 +401,31 @@ namespace JackAnalyzer.Implementations
 
         public void CompileExpression()
         {
+            string expressionTag = Tags.Expression;
+
+            this.compiled.Append(expressionTag.ConstructOpeningTag());
+
+            this.CompileExpressionCore();
+
+            this.compiled.Append(expressionTag.ConstructClosingTag());
+
             return;
-            //throw new NotImplementedException();
+        }
+
+        private void CompileExpressionCore()
+        {
+            this.CompileTerm();
+
+            TokenType currentTokenType = this.tokenizer.TokenType();
+            string currentToken = this.tokenizer.GetCurrentToken();
+
+            if (currentTokenType == TokenType.Symbol && currentToken.IsOp())
+            {
+                this.AppendTokenToCompiled(currentToken, TokenType.Symbol);
+
+                // NOTE: Recursive Call
+                this.CompileExpressionCore();
+            }
         }
 
         public void CompileTerm()

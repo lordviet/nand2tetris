@@ -116,6 +116,7 @@ namespace JackAnalyzer
             public const string ParameterList = "parameterList";
             public const string SubroutineDec = "subroutineDec";
             public const string Term = "term";
+            public const string Expression = "expression";
             public const string ExpressionList = "expressionList";
         }
     }
