@@ -268,7 +268,35 @@ namespace JackAnalyzer.Implementations
             // NOTE: all of subroutineName, className and varName are identifiers
             this.AppendNextIdentifierToCompiled();
 
-            // TODO: Check if the next symbol is '(' or '." and follow accordingly
+            if (this.tokenizer.TokenType() != TokenType.Symbol)
+            {
+                throw new UnexpectedTokenTypeException(TokenType.Symbol, tokenizer.TokenType());
+            }
+
+            string currentToken = this.tokenizer.GetCurrentToken();
+
+            switch (currentToken)
+            {
+                case Symbols.LeftParenthesis:
+                    this.CompileExpressionListInSubroutineCall();
+                    break;
+                case Symbols.Dot:
+                    this.AppendTokenToCompiled(Symbols.Dot, TokenType.Symbol);
+                    // NOTE: Recursive call, be careful with this invocation.
+                    this.CompileSubroutineCall();
+                    break;
+                default:
+                    throw new Exception("Expected either '(' or a '.'");
+            }
+        }
+
+        private void CompileExpressionListInSubroutineCall()
+        {
+            this.AppendTokenToCompiled(Symbols.LeftParenthesis, TokenType.Symbol);
+
+            this.CompileExpressionList();
+
+            this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
         }
 
         public void CompileLet()

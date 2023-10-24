@@ -97,6 +97,7 @@ namespace JackAnalyzer
             public const string EqualitySign = "=";
             public const string Semicolon = ";";
             public const string Comma = ",";
+            public const string Dot = ".";
         }
 
         public static class Statements
