@@ -241,8 +241,57 @@ namespace JackAnalyzer.Implementations
 
         public void CompileStatements()
         {
-            return;
-            //throw new NotImplementedException();
+            string statementsTag = Tags.Statements;
+
+            this.compiled.Append(statementsTag.ConstructOpeningTag());
+
+            TokenType currentTokenType = this.tokenizer.TokenType();
+
+            if (currentTokenType != TokenType.Keyword)
+            {
+                throw new UnexpectedTokenTypeException(TokenType.Keyword, currentTokenType);
+            }
+
+            if (!this.tokenizer.Keyword().IsBeginningOfStatement())
+            {
+                throw new Exception("Current Token is not a valid beginning of a statement");
+            }
+
+            this.CompileStatement();
+
+            this.compiled.Append(statementsTag.ConstructClosingTag());
+        }
+
+        // TODO: We've made sure that we're working with a Keyword
+        // NOTE: Be careful with recursion
+        private void CompileStatement()
+        {
+            switch (this.tokenizer.Keyword())
+            {
+                case Keyword.Let:
+                    this.CompileLet();
+                    break;
+                case Keyword.If:
+                    this.CompileIf();
+                    break;
+                case Keyword.While:
+                    this.CompileWhile();
+                    break;
+                case Keyword.Do:
+                    this.CompileDo();
+                    break;
+                case Keyword.Return:
+                    this.CompileReturn();
+                    break;
+                default:
+                    // Introduce Unexpected Keyword exception
+                    throw new Exception();
+            }
+
+            if (this.tokenizer.TokenType() == TokenType.Keyword && this.tokenizer.Keyword().IsBeginningOfStatement())
+            {
+                this.CompileStatement();
+            }
         }
 
         public void CompileDo()
