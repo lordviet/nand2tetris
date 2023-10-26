@@ -490,11 +490,14 @@ namespace JackAnalyzer.Implementations
             {
                 case TokenType.IntegerConstant:
                 case TokenType.StringConstant:
-                    // TODO: Not exactly correct since I need tags defining if it's a string constant maybe the body of the Append function is wrong
                     this.AppendTokenToCompiled(token, currentTokenType);
                     break;
                 case TokenType.Keyword:
-                //this.HandleKeywordInTerm();
+                    this.HandleKeywordInTerm(this.tokenizer.Keyword());
+                    break;
+                case TokenType.Symbol:
+                    this.HandleSymbolInTerm();
+                    break;
                 default:
                     throw new Exception("");
             }
@@ -502,6 +505,30 @@ namespace JackAnalyzer.Implementations
             this.compiled.Append(termTag.ConstructClosingTag());
 
             throw new NotImplementedException();
+        }
+
+        private void HandleKeywordInTerm(Keyword keyword)
+        {
+            if (!keyword.IsKeywordConstant())
+            {
+                // TODO: UnexpectedKeywordException
+                throw new Exception("");
+            }
+
+            // TODO: SHould we append keywordConstant node or should we keep it as keyword only? 
+            this.AppendTokenToCompiled(LexicalElements.ReverseKeywordMap[keyword], TokenType.Keyword);
+        }
+
+
+        private void HandleSymbolInTerm()
+        {
+            // TODO: Could also be a unaryOp and should handle a different case
+
+            this.AppendTokenToCompiled(Symbols.LeftParenthesis, TokenType.Symbol);
+
+            this.CompileExpression();
+
+            this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
         }
 
         private void HandleIdentifierInTerm()
@@ -598,6 +625,8 @@ namespace JackAnalyzer.Implementations
                 TokenType.Keyword => token.ConstructKeywordNode(),
                 TokenType.Symbol => token.ConstructSymbolNode(),
                 TokenType.Identifier => token.ConstructIdentifierNode(),
+                TokenType.IntegerConstant => token.ConstructIntegerConstantNode(),
+                TokenType.StringConstant => token.ConstructStringConstantNode(),
                 _ => throw new NotSupportedException("") // TODO: Exception message
             };
 

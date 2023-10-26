@@ -22,6 +22,7 @@ namespace JackAnalyzer.Extensions
                 : source[0..commentStart];
         }
 
+        // TODO: the hard-coded strings should come from the constants
         public static string ConstructSymbolNode(this string source)
         {
             // TODO: if source is symbol, what is a symbol
@@ -36,6 +37,21 @@ namespace JackAnalyzer.Extensions
         public static string ConstructIdentifierNode(this string source)
         {
             return source.ConstructNode("identifier");
+        }
+
+        public static string ConstructIntegerConstantNode(this string source)
+        {
+            return source.ConstructNode("integerConstant");
+        }
+
+        public static string ConstructStringConstantNode(this string source)
+        {
+            return source.ConstructNode("stringConstant");
+        }
+
+        public static string ConstructKeywordConstantNode(this string source)
+        {
+            return source.ConstructNode("keywordConstant");
         }
 
         private static string ConstructNode(this string source, string tagName)
@@ -70,6 +86,16 @@ namespace JackAnalyzer.Extensions
             char[] operators = new char[]
             {
                 '+', '-', '*', '/', '&', '|', '<', '>', '='
+            };
+
+            return source.IsInCollection(Constants.LexicalElements.SymbolMap, operators);
+        }
+
+        public static bool IsUnaryOp(this string source)
+        {
+            char[] operators = new char[]
+            {
+                '-', '~'
             };
 
             return source.IsInCollection(Constants.LexicalElements.SymbolMap, operators);
