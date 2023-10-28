@@ -498,6 +498,9 @@ namespace JackAnalyzer.Implementations
                 case TokenType.Symbol:
                     this.HandleSymbolInTerm();
                     break;
+                case TokenType.Identifier:
+                    this.HandleIdentifierInTerm();
+                    break;
                 default:
                     throw new Exception("");
             }
@@ -515,14 +518,21 @@ namespace JackAnalyzer.Implementations
                 throw new Exception("");
             }
 
-            // TODO: SHould we append keywordConstant node or should we keep it as keyword only? 
+            // TODO: Should we append keywordConstant node or should we keep it as keyword only? 
             this.AppendTokenToCompiled(LexicalElements.ReverseKeywordMap[keyword], TokenType.Keyword);
         }
 
 
         private void HandleSymbolInTerm()
         {
-            // TODO: Could also be a unaryOp and should handle a different case
+            string currentToken = this.tokenizer.GetCurrentToken();
+
+            if (currentToken.IsUnaryOp())
+            {
+                this.AppendTokenToCompiled(currentToken, TokenType.Symbol);
+
+                return;
+            }
 
             this.AppendTokenToCompiled(Symbols.LeftParenthesis, TokenType.Symbol);
 
@@ -533,7 +543,24 @@ namespace JackAnalyzer.Implementations
 
         private void HandleIdentifierInTerm()
         {
-            string identifier = this.tokenizer.Identifier();
+            this.AppendNextIdentifierToCompiled();
+
+            TokenType currentTokenType = this.tokenizer.TokenType();
+
+            if (currentTokenType != TokenType.Symbol)
+            {
+                // TODO: We probably don't need to throw an exception here since cutting the program would be enough
+                return;
+            }
+
+            string currentToken = this.tokenizer.GetCurrentToken();
+
+            if (this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.LeftParenthesis])
+            {
+                // TODO: Handle subroutineCall case
+            }
+
+            // TODO: Handle varName '[' expression ']' case
 
         }
 
