@@ -65,4 +65,27 @@ public class Tests
         Assert.NotNull(formatted.ToString());
     }
 
+    [TestCase("let s = null;")]
+    [TestCase("let s = \"string constant\";")]
+    [TestCase("let i = i | j;")]
+    [TestCase("let i = i * (-j);")]
+    [TestCase("let j = j / (-2);")]
+    // TODO: Handle Case with square brackets
+    public void TestCompileLetExpression(string letExpression)
+    {
+        IJackTokenizer tokenizer = new JackTokenizer(letExpression);
+        ICompilationEngine engine = new CompilationEngine(tokenizer);
+
+        engine.CompileLet();
+
+        string compiled = engine.Close();
+
+        XDocument formatted = XDocument.Parse(compiled);
+
+        string let = formatted.ToString();
+
+        // Example assertion (modify as needed):
+        Assert.NotNull(let);
+    }
+
 }
