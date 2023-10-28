@@ -94,6 +94,8 @@ namespace JackAnalyzer
             public const string RightParenthesis = ")";
             public const string LeftCurlyBrace = "{";
             public const string RightCurlyBrace = "}";
+            public const string LeftSquareBracket = "[";
+            public const string RightSquareBracket = "]";
             public const string EqualitySign = "=";
             public const string Semicolon = ";";
             public const string Comma = ",";

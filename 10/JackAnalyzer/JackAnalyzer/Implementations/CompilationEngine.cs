@@ -331,7 +331,7 @@ namespace JackAnalyzer.Implementations
                     break;
                 case Symbols.Dot:
                     this.AppendTokenToCompiled(Symbols.Dot, TokenType.Symbol);
-                    // NOTE: Recursive call, be careful with this invocation.
+                    // NOTE: Recursive call, be careful with this invocation, maybe it is required only once since this can be easily broken?
                     this.CompileSubroutineCall();
                     break;
                 default:
@@ -358,7 +358,7 @@ namespace JackAnalyzer.Implementations
 
             this.AppendNextIdentifierToCompiled();
 
-            // TODO: optional Expression in-between?
+            // TODO: optional Expression in-between? 0 or 1 times with curly brackets
 
             this.AppendTokenToCompiled(Symbols.EqualitySign, TokenType.Symbol);
 
@@ -506,8 +506,6 @@ namespace JackAnalyzer.Implementations
             }
 
             this.compiled.Append(termTag.ConstructClosingTag());
-
-            throw new NotImplementedException();
         }
 
         private void HandleKeywordInTerm(Keyword keyword)
@@ -531,6 +529,9 @@ namespace JackAnalyzer.Implementations
             {
                 this.AppendTokenToCompiled(currentToken, TokenType.Symbol);
 
+                // Recursive call
+                this.CompileTerm();
+
                 return;
             }
 
@@ -543,6 +544,7 @@ namespace JackAnalyzer.Implementations
 
         private void HandleIdentifierInTerm()
         {
+            // varName | varName ‘[‘ expression ‘]’ | subroutineCall
             this.AppendNextIdentifierToCompiled();
 
             TokenType currentTokenType = this.tokenizer.TokenType();
@@ -554,14 +556,36 @@ namespace JackAnalyzer.Implementations
             }
 
             string currentToken = this.tokenizer.GetCurrentToken();
+            char symbol = this.tokenizer.Symbol();
 
-            if (this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.LeftParenthesis])
+            if (symbol == LexicalElements.SymbolMap[Symbols.LeftSquareBracket])
             {
-                // TODO: Handle subroutineCall case
+                this.AppendTokenToCompiled(Symbols.LeftSquareBracket, TokenType.Symbol);
+
+                this.CompileExpression();
+
+                this.AppendTokenToCompiled(Symbols.RightSquareBracket, TokenType.Symbol);
             }
 
-            // TODO: Handle varName '[' expression ']' case
+            if (symbol == LexicalElements.SymbolMap[Symbols.LeftParenthesis] || symbol == LexicalElements.SymbolMap[Symbols.Dot])
+            {
+                // TODO: This switch can become its own expression
+                switch (currentToken)
+                {
+                    case Symbols.LeftParenthesis:
+                        this.CompileExpressionListInSubroutineCall();
+                        break;
+                    case Symbols.Dot:
+                        this.AppendTokenToCompiled(Symbols.Dot, TokenType.Symbol);
+                        // NOTE: Recursive call, be careful with this invocation, maybe it is required only once since this can be easily broken?
+                        this.CompileSubroutineCall();
+                        break;
+                    default:
+                        throw new Exception("Expected either '(' or a '.'");
+                }
+            }
 
+            return;
         }
 
         public void CompileExpressionList()
