@@ -22,26 +22,61 @@ namespace JackAnalyzer.Implementations
 
         public void CompileClass()
         {
+            // 'class' className '{' classVarDec* subroutineDec* '}'
+
             string classKeyword = LexicalElements.ReverseKeywordMap[Keyword.Class];
 
             this.compiled.Append(classKeyword.ConstructOpeningTag());
 
             this.AppendKeywordToCompiled(Keyword.Class);
 
-            // className
             this.AppendNextIdentifierToCompiled();
 
             this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
 
-            // TODO: Check if it's a proper classVarDec and compile it if it is
-            this.CompileClassVarDec();
+            this.CompileClassVarDecInClass();
 
-            // TODO: Check if it's a proper subroutine dec
-            this.CompileSubroutine();
+            this.CompileSubroutineDecInClass();
 
             this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
 
             this.compiled.Append(classKeyword.ConstructClosingTag());
+        }
+
+        private void CompileClassVarDecInClass()
+        {
+            if (this.tokenizer.TokenType() != TokenType.Keyword)
+            {
+                return;
+            }
+
+            Keyword keyword = this.tokenizer.Keyword();
+
+            if (keyword == Keyword.Static || keyword == Keyword.Field)
+            {
+                this.CompileClassVarDec();
+                this.CompileClassVarDecInClass();
+            }
+
+            return;
+        }
+
+        private void CompileSubroutineDecInClass()
+        {
+            if (this.tokenizer.TokenType() != TokenType.Keyword)
+            {
+                return;
+            }
+
+            Keyword keyword = this.tokenizer.Keyword();
+
+            if (keyword == Keyword.Constructor || keyword == Keyword.Function || keyword == Keyword.Method)
+            {
+                this.CompileSubroutine();
+                this.CompileSubroutineDecInClass();
+            }
+
+            return;
         }
 
         public void CompileClassVarDec()
