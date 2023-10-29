@@ -165,7 +165,7 @@ namespace JackAnalyzer.Implementations
             // '{' varDec* statements '}'
             this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
 
-            // varDec
+            // TODO: replace with recursion.
             while (this.tokenizer.TokenType() == TokenType.Keyword && this.tokenizer.Keyword().IsType())
             {
                 this.CompileVarDec();
@@ -174,8 +174,6 @@ namespace JackAnalyzer.Implementations
             this.CompileStatements();
 
             this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
-
-            throw new NotImplementedException();
         }
 
         public void CompileParameterList()
@@ -438,9 +436,15 @@ namespace JackAnalyzer.Implementations
 
             this.AppendKeywordToCompiled(Keyword.Return);
 
-            if (this.tokenizer.GetCurrentToken() != Symbols.Semicolon)
+            // TODO: alternative idea
+            //if (this.tokenizer this.tokenizer.GetCurrentToken() != Symbols.Semicolon)
+            //{
+            //    // We assume that anything other than a semicolon is an expression
+            //    this.CompileExpression();
+            //}
+
+            if (this.IsNextTokenTheBeginningOfExpression())
             {
-                // We assume that anything other than a semicolon is an expression
                 this.CompileExpression();
             }
 
@@ -630,16 +634,37 @@ namespace JackAnalyzer.Implementations
 
         public void CompileExpressionList()
         {
+            // (expression (',' expression)*)?
+
             string expressionListTag = Tags.ExpressionList;
 
             this.compiled.Append(expressionListTag.ConstructOpeningTag());
 
-            //  TODO: How to check if the next token is an expression?
+            if (this.IsNextTokenTheBeginningOfExpression())
+            {
+                this.CompileExpression();
+
+                this.CompileExpressionInExpressionList();
+            }
 
             this.compiled.Append(expressionListTag.ConstructClosingTag());
 
             return;
-            //throw new NotImplementedException();
+        }
+
+        private void CompileExpressionInExpressionList()
+        {
+            TokenType currentTokenType = this.tokenizer.TokenType();
+            string currentToken = this.tokenizer.GetCurrentToken();
+
+            if (currentTokenType == TokenType.Symbol && currentToken == Symbols.Comma)
+            {
+                this.AppendTokenToCompiled(currentToken, currentTokenType);
+                this.CompileExpression();
+                this.CompileExpressionList();
+            }
+
+            return;
         }
 
         public string Close()
@@ -730,6 +755,29 @@ namespace JackAnalyzer.Implementations
             {
                 throw new Exception($"Keyword '{keyword}' is not a valid type.");
             }
+        }
+
+        private bool IsNextTokenTheBeginningOfExpression()
+        {
+            return this.IsNextTokenTerm();
+        }
+
+        private bool IsNextTokenTerm()
+        {
+            TokenType currentTokenType = this.tokenizer.TokenType();
+
+            string currentToken = this.tokenizer.GetCurrentToken();
+
+            bool startsWithLeftParenthesis = currentTokenType == TokenType.Keyword && currentToken == Symbols.LeftParenthesis;
+            bool isKeywordConstant = currentTokenType == TokenType.Keyword && this.tokenizer.Keyword().IsKeywordConstant();
+            bool isUnaryOp = currentTokenType == TokenType.Symbol && currentToken.IsUnaryOp();
+
+            return currentTokenType == TokenType.IntegerConstant
+                || currentTokenType == TokenType.StringConstant
+                || currentTokenType == TokenType.Identifier
+                || startsWithLeftParenthesis
+                || isKeywordConstant
+                || isUnaryOp;
         }
     }
 }
