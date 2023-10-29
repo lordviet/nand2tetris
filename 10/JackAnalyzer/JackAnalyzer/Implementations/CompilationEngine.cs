@@ -17,7 +17,7 @@ namespace JackAnalyzer.Implementations
             this.tokenizer = tokenizer;
             this.compiled = new StringBuilder();
 
-            //this.CompileClass();
+            this.CompileClass();
         }
 
         public void CompileClass()
@@ -140,10 +140,12 @@ namespace JackAnalyzer.Implementations
 
             Keyword typeKeyword = this.tokenizer.Keyword();
 
-            if (typeKeyword != Keyword.Void || !typeKeyword.IsType())
+            if (typeKeyword != Keyword.Void && !typeKeyword.IsType())
             {
                 throw new Exception("Must be only void or a type");
             }
+
+            this.AppendTokenToCompiled(this.tokenizer.GetCurrentToken(), TokenType.Keyword);
 
             // subroutineName
             this.AppendNextIdentifierToCompiled();
@@ -162,18 +164,40 @@ namespace JackAnalyzer.Implementations
         // TODO: needs to be thouroughly tested
         private void CompileSubroutineBody()
         {
+            string subroutineBodyTag = Tags.SubroutineBody;
+
+            this.compiled.Append(subroutineBodyTag.ConstructOpeningTag());
+
             // '{' varDec* statements '}'
             this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
 
-            // TODO: replace with recursion.
-            while (this.tokenizer.TokenType() == TokenType.Keyword && this.tokenizer.Keyword().IsType())
-            {
-                this.CompileVarDec();
-            }
+            this.CompileVarDecInSubroutineBody();
 
             this.CompileStatements();
 
             this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
+
+            this.compiled.Append(subroutineBodyTag.ConstructClosingTag());
+        }
+
+        private void CompileVarDecInSubroutineBody()
+        {
+            TokenType tokenType = this.tokenizer.TokenType();
+
+            if (tokenType != TokenType.Keyword)
+            {
+                return;
+            }
+
+            Keyword keyword = this.tokenizer.Keyword();
+
+            if(keyword != Keyword.Var)
+            {
+                return;
+            }
+
+            this.CompileVarDec();
+            this.CompileVarDecInSubroutineBody();
         }
 
         public void CompileParameterList()
@@ -245,14 +269,24 @@ namespace JackAnalyzer.Implementations
 
             this.AppendKeywordToCompiled(currentKeyword);
 
-            Keyword typeKeyword = this.tokenizer.Keyword();
+            // TODO: Missing proper type handling
+            if (this.tokenizer.TokenType() == TokenType.Keyword)
+            {
+                Keyword typeKeyword = this.tokenizer.Keyword();
 
-            this.EnsureKeywordIsType(typeKeyword);
+                this.EnsureKeywordIsType(typeKeyword);
 
-            this.AppendKeywordToCompiled(typeKeyword);
+                this.AppendKeywordToCompiled(typeKeyword);
+            }
+            else
+            {
+                this.AppendNextIdentifierToCompiled();
+            }
+
 
             this.AppendNextIdentifierToCompiled();
 
+            // Replace with Recursion
             while (this.tokenizer.TokenType() == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.Comma])
             {
                 this.AppendTokenToCompiled(Symbols.Comma, TokenType.Symbol);

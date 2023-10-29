@@ -117,6 +117,7 @@ namespace JackAnalyzer
             public const string VarDec = "varDec";
             public const string ParameterList = "parameterList";
             public const string SubroutineDec = "subroutineDec";
+            public const string SubroutineBody = "subroutineBody";
             public const string Term = "term";
             public const string Expression = "expression";
             public const string ExpressionList = "expressionList";

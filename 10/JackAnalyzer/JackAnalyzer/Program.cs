@@ -54,7 +54,7 @@ class Program
             string fileContents = File.ReadAllText(filePath);
             string fileNameWithoutExtensions = Path.GetFileNameWithoutExtension(filePath);
 
-            string analyzedFile = AnalyzeFile(fileContents, fileNameWithoutExtensions);
+            string analyzedFile = AnalyzeFile(fileContents);
 
             jackFiles.Append(analyzedFile);
         }
@@ -76,17 +76,17 @@ class Program
         string fileContents = File.ReadAllText(filePath);
         string fileNameWithoutExtensions = Path.GetFileNameWithoutExtension(filePath);
 
-        string analyzed = AnalyzeFile(fileContents, fileNameWithoutExtensions);
+        string analyzed = AnalyzeFile(fileContents);
 
-        //SaveOutputFile(filePath, fileNameWithoutExtensions, analyzed);
+        SaveOutputFile(filePath, fileNameWithoutExtensions, analyzed);
     }
 
-    private static string AnalyzeFile(string fileContents, string fileName)
+    private static string AnalyzeFile(string fileContents)
     {
         IJackTokenizer tokenizer = new JackTokenizer(fileContents);
         ICompilationEngine engine = new CompilationEngine(tokenizer);
 
-        return "";
+        return engine.Close();
     }
 
     private static void SaveOutputFileDir(string directoryName, string fileName, string analyzedCode)
