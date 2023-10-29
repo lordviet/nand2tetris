@@ -43,7 +43,7 @@ namespace JackAnalyzer.Implementations
             this.compiled.Append(classKeyword.ConstructClosingTag());
         }
 
-        private void CompileClassVarDecInClass()
+        private void CompileClassMemberInClass(Keyword[] acceptableKeywords, Action compilationAction)
         {
             if (this.tokenizer.TokenType() != TokenType.Keyword)
             {
@@ -52,31 +52,23 @@ namespace JackAnalyzer.Implementations
 
             Keyword keyword = this.tokenizer.Keyword();
 
-            if (keyword == Keyword.Static || keyword == Keyword.Field)
+            if (acceptableKeywords.Contains(keyword))
             {
-                this.CompileClassVarDec();
-                this.CompileClassVarDecInClass();
+                compilationAction(); // Execute the specified compilation action
+                this.CompileClassMemberInClass(acceptableKeywords, compilationAction); // Recursive call
             }
+        }
 
-            return;
+        private void CompileClassVarDecInClass()
+        {
+            Keyword[] acceptableKeywords = { Keyword.Static, Keyword.Field };
+            this.CompileClassMemberInClass(acceptableKeywords, this.CompileClassVarDec);
         }
 
         private void CompileSubroutineDecInClass()
         {
-            if (this.tokenizer.TokenType() != TokenType.Keyword)
-            {
-                return;
-            }
-
-            Keyword keyword = this.tokenizer.Keyword();
-
-            if (keyword == Keyword.Constructor || keyword == Keyword.Function || keyword == Keyword.Method)
-            {
-                this.CompileSubroutine();
-                this.CompileSubroutineDecInClass();
-            }
-
-            return;
+            Keyword[] acceptableKeywords = { Keyword.Constructor, Keyword.Function, Keyword.Method };
+            this.CompileClassMemberInClass(acceptableKeywords, this.CompileSubroutine);
         }
 
         public void CompileClassVarDec()
@@ -446,7 +438,11 @@ namespace JackAnalyzer.Implementations
 
             this.AppendKeywordToCompiled(Keyword.Return);
 
-            // TODO: compile expression
+            if (this.tokenizer.GetCurrentToken() != Symbols.Semicolon)
+            {
+                // We assume that anything other than a semicolon is an expression
+                this.CompileExpression();
+            }
 
             this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
 
@@ -651,20 +647,18 @@ namespace JackAnalyzer.Implementations
             return this.compiled.ToString();
         }
 
-        // TODO: I dislike the name since it does not what the method does really
-        private string RetrieveNextExpectedOfType(TokenType expectedTokenType)
+        private string AssertNextTokenIsOfType(TokenType expectedTokenType)
         {
             if (!this.tokenizer.HasMoreTokens())
             {
-                // TODO: better error message
-                throw new Exception("No more tokens in tokenizer");
+                throw new Exception("Unexpected end of tokenizer, no tokens left.");
             }
 
             TokenType currentTokenType = this.tokenizer.TokenType();
 
             if (currentTokenType != expectedTokenType)
             {
-                throw new Exception($"Expected token type {expectedTokenType} but got {currentTokenType} instead.");
+                throw new UnexpectedTokenTypeException(expectedTokenType, currentTokenType);
             }
 
             string token = this.tokenizer.GetCurrentToken();
@@ -697,7 +691,7 @@ namespace JackAnalyzer.Implementations
 
         private void AppendNextIdentifierToCompiled()
         {
-            string token = this.RetrieveNextExpectedOfType(TokenType.Identifier);
+            string token = this.AssertNextTokenIsOfType(TokenType.Identifier);
 
             this.AppendTokenToCompiled(token, TokenType.Identifier);
         }
