@@ -350,6 +350,8 @@ namespace JackAnalyzer.Implementations
 
         public void CompileLet()
         {
+            // 'let' varName ('[' expression ']')? '=' expression ';'
+
             string letStatement = Statements.Let;
 
             this.compiled.Append(letStatement.ConstructOpeningTag());
@@ -358,7 +360,14 @@ namespace JackAnalyzer.Implementations
 
             this.AppendNextIdentifierToCompiled();
 
-            // TODO: optional Expression in-between? 0 or 1 times with curly brackets
+            if (this.tokenizer.TokenType() == TokenType.Symbol)
+            {
+                this.AppendTokenToCompiled(Symbols.LeftSquareBracket, TokenType.Symbol);
+
+                this.CompileExpression();
+
+                this.AppendTokenToCompiled(Symbols.RightSquareBracket, TokenType.Symbol);
+            }
 
             this.AppendTokenToCompiled(Symbols.EqualitySign, TokenType.Symbol);
 

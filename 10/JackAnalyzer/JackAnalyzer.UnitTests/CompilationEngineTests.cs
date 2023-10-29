@@ -70,7 +70,7 @@ public class Tests
     [TestCase("let i = i | j;")]
     [TestCase("let i = i * (-j);")]
     [TestCase("let j = j / (-2);")]
-    // TODO: Handle Case with square brackets
+    [TestCase("let a[1] = a[2];")]
     public void TestCompileLetExpression(string letExpression)
     {
         IJackTokenizer tokenizer = new JackTokenizer(letExpression);
