@@ -191,7 +191,7 @@ namespace JackAnalyzer.Implementations
 
             Keyword keyword = this.tokenizer.Keyword();
 
-            if(keyword != Keyword.Var)
+            if (keyword != Keyword.Var)
             {
                 return;
             }
@@ -419,7 +419,7 @@ namespace JackAnalyzer.Implementations
 
             this.AppendNextIdentifierToCompiled();
 
-            if (this.tokenizer.TokenType() == TokenType.Symbol)
+            if (this.tokenizer.TokenType() == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.LeftSquareBracket])
             {
                 this.AppendTokenToCompiled(Symbols.LeftSquareBracket, TokenType.Symbol);
 
