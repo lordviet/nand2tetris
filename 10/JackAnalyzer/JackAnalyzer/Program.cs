@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Numerics;
+using System.Text;
+using System.Xml.Linq;
 using JackAnalyzer;
 using JackAnalyzer.Contracts;
 using JackAnalyzer.Implementations;
@@ -122,7 +124,8 @@ class Program
 
         try
         {
-            File.WriteAllText(outputFile, analyzedCode);
+            XDocument formatted = XDocument.Parse(analyzedCode);
+            File.WriteAllText(outputFile, formatted.ToString());
             Console.WriteLine("Syntax analysis successfully completed. Output file: " + outputFile);
         }
         catch (Exception ex)

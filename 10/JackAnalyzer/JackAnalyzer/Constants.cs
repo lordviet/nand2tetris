@@ -83,6 +83,14 @@ namespace JackAnalyzer
                 { "~", '~' }
             };
 
+            public static readonly Dictionary<string, string> SpecialSymbolOutputMap = new()
+            {
+                {"<", "&lt;" },
+                {">", "&gt;" },
+                {"\"", "&quot;"},
+                { "&", "&amp;"}
+            };
+
             public const string StringPattern = @"^""[^""]*""";
 
             public const string IdentifierPattern = @"\b[a-zA-Z_][a-zA-Z0-9_]*\b";

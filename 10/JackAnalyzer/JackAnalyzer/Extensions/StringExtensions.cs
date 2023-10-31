@@ -25,7 +25,11 @@ namespace JackAnalyzer.Extensions
         // TODO: the hard-coded strings should come from the constants
         public static string ConstructSymbolNode(this string source)
         {
-            // TODO: if source is symbol, what is a symbol
+            if (Constants.LexicalElements.SpecialSymbolOutputMap.TryGetValue(source, out string? specialSymbolOutput))
+            {
+                return specialSymbolOutput.ConstructNode("symbol");
+            }
+
             return source.ConstructNode("symbol");
         }
 
@@ -46,7 +50,8 @@ namespace JackAnalyzer.Extensions
 
         public static string ConstructStringConstantNode(this string source)
         {
-            return source.ConstructNode("stringConstant");
+            // TODO: Potentially problematic
+            return source.Trim('"').ConstructNode("stringConstant");
         }
 
         public static string ConstructKeywordConstantNode(this string source)
