@@ -83,11 +83,13 @@ namespace JackAnalyzer.Implementations
 
             this.AppendKeywordToCompiled(this.tokenizer.Keyword());
 
-            Keyword typeKeyword = this.tokenizer.Keyword();
+            this.CompileType();
 
-            this.EnsureKeywordIsType(typeKeyword);
+            //Keyword typeKeyword = this.tokenizer.Keyword();
 
-            this.AppendKeywordToCompiled(typeKeyword);
+            //this.EnsureKeywordIsType(typeKeyword);
+
+            //this.AppendKeywordToCompiled(typeKeyword);
 
             this.AppendNextIdentifierToCompiled();
 
@@ -133,19 +135,28 @@ namespace JackAnalyzer.Implementations
             // TODO: ('void' | type) fn?
             TokenType currentToken = this.tokenizer.TokenType();
 
-            if (currentToken != TokenType.Keyword)
+            //if (currentToken != TokenType.Keyword)
+            //{
+            //    throw new UnexpectedTokenTypeException(TokenType.Keyword, currentToken);
+            //}
+
+            if (currentToken == TokenType.Keyword && this.tokenizer.Keyword() == Keyword.Void)
             {
-                throw new UnexpectedTokenTypeException(TokenType.Keyword, currentToken);
+                this.AppendTokenToCompiled(this.tokenizer.GetCurrentToken(), TokenType.Keyword);
+            }
+            else
+            {
+                this.CompileType();
             }
 
-            Keyword typeKeyword = this.tokenizer.Keyword();
+            //Keyword typeKeyword = this.tokenizer.Keyword();
 
-            if (typeKeyword != Keyword.Void && !typeKeyword.IsType())
-            {
-                throw new Exception("Must be only void or a type");
-            }
+            //if (typeKeyword != Keyword.Void && !typeKeyword.IsType())
+            //{
+            //    throw new Exception("Must be only void or a type");
+            //}
 
-            this.AppendTokenToCompiled(this.tokenizer.GetCurrentToken(), TokenType.Keyword);
+            //this.AppendTokenToCompiled(this.tokenizer.GetCurrentToken(), TokenType.Keyword);
 
             // subroutineName
             this.AppendNextIdentifierToCompiled();
@@ -245,6 +256,22 @@ namespace JackAnalyzer.Implementations
             this.CompileParameterListInner();
         }
 
+        private void CompileType()
+        {
+            if (this.tokenizer.TokenType() == TokenType.Keyword)
+            {
+                Keyword typeKeyword = this.tokenizer.Keyword();
+
+                this.EnsureKeywordIsType(typeKeyword);
+
+                this.AppendKeywordToCompiled(typeKeyword);
+            }
+            else
+            {
+                this.AppendNextIdentifierToCompiled();
+            }
+        }
+
         public void CompileVarDec()
         {
             // var type varName (', ' varName)* ';'
@@ -270,19 +297,7 @@ namespace JackAnalyzer.Implementations
             this.AppendKeywordToCompiled(currentKeyword);
 
             // TODO: Missing proper type handling
-            if (this.tokenizer.TokenType() == TokenType.Keyword)
-            {
-                Keyword typeKeyword = this.tokenizer.Keyword();
-
-                this.EnsureKeywordIsType(typeKeyword);
-
-                this.AppendKeywordToCompiled(typeKeyword);
-            }
-            else
-            {
-                this.AppendNextIdentifierToCompiled();
-            }
-
+            this.CompileType();
 
             this.AppendNextIdentifierToCompiled();
 
