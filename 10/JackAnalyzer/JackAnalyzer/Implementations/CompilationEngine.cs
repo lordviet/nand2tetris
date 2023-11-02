@@ -284,24 +284,23 @@ namespace JackAnalyzer.Implementations
 
             if (currentToken != TokenType.Keyword)
             {
-                throw new Exception("");
+                throw new UnexpectedTokenTypeException(TokenType.Keyword, currentToken);
             }
 
             Keyword currentKeyword = this.tokenizer.Keyword();
 
             if (currentKeyword != Keyword.Var)
             {
-                throw new Exception("");
+                throw new UnexpectedKeywordException(Keyword.Var, currentKeyword);
             }
 
             this.AppendKeywordToCompiled(currentKeyword);
 
-            // TODO: Missing proper type handling
             this.CompileType();
 
             this.AppendNextIdentifierToCompiled();
 
-            // Replace with Recursion
+            // TODO: Replace with Recursion
             while (this.tokenizer.TokenType() == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.Comma])
             {
                 this.AppendTokenToCompiled(Symbols.Comma, TokenType.Symbol);
@@ -358,8 +357,7 @@ namespace JackAnalyzer.Implementations
                     this.CompileReturn();
                     break;
                 default:
-                    // Introduce Unexpected Keyword exception
-                    throw new Exception();
+                    throw new UnexpectedKeywordException();
             }
 
             if (this.tokenizer.TokenType() == TokenType.Keyword && this.tokenizer.Keyword().IsBeginningOfStatement())
@@ -605,8 +603,7 @@ namespace JackAnalyzer.Implementations
         {
             if (!keyword.IsKeywordConstant())
             {
-                // TODO: UnexpectedKeywordException
-                throw new Exception("");
+                throw new UnexpectedKeywordException();
             }
 
             // TODO: Should we append keywordConstant node or should we keep it as keyword only? 
