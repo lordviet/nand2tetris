@@ -8,9 +8,11 @@ namespace JackAnalyzer.Extensions
         {
             string forwardSlashSyntax = "//";
             string slashStarSyntax = "/*";
+            string starSyntax = "*";
 
             string initialStrip = source.StripCommentCore(forwardSlashSyntax);
-            return initialStrip.StripCommentCore(slashStarSyntax);
+            string secondaryStrip = initialStrip.StripCommentCore(slashStarSyntax);
+            return secondaryStrip.StripCommentCore(starSyntax);
         }
 
         public static string StripCommentCore(this string source, string commentSyntax)
