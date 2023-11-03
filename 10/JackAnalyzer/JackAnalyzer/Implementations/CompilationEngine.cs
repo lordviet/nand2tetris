@@ -707,7 +707,7 @@ namespace JackAnalyzer.Implementations
             {
                 this.AppendTokenToCompiled(currentToken, currentTokenType);
                 this.CompileExpression();
-                this.CompileExpressionList();
+                this.CompileExpressionInExpressionList();
             }
 
             return;
