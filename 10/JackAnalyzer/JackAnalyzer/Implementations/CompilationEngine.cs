@@ -320,15 +320,20 @@ namespace JackAnalyzer.Implementations
 
             TokenType currentTokenType = this.tokenizer.TokenType();
 
-            if (currentTokenType != TokenType.Keyword)
+            // To compile a statement we need it to be a keyword that marks the beginning of a statement
+            if (currentTokenType != TokenType.Keyword || !this.tokenizer.Keyword().IsBeginningOfStatement())
             {
-                throw new UnexpectedTokenTypeException(TokenType.Keyword, currentTokenType);
+                this.compiled.Append(statementsTag.ConstructClosingTag());
+                return;
+                //throw new UnexpectedTokenTypeException(TokenType.Keyword, currentTokenType);
             }
 
-            if (!this.tokenizer.Keyword().IsBeginningOfStatement())
-            {
-                throw new Exception("Current Token is not a valid beginning of a statement");
-            }
+            //if (!this.tokenizer.Keyword().IsBeginningOfStatement())
+            //{
+            //    this.compiled.Append(statementsTag.ConstructClosingTag());
+            //    return;
+            //    //throw new Exception("Current Token is not a valid beginning of a statement");
+            //}
 
             this.CompileStatement();
 
