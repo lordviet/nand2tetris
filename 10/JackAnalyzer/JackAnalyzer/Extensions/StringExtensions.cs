@@ -12,7 +12,7 @@ namespace JackAnalyzer.Extensions
 
             string initialStrip = source.StripCommentCore(forwardSlashSyntax);
             string secondaryStrip = initialStrip.StripCommentCore(slashStarSyntax);
-            return secondaryStrip.StripCommentCore(starSyntax);
+            return secondaryStrip.TrimStart().IndexOf("*") == 0 ? secondaryStrip.StripCommentCore(starSyntax) : secondaryStrip;
         }
 
         public static string StripCommentCore(this string source, string commentSyntax)
