@@ -12,12 +12,15 @@ namespace JackAnalyzer.Implementations
         private readonly IJackTokenizer tokenizer;
         private readonly StringBuilder compiled;
 
-        public CompilationEngine(IJackTokenizer tokenizer)
+        public CompilationEngine(IJackTokenizer tokenizer, bool compileClass = true)
         {
             this.tokenizer = tokenizer;
             this.compiled = new StringBuilder();
 
-            this.CompileClass();
+            if (compileClass)
+            {
+                this.CompileClass();
+            }
         }
 
         public void CompileClass()
@@ -819,7 +822,7 @@ namespace JackAnalyzer.Implementations
 
             string currentToken = this.tokenizer.GetCurrentToken();
 
-            bool startsWithLeftParenthesis = currentTokenType == TokenType.Keyword && currentToken == Symbols.LeftParenthesis;
+            bool startsWithLeftParenthesis = currentTokenType == TokenType.Symbol && currentToken == Symbols.LeftParenthesis;
             bool isKeywordConstant = currentTokenType == TokenType.Keyword && this.tokenizer.Keyword().IsKeywordConstant();
             bool isUnaryOp = currentTokenType == TokenType.Symbol && currentToken.IsUnaryOp();
 

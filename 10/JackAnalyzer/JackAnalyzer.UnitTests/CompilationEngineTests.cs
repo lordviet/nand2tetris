@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System.Linq.Expressions;
+using System.Xml.Linq;
 using JackAnalyzer.Contracts;
 using JackAnalyzer.Implementations;
 
@@ -22,7 +23,7 @@ public class Tests
         """;
 
         IJackTokenizer tokenizer = new JackTokenizer(whileExpression);
-        ICompilationEngine engine = new CompilationEngine(tokenizer);
+        ICompilationEngine engine = new CompilationEngine(tokenizer, compileClass: false);
 
         engine.CompileWhile();
 
@@ -37,7 +38,7 @@ public class Tests
         string classVarDecExpression = "static boolean test, test2, test3;";
 
         IJackTokenizer tokenizer = new JackTokenizer(classVarDecExpression);
-        ICompilationEngine engine = new CompilationEngine(tokenizer);
+        ICompilationEngine engine = new CompilationEngine(tokenizer, compileClass: false);
 
         engine.CompileClassVarDec();
 
@@ -53,7 +54,7 @@ public class Tests
     public void TestCompileParameterList(string parameterListExpression)
     {
         IJackTokenizer tokenizer = new JackTokenizer(parameterListExpression);
-        ICompilationEngine engine = new CompilationEngine(tokenizer);
+        ICompilationEngine engine = new CompilationEngine(tokenizer, compileClass: false);
 
         engine.CompileParameterList();
 
@@ -74,7 +75,7 @@ public class Tests
     public void TestCompileLetExpression(string letExpression)
     {
         IJackTokenizer tokenizer = new JackTokenizer(letExpression);
-        ICompilationEngine engine = new CompilationEngine(tokenizer);
+        ICompilationEngine engine = new CompilationEngine(tokenizer, compileClass: false);
 
         engine.CompileLet();
 
@@ -88,4 +89,23 @@ public class Tests
         Assert.NotNull(let);
     }
 
+
+    //[TestCase("do Screen.drawRectangle(x, (y + size) - 1, x + size, y + size);")]
+    [TestCase("do Screen.drawRectangle((x + size) - 1, y, x + size, y + size);")]
+    public void TestCompileDoExpression(string doExpression)
+    {
+        IJackTokenizer tokenizer = new JackTokenizer(doExpression);
+        ICompilationEngine engine = new CompilationEngine(tokenizer, compileClass: false);
+
+        engine.CompileDo();
+
+        string compiled = engine.Close();
+
+        XDocument formatted = XDocument.Parse(compiled);
+
+        string formattedDo = formatted.ToString();
+
+        // Example assertion (modify as needed):
+        Assert.NotNull(formattedDo);
+    }
 }
