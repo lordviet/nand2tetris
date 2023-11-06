@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using System.Text;
+﻿using System.Text;
 using System.Xml.Linq;
 using JackAnalyzer;
 using JackAnalyzer.Contracts;
