@@ -88,12 +88,6 @@ namespace JackAnalyzer.Implementations
 
             this.CompileType();
 
-            //Keyword typeKeyword = this.tokenizer.Keyword();
-
-            //this.EnsureKeywordIsType(typeKeyword);
-
-            //this.AppendKeywordToCompiled(typeKeyword);
-
             this.AppendNextIdentifierToCompiled();
 
             while (this.tokenizer.TokenType() == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.Comma])
@@ -135,13 +129,7 @@ namespace JackAnalyzer.Implementations
             this.CheckIfCurrentTokenIsAmongExpectedKeywords(new Keyword[] { Keyword.Constructor, Keyword.Function, Keyword.Method });
             this.AppendKeywordToCompiled(this.tokenizer.Keyword());
 
-            // TODO: ('void' | type) fn?
             TokenType currentToken = this.tokenizer.TokenType();
-
-            //if (currentToken != TokenType.Keyword)
-            //{
-            //    throw new UnexpectedTokenTypeException(TokenType.Keyword, currentToken);
-            //}
 
             if (currentToken == TokenType.Keyword && this.tokenizer.Keyword() == Keyword.Void)
             {
@@ -151,15 +139,6 @@ namespace JackAnalyzer.Implementations
             {
                 this.CompileType();
             }
-
-            //Keyword typeKeyword = this.tokenizer.Keyword();
-
-            //if (typeKeyword != Keyword.Void && !typeKeyword.IsType())
-            //{
-            //    throw new Exception("Must be only void or a type");
-            //}
-
-            //this.AppendTokenToCompiled(this.tokenizer.GetCurrentToken(), TokenType.Keyword);
 
             // subroutineName
             this.AppendNextIdentifierToCompiled();
@@ -175,7 +154,6 @@ namespace JackAnalyzer.Implementations
             this.compiled.Append(subroutineDecTag.ConstructClosingTag());
         }
 
-        // TODO: needs to be thouroughly tested
         private void CompileSubroutineBody()
         {
             string subroutineBodyTag = Tags.SubroutineBody;
@@ -227,7 +205,6 @@ namespace JackAnalyzer.Implementations
             this.compiled.Append(parameterListTag.ConstructClosingTag());
         }
 
-        // TODO: needs to be thouroughly tested
         private void CompileParameterListInner()
         {
             TokenType currentToken = this.tokenizer.TokenType();
@@ -328,15 +305,7 @@ namespace JackAnalyzer.Implementations
             {
                 this.compiled.Append(statementsTag.ConstructClosingTag());
                 return;
-                //throw new UnexpectedTokenTypeException(TokenType.Keyword, currentTokenType);
             }
-
-            //if (!this.tokenizer.Keyword().IsBeginningOfStatement())
-            //{
-            //    this.compiled.Append(statementsTag.ConstructClosingTag());
-            //    return;
-            //    //throw new Exception("Current Token is not a valid beginning of a statement");
-            //}
 
             this.CompileStatement();
 
@@ -491,13 +460,6 @@ namespace JackAnalyzer.Implementations
 
             this.AppendKeywordToCompiled(Keyword.Return);
 
-            // TODO: alternative idea
-            //if (this.tokenizer this.tokenizer.GetCurrentToken() != Symbols.Semicolon)
-            //{
-            //    // We assume that anything other than a semicolon is an expression
-            //    this.CompileExpression();
-            //}
-
             if (this.IsNextTokenTheBeginningOfExpression())
             {
                 this.CompileExpression();
@@ -614,7 +576,6 @@ namespace JackAnalyzer.Implementations
                 throw new UnexpectedKeywordException();
             }
 
-            // TODO: Should we append keywordConstant node or should we keep it as keyword only? 
             this.AppendTokenToCompiled(LexicalElements.ReverseKeywordMap[keyword], TokenType.Keyword);
         }
 
@@ -627,7 +588,7 @@ namespace JackAnalyzer.Implementations
             {
                 this.AppendTokenToCompiled(currentToken, TokenType.Symbol);
 
-                // Recursive call
+                // NOTE: Recursive call
                 this.CompileTerm();
 
                 return;
@@ -741,8 +702,6 @@ namespace JackAnalyzer.Implementations
             }
 
             string token = this.tokenizer.GetCurrentToken();
-
-            //this.tokenizer.Advance();
 
             return token;
         }

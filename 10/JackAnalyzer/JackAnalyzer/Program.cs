@@ -1,5 +1,4 @@
-﻿using System.Text;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 using JackAnalyzer;
 using JackAnalyzer.Contracts;
 using JackAnalyzer.Implementations;
@@ -48,22 +47,15 @@ class Program
             return;
         }
 
-        StringBuilder translatedFiles = new StringBuilder();
-
         foreach (string filePath in jackFiles)
         {
             string fileContents = File.ReadAllText(filePath);
             string fileNameWithoutExtensions = Path.GetFileNameWithoutExtension(filePath);
 
-            string analyzedFile = AnalyzeFile(fileContents);
+            string analyzed = AnalyzeFile(fileContents);
 
-            jackFiles.Append(analyzedFile);
+            SaveOutputFile(filePath, fileNameWithoutExtensions, analyzed);
         }
-
-        // Get the inside directory by using the first element of the.jack files
-        string? saveDirectoryPath = Path.GetDirectoryName(jackFiles[0]);
-
-        SaveOutputFileDir(saveDirectoryPath ?? directoryPath, directoryPath, translatedFiles.ToString());
     }
 
     private static void HandleFile(string filePath)
@@ -88,23 +80,6 @@ class Program
         ICompilationEngine engine = new CompilationEngine(tokenizer);
 
         return engine.Close();
-    }
-
-    private static void SaveOutputFileDir(string directoryName, string fileName, string analyzedCode)
-    {
-        try
-        {
-            // Combine the directory path with the default output file extension to create the output file path
-            string fileNameWithoutExtensions = Path.GetFileNameWithoutExtension(fileName);
-            string outputFile = Path.Combine(directoryName, $"{fileNameWithoutExtensions}{Constants.DefaultOutputFileExtension}");
-
-            File.WriteAllText(outputFile, analyzedCode);
-            Console.WriteLine("Syntax analysis successfully completed. Output file: " + outputFile);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Error saving the output file: " + ex.Message);
-        }
     }
 
     private static void SaveOutputFile(string basePath, string fileName, string analyzedCode)

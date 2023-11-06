@@ -16,7 +16,7 @@ namespace JackAnalyzer.Contracts
 
 		char Symbol();
 
-		string Identifier();
+		//string Identifier();
 
 		int IntegerValue();
 

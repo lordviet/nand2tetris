@@ -87,13 +87,13 @@ namespace JackAnalyzer.Implementations
             return Constants.LexicalElements.SymbolMap[currentToken];
         }
 
-        public string Identifier()
-        {
-            this.ThrowIfTokenTypeDoesNotMatchExpected(Enums.TokenType.Identifier, TokenType());
+        //public string Identifier()
+        //{
+        //    this.ThrowIfTokenTypeDoesNotMatchExpected(Enums.TokenType.Identifier, TokenType());
 
-            // TODO: Missing implementation
-            throw new NotImplementedException();
-        }
+        //    // TODO: Missing implementation
+        //    throw new NotImplementedException();
+        //}
 
         public int IntegerValue()
         {
