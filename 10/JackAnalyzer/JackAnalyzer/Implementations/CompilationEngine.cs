@@ -374,6 +374,11 @@ namespace JackAnalyzer.Implementations
 
             string currentToken = this.tokenizer.GetCurrentToken();
 
+            this.HandleSubroutineCallSymbol(currentToken);
+        }
+
+        private void HandleSubroutineCallSymbol(string currentToken)
+        {
             switch (currentToken)
             {
                 case Symbols.LeftParenthesis:
@@ -611,7 +616,6 @@ namespace JackAnalyzer.Implementations
 
             if (currentTokenType != TokenType.Symbol)
             {
-                // TODO: We probably don't need to throw an exception here since cutting the program would be enough
                 return;
             }
 
@@ -629,20 +633,7 @@ namespace JackAnalyzer.Implementations
 
             if (symbol == LexicalElements.SymbolMap[Symbols.LeftParenthesis] || symbol == LexicalElements.SymbolMap[Symbols.Dot])
             {
-                // TODO: This switch can become its own expression
-                switch (currentToken)
-                {
-                    case Symbols.LeftParenthesis:
-                        this.CompileExpressionListInSubroutineCall();
-                        break;
-                    case Symbols.Dot:
-                        this.AppendTokenToCompiled(Symbols.Dot, TokenType.Symbol);
-                        // NOTE: Recursive call, be careful with this invocation, maybe it is required only once since this can be easily broken?
-                        this.CompileSubroutineCall();
-                        break;
-                    default:
-                        throw new Exception($"Expected either a '{Symbols.LeftParenthesis}' or a '{Symbols.Dot}' when handling subroutine call.");
-                }
+                this.HandleSubroutineCallSymbol(currentToken);
             }
 
             return;
@@ -711,7 +702,6 @@ namespace JackAnalyzer.Implementations
         {
             if (!this.tokenizer.HasMoreTokens())
             {
-                // TODO: Maybe throw?
                 return;
             }
 

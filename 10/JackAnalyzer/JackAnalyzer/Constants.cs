@@ -130,6 +130,12 @@ namespace JackAnalyzer
             public const string Expression = "expression";
             public const string ExpressionList = "expressionList";
             public const string Statements = "statements";
+            public const string Symbol = "symbol";
+            public const string Keyword = "keyword";
+            public const string Identifier = "identifier";
+            public const string IntegerConstant = "integerConstant";
+            public const string StringConstant = "stringConstant";
+            public const string KeywordConstant = "keywordConstant";
         }
     }
 }

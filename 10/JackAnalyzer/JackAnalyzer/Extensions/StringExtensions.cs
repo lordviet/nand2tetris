@@ -1,4 +1,5 @@
 ﻿using JackAnalyzer.Enums;
+using static JackAnalyzer.Constants;
 
 namespace JackAnalyzer.Extensions
 {
@@ -24,42 +25,42 @@ namespace JackAnalyzer.Extensions
                 : source[0..commentStart];
         }
 
-        // TODO: the hard-coded strings should come from the constants
         public static string ConstructSymbolNode(this string source)
         {
-            if (Constants.LexicalElements.SpecialSymbolOutputMap.TryGetValue(source, out string? specialSymbolOutput))
+            if (LexicalElements.SpecialSymbolOutputMap.TryGetValue(source, out string? specialSymbolOutput))
             {
-                return specialSymbolOutput.ConstructNode("symbol");
+                return specialSymbolOutput.ConstructNode(Tags.Symbol);
             }
 
-            return source.ConstructNode("symbol");
+            return source.ConstructNode(Tags.Symbol);
         }
 
         public static string ConstructKeywordNode(this string source)
         {
-            return source.ConstructNode("keyword");
+            return source.ConstructNode(Tags.Keyword);
         }
 
         public static string ConstructIdentifierNode(this string source)
         {
-            return source.ConstructNode("identifier");
+            return source.ConstructNode(Tags.Identifier);
         }
 
         public static string ConstructIntegerConstantNode(this string source)
         {
-            return source.ConstructNode("integerConstant");
+            return source.ConstructNode(Tags.IntegerConstant);
         }
 
         public static string ConstructStringConstantNode(this string source)
         {
-            // TODO: Potentially problematic
-            return source.Trim('"').ConstructNode("stringConstant");
+            // NOTE: Foolish implementation
+            return source.Trim('"').ConstructNode(Tags.StringConstant);
         }
 
         public static string ConstructKeywordConstantNode(this string source)
         {
-            return source.ConstructNode("keywordConstant");
+            return source.ConstructNode(Tags.KeywordConstant);
         }
+
 
         private static string ConstructNode(this string source, string tagName)
         {
@@ -85,7 +86,7 @@ namespace JackAnalyzer.Extensions
                 Keyword.This
             };
 
-            return source.IsInCollection(Constants.LexicalElements.KeywordMap, constants);
+            return source.IsInCollection(LexicalElements.KeywordMap, constants);
         }
 
         public static bool IsOp(this string source)
@@ -95,7 +96,7 @@ namespace JackAnalyzer.Extensions
                 '+', '-', '*', '/', '&', '|', '<', '>', '='
             };
 
-            return source.IsInCollection(Constants.LexicalElements.SymbolMap, operators);
+            return source.IsInCollection(LexicalElements.SymbolMap, operators);
         }
 
         public static bool IsUnaryOp(this string source)
@@ -105,18 +106,11 @@ namespace JackAnalyzer.Extensions
                 '-', '~'
             };
 
-            return source.IsInCollection(Constants.LexicalElements.SymbolMap, operators);
+            return source.IsInCollection(LexicalElements.SymbolMap, operators);
         }
 
         public static bool IsInCollection<T>(this string source, Dictionary<string, T> referenceMap, T[] collection)
         {
-            //if (!map.ContainsKey(source))
-            //{
-            //    return false;
-            //}
-
-            //return constants.Contains(map[source]);
-
             if (referenceMap.TryGetValue(source, out T? value))
             {
                 return collection.Contains(value);

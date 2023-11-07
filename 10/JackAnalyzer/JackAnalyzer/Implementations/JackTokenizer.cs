@@ -128,7 +128,6 @@ namespace JackAnalyzer.Implementations
             throw new UnexpectedTokenTypeException(expected, received);
         }
 
-        // TODO: Handle parameterList
         private static string[] PreprocessFileContents(string fileContents)
         {
             string pattern = @"(""[^""]*""|\s+|\b|\W|[,\.])";
