@@ -8,8 +8,14 @@ namespace JackAnalyzer.Exceptions
         {
         }
 
+        public UnexpectedTokenTypeException(string message)
+            : base(message)
+        {
+
+        }
+
         public UnexpectedTokenTypeException(TokenType expected, TokenType received)
-        : base($"Expected token of type - {expected}, instead got {received}.")
+            : base($"Expected token of type - {expected}, instead got {received}.")
         {
         }
 

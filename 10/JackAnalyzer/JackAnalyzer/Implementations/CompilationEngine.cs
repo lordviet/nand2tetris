@@ -90,15 +90,23 @@ namespace JackAnalyzer.Implementations
 
             this.AppendNextIdentifierToCompiled();
 
-            while (this.tokenizer.TokenType() == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.Comma])
-            {
-                this.AppendTokenToCompiled(Symbols.Comma, TokenType.Symbol);
-                this.AppendNextIdentifierToCompiled();
-            }
+            this.CompileCommaSeparatedVarNames();
 
             this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
 
             this.compiled.Append(classVarDecTag.ConstructClosingTag());
+        }
+
+        private void CompileCommaSeparatedVarNames()
+        {
+            if (this.tokenizer.TokenType() == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.Comma])
+            {
+                this.AppendTokenToCompiled(Symbols.Comma, TokenType.Symbol);
+                this.AppendNextIdentifierToCompiled();
+                this.CompileCommaSeparatedVarNames();
+            }
+
+            return;
         }
 
         private void CheckIfCurrentTokenIsAmongExpectedKeywords(Keyword[] expectedKeywords)
@@ -107,14 +115,14 @@ namespace JackAnalyzer.Implementations
 
             if (currentToken != TokenType.Keyword)
             {
-                throw new Exception("");
+                throw new UnexpectedTokenTypeException(TokenType.Keyword, currentToken);
             }
 
             Keyword currentKeyword = this.tokenizer.Keyword();
 
             if (!expectedKeywords.Contains(currentKeyword))
             {
-                throw new Exception("");
+                throw new Exception($"Expected one of the following keywords: {string.Join(", ", expectedKeywords)}, but found: {currentKeyword}");
             }
         }
 
@@ -228,8 +236,7 @@ namespace JackAnalyzer.Implementations
 
                 if (this.tokenizer.TokenType() != TokenType.Keyword)
                 {
-                    // TODO: Refactor this by introducing an exception and making the code more readable.
-                    throw new Exception(", can be followed only by a keyword in the case of param lists");
+                    throw new Exception("A comma in the parameter list should be followed by a keyword.");
                 }
             }
 
@@ -280,12 +287,7 @@ namespace JackAnalyzer.Implementations
 
             this.AppendNextIdentifierToCompiled();
 
-            // TODO: Replace with Recursion
-            while (this.tokenizer.TokenType() == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.Comma])
-            {
-                this.AppendTokenToCompiled(Symbols.Comma, TokenType.Symbol);
-                this.AppendNextIdentifierToCompiled();
-            }
+            this.CompileCommaSeparatedVarNames();
 
             this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
 
@@ -312,7 +314,6 @@ namespace JackAnalyzer.Implementations
             this.compiled.Append(statementsTag.ConstructClosingTag());
         }
 
-        // TODO: We've made sure that we're working with a Keyword
         // NOTE: Be careful with recursion
         private void CompileStatement()
         {
@@ -384,7 +385,7 @@ namespace JackAnalyzer.Implementations
                     this.CompileSubroutineCall();
                     break;
                 default:
-                    throw new Exception("Expected either '(' or a '.'");
+                    throw new Exception($"Expected either a '{Symbols.LeftParenthesis}' or a '{Symbols.Dot}' when handling subroutine call.");
             }
         }
 
@@ -563,7 +564,7 @@ namespace JackAnalyzer.Implementations
                     this.HandleIdentifierInTerm();
                     break;
                 default:
-                    throw new Exception("");
+                    throw new UnexpectedTokenTypeException($"Unexpected token type: {currentTokenType}");
             }
 
             this.compiled.Append(termTag.ConstructClosingTag());
@@ -640,7 +641,7 @@ namespace JackAnalyzer.Implementations
                         this.CompileSubroutineCall();
                         break;
                     default:
-                        throw new Exception("Expected either '(' or a '.'");
+                        throw new Exception($"Expected either a '{Symbols.LeftParenthesis}' or a '{Symbols.Dot}' when handling subroutine call.");
                 }
             }
 
@@ -718,8 +719,7 @@ namespace JackAnalyzer.Implementations
 
             if (currentToken != expectedToken)
             {
-                // TODO: Introduce unexpected token exception
-                throw new Exception($"Expected token {expectedToken} but got {currentToken} instead.");
+                throw new UnexpectedTokenTypeException($"Expected token {expectedToken} but got {currentToken} instead.");
             }
 
             this.tokenizer.Advance();
@@ -754,7 +754,7 @@ namespace JackAnalyzer.Implementations
                 TokenType.Identifier => token.ConstructIdentifierNode(),
                 TokenType.IntegerConstant => token.ConstructIntegerConstantNode(),
                 TokenType.StringConstant => token.ConstructStringConstantNode(),
-                _ => throw new NotSupportedException("") // TODO: Exception message
+                _ => throw new UnexpectedTokenTypeException()
             };
 
             this.compiled.Append(node);

@@ -34,12 +34,12 @@ namespace JackAnalyzer.Implementations
 
         public TokenType TokenType()
         {
-            if (!HasMoreTokens())
+            if (!this.HasMoreTokens())
             {
                 throw new InvalidOperationException("There are no more tokens to process.");
             }
 
-            string currentToken = GetCurrentToken();
+            string currentToken = this.GetCurrentToken();
 
             if (Constants.LexicalElements.KeywordMap.ContainsKey(currentToken))
             {
@@ -73,7 +73,7 @@ namespace JackAnalyzer.Implementations
         {
             this.ThrowIfTokenTypeDoesNotMatchExpected(Enums.TokenType.Keyword, TokenType());
 
-            string currentToken = GetCurrentToken();
+            string currentToken = this.GetCurrentToken();
 
             return Constants.LexicalElements.KeywordMap[currentToken];
         }
@@ -82,7 +82,7 @@ namespace JackAnalyzer.Implementations
         {
             this.ThrowIfTokenTypeDoesNotMatchExpected(Enums.TokenType.Symbol, TokenType());
 
-            string currentToken = GetCurrentToken();
+            string currentToken = this.GetCurrentToken();
 
             return Constants.LexicalElements.SymbolMap[currentToken];
         }
@@ -99,7 +99,7 @@ namespace JackAnalyzer.Implementations
         {
             this.ThrowIfTokenTypeDoesNotMatchExpected(Enums.TokenType.IntegerConstant, TokenType());
 
-            string currentToken = GetCurrentToken();
+            string currentToken = this.GetCurrentToken();
 
             if (!short.TryParse(currentToken, out short numericCurrentToken))
             {
@@ -113,7 +113,7 @@ namespace JackAnalyzer.Implementations
         {
             this.ThrowIfTokenTypeDoesNotMatchExpected(Enums.TokenType.StringConstant, TokenType());
 
-            string currentToken = GetCurrentToken();
+            string currentToken = this.GetCurrentToken();
 
             return currentToken;
         }

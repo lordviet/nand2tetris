@@ -9,7 +9,7 @@ namespace JackAnalyzer.Exceptions
         }
 
         public UnexpectedKeywordException(Keyword expected, Keyword received)
-        : base($"Expected keyword - {expected}, instead got {received}.")
+            : base($"Expected keyword - {expected}, instead got {received}.")
         {
         }
 
