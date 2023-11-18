@@ -13,6 +13,7 @@
     <None Remove="Implementations\" />
     <None Remove="Exceptions\" />
     <None Remove="Extensions\" />
+    <None Remove="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Enums\" />
@@ -20,5 +21,6 @@
     <Folder Include="Implementations\" />
     <Folder Include="Exceptions\" />
     <Folder Include="Extensions\" />
+    <Folder Include="Models\" />
   </ItemGroup>
 </Project>
