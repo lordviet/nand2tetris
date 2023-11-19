@@ -9,13 +9,16 @@ namespace JackCompiler.Implementations
         public Dictionary<string, SymbolTableEntry> classScope;
         public Dictionary<string, SymbolTableEntry> subroutineScope;
 
-        public int classScopeIndex = 0;
-        public int subroutineScopeIndex = 0;
+        public int classScopeIndex;
+        public int subroutineScopeIndex;
 
         public SymbolTable()
         {
             this.classScope = new Dictionary<string, SymbolTableEntry>();
             this.subroutineScope = new Dictionary<string, SymbolTableEntry>();
+
+            this.classScopeIndex = 0;
+            this.subroutineScopeIndex = 0;
         }
 
         public void StartSubroutine()
@@ -46,20 +49,51 @@ namespace JackCompiler.Implementations
 
         public int VarCount(IdentifierKind kind)
         {
-            throw new NotImplementedException();
+            switch (kind)
+            {
+                case IdentifierKind.Static:
+                case IdentifierKind.Field:
+                    return this.classScope.Count(kvp => kvp.Value.Kind == kind);
+                case IdentifierKind.Argument:
+                case IdentifierKind.Var:
+                    return this.subroutineScope.Count(kvp => kvp.Value.Kind == kind);
+                default:
+                    throw new Exception($"Identifier kind is not recognized - {kind}");
+            };
         }
 
-        // TODO: These three can be abstracted away
+        // TODO: These three can be abstracted away, idea
+        //private T GetIdentifierProperty<T>(string name, Func<SymbolTableEntry, T> propertySelector, T? defaultReturnValue = null)
+        //{
+        //    if (subroutineScope.ContainsKey(name))
+        //    {
+        //        return propertySelector(subroutineScope[name]);
+        //    }
+
+        //    if (classScope.ContainsKey(name))
+        //    {
+        //        return propertySelector(classScope[name]);
+        //    }
+
+        //    throw new Exception($"Neither class, nor subroutine scope contains {name}");
+        //}
+
+        //public IdentifierKind KindOf(string name)
+        //{
+        //    return GetIdentifierProperty(name, x => x.Kind);
+        //}
+
+
         public IdentifierKind KindOf(string name)
         {
-            if (classScope.ContainsKey(name))
-            {
-                return classScope[name].Kind;
-            }
-
             if (subroutineScope.ContainsKey(name))
             {
                 return subroutineScope[name].Kind;
+            }
+
+            if (classScope.ContainsKey(name))
+            {
+                return classScope[name].Kind;
             }
 
             return IdentifierKind.None;
@@ -67,14 +101,14 @@ namespace JackCompiler.Implementations
 
         public string TypeOf(string name)
         {
-            if (classScope.ContainsKey(name))
-            {
-                return classScope[name].Type;
-            }
-
             if (subroutineScope.ContainsKey(name))
             {
                 return subroutineScope[name].Type;
+            }
+
+            if (classScope.ContainsKey(name))
+            {
+                return classScope[name].Type;
             }
 
             throw new Exception($"Neither class, nor subroutine scope contains {name}");
@@ -82,14 +116,14 @@ namespace JackCompiler.Implementations
 
         public int IndexOf(string name)
         {
-            if (classScope.ContainsKey(name))
-            {
-                return classScope[name].Index;
-            }
-
             if (subroutineScope.ContainsKey(name))
             {
                 return subroutineScope[name].Index;
+            }
+
+            if (classScope.ContainsKey(name))
+            {
+                return classScope[name].Index;
             }
 
             throw new Exception($"Neither class, nor subroutine scope contains {name}");
