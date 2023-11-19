@@ -29,6 +29,7 @@ namespace JackCompiler.Implementations
 
         public void Define(string name, string type, IdentifierKind kind)
         {
+            // TODO: Fix index incrementation since it's not correct, use index method
             switch (kind)
             {
                 case IdentifierKind.Static:

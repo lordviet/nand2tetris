@@ -10,11 +10,15 @@ namespace JackCompiler.Implementations
     public class CompilationEngine : ICompilationEngine
     {
         private readonly IJackTokenizer tokenizer;
+        private readonly ISymbolTable symbolTable;
+
         private readonly StringBuilder compiled;
 
-        public CompilationEngine(IJackTokenizer tokenizer, bool compileClass = true)
+        public CompilationEngine(IJackTokenizer tokenizer, ISymbolTable symbolTable, bool compileClass = true)
         {
             this.tokenizer = tokenizer;
+            this.symbolTable = symbolTable;
+
             this.compiled = new StringBuilder();
 
             if (compileClass)
@@ -84,24 +88,51 @@ namespace JackCompiler.Implementations
 
             this.CheckIfCurrentTokenIsAmongExpectedKeywords(new Keyword[] { Keyword.Static, Keyword.Field });
 
+            Keyword currentKeyword = this.tokenizer.Keyword();
+
             this.AppendKeywordToCompiled(this.tokenizer.Keyword());
 
-            this.CompileType();
+            string type = this.CompileType();
+
+            string varName = this.tokenizer.GetCurrentToken();
 
             this.AppendNextIdentifierToCompiled();
 
-            this.CompileCommaSeparatedVarNames();
+            IdentifierKind kind = currentKeyword.ToIdentifierKind();
+
+            this.symbolTable.Define(varName, type, kind);
+
+            this.CompileCommaSeparatedVarNames(type, kind);
 
             this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
 
             this.compiled.Append(classVarDecTag.ConstructClosingTag());
         }
 
+        private void CompileCommaSeparatedVarNames(string parentType, IdentifierKind parentIdentifierKind)
+        {
+            if (this.tokenizer.TokenType() == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.Comma])
+            {
+                this.AppendTokenToCompiled(Symbols.Comma, TokenType.Symbol);
+
+                string varName = this.tokenizer.GetCurrentToken();
+                this.symbolTable.Define(varName, parentType, parentIdentifierKind);
+
+                this.AppendNextIdentifierToCompiled();
+                this.CompileCommaSeparatedVarNames(parentType, parentIdentifierKind);
+            }
+
+            return;
+        }
+
+
+        // TODO: Overload to compile code until the subroutine symbol table is done for
         private void CompileCommaSeparatedVarNames()
         {
             if (this.tokenizer.TokenType() == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.Comma])
             {
                 this.AppendTokenToCompiled(Symbols.Comma, TokenType.Symbol);
+
                 this.AppendNextIdentifierToCompiled();
                 this.CompileCommaSeparatedVarNames();
             }
@@ -128,6 +159,8 @@ namespace JackCompiler.Implementations
 
         public void CompileSubroutine()
         {
+            this.symbolTable.StartSubroutine();
+
             // ('constructor' | 'function' | 'method') ('void' | type) subroutineName '(' paramList ')' subroutineBody
 
             string subroutineDecTag = Tags.SubroutineDec;
@@ -243,8 +276,10 @@ namespace JackCompiler.Implementations
             this.CompileParameterListInner();
         }
 
-        private void CompileType()
+        private string CompileType()
         {
+            string type = this.tokenizer.GetCurrentToken();
+
             if (this.tokenizer.TokenType() == TokenType.Keyword)
             {
                 Keyword typeKeyword = this.tokenizer.Keyword();
@@ -257,6 +292,8 @@ namespace JackCompiler.Implementations
             {
                 this.AppendNextIdentifierToCompiled();
             }
+
+            return type;
         }
 
         public void CompileVarDec()

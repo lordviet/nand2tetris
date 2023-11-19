@@ -77,7 +77,9 @@ class Program
     private static string AnalyzeFile(string fileContents)
     {
         IJackTokenizer tokenizer = new JackTokenizer(fileContents);
-        ICompilationEngine engine = new CompilationEngine(tokenizer);
+        ISymbolTable symbolTable = new SymbolTable();
+
+        ICompilationEngine engine = new CompilationEngine(tokenizer, symbolTable);
 
         return engine.Close();
     }
