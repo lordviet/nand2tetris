@@ -18,6 +18,18 @@ namespace JackCompiler.Extensions
         {
             return source == Keyword.True || source == Keyword.False || source == Keyword.Null || source == Keyword.This;
         }
+
+        public static IdentifierKind ToIdentifierKind(this Keyword source)
+        {
+            return source switch
+            {
+                Keyword.Static => IdentifierKind.Static,
+                Keyword.Field => IdentifierKind.Field,
+
+                Keyword.Var => IdentifierKind.Var,
+
+                _ => throw new Exception($"Keyword {source} is not a valid identifier kind")
+            };
+        }
     }
 }
-

@@ -96,11 +96,11 @@ namespace JackCompiler.Implementations
 
             string varName = this.tokenizer.GetCurrentToken();
 
-            this.AppendNextIdentifierToCompiled();
-
             IdentifierKind kind = currentKeyword.ToIdentifierKind();
 
             this.symbolTable.Define(varName, type, kind);
+
+            this.AppendNextIdentifierToCompiled();
 
             this.CompileCommaSeparatedVarNames(type, kind);
 
@@ -160,6 +160,9 @@ namespace JackCompiler.Implementations
         public void CompileSubroutine()
         {
             this.symbolTable.StartSubroutine();
+
+            // TODO: Retrieve the class name and pass it here
+            this.symbolTable.Define(name: "this", type: "ClassName", IdentifierKind.Argument);
 
             // ('constructor' | 'function' | 'method') ('void' | type) subroutineName '(' paramList ')' subroutineBody
 
@@ -259,7 +262,14 @@ namespace JackCompiler.Implementations
 
             this.EnsureKeywordIsType(typeKeyword);
 
+            // Saving the value of the type as a string to be passed in the symbol table
+            string type = this.tokenizer.GetCurrentToken();
+
             this.AppendKeywordToCompiled(typeKeyword);
+
+            string paramName = this.tokenizer.GetCurrentToken();
+
+            this.symbolTable.Define(paramName, type, IdentifierKind.Argument);
 
             this.AppendNextIdentifierToCompiled();
 
@@ -320,11 +330,16 @@ namespace JackCompiler.Implementations
 
             this.AppendKeywordToCompiled(currentKeyword);
 
-            this.CompileType();
+            string type = this.CompileType();
+
+            string varName = this.tokenizer.GetCurrentToken();
+
+            // TODO: Hard-coded identifier kind, might also be local?
+            this.symbolTable.Define(varName, type, IdentifierKind.Var);
 
             this.AppendNextIdentifierToCompiled();
 
-            this.CompileCommaSeparatedVarNames();
+            this.CompileCommaSeparatedVarNames(type, IdentifierKind.Var);
 
             this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
 

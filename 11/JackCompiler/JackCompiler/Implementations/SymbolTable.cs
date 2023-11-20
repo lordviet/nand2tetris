@@ -9,21 +9,21 @@ namespace JackCompiler.Implementations
         public Dictionary<string, SymbolTableEntry> classScope;
         public Dictionary<string, SymbolTableEntry> subroutineScope;
 
-        public int classScopeIndex;
-        public int subroutineScopeIndex;
+        //public int classScopeIndex;
+        //public int subroutineScopeIndex;
 
         public SymbolTable()
         {
             this.classScope = new Dictionary<string, SymbolTableEntry>();
             this.subroutineScope = new Dictionary<string, SymbolTableEntry>();
 
-            this.classScopeIndex = 0;
-            this.subroutineScopeIndex = 0;
+            //this.classScopeIndex = 0;
+            //this.subroutineScopeIndex = 0;
         }
 
         public void StartSubroutine()
         {
-            this.subroutineScopeIndex = 0;
+            //this.subroutineScopeIndex = 0;
             this.subroutineScope.Clear();
         }
 
@@ -34,13 +34,11 @@ namespace JackCompiler.Implementations
             {
                 case IdentifierKind.Static:
                 case IdentifierKind.Field:
-                    classScope.Add(name, this.ConstructSymbolTableEntry(type, kind, this.classScopeIndex));
-                    classScopeIndex++;
+                    classScope.Add(name, this.ConstructSymbolTableEntry(type, kind, this.VarCount(kind)));
                     break;
                 case IdentifierKind.Argument:
                 case IdentifierKind.Var:
-                    subroutineScope.Add(name, this.ConstructSymbolTableEntry(type, kind, this.subroutineScopeIndex));
-                    subroutineScopeIndex++;
+                    subroutineScope.Add(name, this.ConstructSymbolTableEntry(type, kind, this.VarCount(kind)));
                     break;
                 default:
                     // TODO: Handle this one
@@ -127,7 +125,9 @@ namespace JackCompiler.Implementations
                 return classScope[name].Index;
             }
 
-            throw new Exception($"Neither class, nor subroutine scope contains {name}");
+            return -1;
+
+            //throw new Exception($"Neither class, nor subroutine scope contains {name}");
         }
 
         private SymbolTableEntry ConstructSymbolTableEntry(string type, IdentifierKind kind, int index)

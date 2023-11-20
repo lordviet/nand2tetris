@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 using JackCompiler.Contracts;
 using JackCompiler.Implementations;
 
@@ -7,6 +6,8 @@ namespace JackCompiler.UnitTests;
 
 public class Tests
 {
+    ISymbolTable symbolTable = new SymbolTable();
+
     [SetUp]
     public void Setup()
     {
@@ -23,7 +24,7 @@ public class Tests
         """;
 
         IJackTokenizer tokenizer = new JackTokenizer(whileExpression);
-        ICompilationEngine engine = new CompilationEngine(tokenizer, compileClass: false);
+        ICompilationEngine engine = new CompilationEngine(tokenizer, this.symbolTable, compileClass: false);
 
         engine.CompileWhile();
 
@@ -38,7 +39,7 @@ public class Tests
         string classVarDecExpression = "static boolean test, test2, test3;";
 
         IJackTokenizer tokenizer = new JackTokenizer(classVarDecExpression);
-        ICompilationEngine engine = new CompilationEngine(tokenizer, compileClass: false);
+        ICompilationEngine engine = new CompilationEngine(tokenizer, this.symbolTable, compileClass: false);
 
         engine.CompileClassVarDec();
 
@@ -54,7 +55,7 @@ public class Tests
     public void TestCompileParameterList(string parameterListExpression)
     {
         IJackTokenizer tokenizer = new JackTokenizer(parameterListExpression);
-        ICompilationEngine engine = new CompilationEngine(tokenizer, compileClass: false);
+        ICompilationEngine engine = new CompilationEngine(tokenizer, this.symbolTable, compileClass: false);
 
         engine.CompileParameterList();
 
@@ -75,7 +76,7 @@ public class Tests
     public void TestCompileLetExpression(string letExpression)
     {
         IJackTokenizer tokenizer = new JackTokenizer(letExpression);
-        ICompilationEngine engine = new CompilationEngine(tokenizer, compileClass: false);
+        ICompilationEngine engine = new CompilationEngine(tokenizer, this.symbolTable, compileClass: false);
 
         engine.CompileLet();
 
@@ -95,7 +96,7 @@ public class Tests
     public void TestCompileDoExpression(string doExpression)
     {
         IJackTokenizer tokenizer = new JackTokenizer(doExpression);
-        ICompilationEngine engine = new CompilationEngine(tokenizer, compileClass: false);
+        ICompilationEngine engine = new CompilationEngine(tokenizer, this.symbolTable, compileClass: false);
 
         engine.CompileDo();
 
