@@ -45,6 +45,18 @@ namespace JackCompiler.Extensions
             return source.ConstructNode(Tags.Identifier);
         }
 
+        public static string ConstructIdentifierNodeEnhanced(this string source, string type, IdentifierKind kind, int index)
+        {
+            string nameTag = source.ConstructNode("name");
+            string typeTag = type.ConstructNode("type");
+            string kindTag = $"{kind}".ConstructNode("kind");
+            string indexTag = $"{index}".ConstructNode("index");
+
+            string enhancedSource = $"{nameTag} {typeTag} {kindTag} {indexTag}";
+
+            return enhancedSource.ConstructNode(Tags.Identifier);
+        }
+
         public static string ConstructIntegerConstantNode(this string source)
         {
             return source.ConstructNode(Tags.IntegerConstant);

@@ -793,7 +793,7 @@ namespace JackCompiler.Implementations
             {
                 TokenType.Keyword => token.ConstructKeywordNode(),
                 TokenType.Symbol => token.ConstructSymbolNode(),
-                TokenType.Identifier => token.ConstructIdentifierNode(),
+                TokenType.Identifier => ResolveIdentifierNodeConstruction(token),
                 TokenType.IntegerConstant => token.ConstructIntegerConstantNode(),
                 TokenType.StringConstant => token.ConstructStringConstantNode(),
                 _ => throw new UnexpectedTokenTypeException()
@@ -802,6 +802,19 @@ namespace JackCompiler.Implementations
             this.compiled.Append(node);
 
             return;
+        }
+
+        private string ResolveIdentifierNodeConstruction(string token)
+        {
+            int symbolTableIndex = this.symbolTable.IndexOf(token);
+
+            // TODO: I have some missing implementations for class list, subroutines and expressions
+            if (symbolTableIndex == -1)
+            {
+                return token.ConstructIdentifierNode();
+            }
+
+            return token.ConstructIdentifierNodeEnhanced(this.symbolTable.TypeOf(token), this.symbolTable.KindOf(token), symbolTableIndex);
         }
 
         private void EnsureKeywordIsType(Keyword keyword)
