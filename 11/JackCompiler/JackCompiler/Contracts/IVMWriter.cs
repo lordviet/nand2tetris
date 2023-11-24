@@ -8,7 +8,7 @@ namespace JackCompiler.Contracts
 
         public void WritePop(Segment segment, int index);
 
-        public void WriteArithmetic(Command command, int index);
+        public void WriteArithmetic(Command command);
 
         public void WriteLabel(string label);
 
