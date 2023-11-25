@@ -3,52 +3,69 @@ using JackCompiler.Enums;
 
 namespace JackCompiler.Implementations
 {
-    // TODO: Introduce mappers for the enums and change the contracts to return concrete values
     public class VMWriter : IVMWriter
     {
-        public void WritePush(Segment segment, int index)
+        public string WritePush(Segment segment, int index)
         {
-            string pushCommand = $"push {segment} {index}";
+            string pushCommand = $"push {segment.ToString().ToLower()} {index}";
+
+            return pushCommand;
         }
 
-        public void WritePop(Segment segment, int index)
+        public string WritePop(Segment segment, int index)
         {
-            string popCommand = $"pop {segment} {index}";
+            string popCommand = $"pop {segment.ToString().ToLower()} {index}";
+
+            return popCommand;
         }
 
-        public void WriteArithmetic(Command command)
+        public string WriteArithmetic(Command command)
         {
-            string arithmeticCommand = $"{command}";
+            string arithmeticCommand = command.ToString().ToLower();
+
+            return arithmeticCommand;
         }
 
-        public void WriteLabel(string label)
+        public string WriteLabel(string label)
         {
             string labelCommand = $"label {label}";
+
+            return labelCommand;
         }
 
-        public void WriteGoto(string label)
+        public string WriteGoto(string label)
         {
             string gotoCommand = $"goto {label}";
+
+            return gotoCommand;
         }
 
-        public void WriteIf(string label)
+        public string WriteIf(string label)
         {
             string ifCommand = $"if-goto {label}";
+
+            return ifCommand;
         }
 
-        public void WriteCall(string name, int nArgs)
+        public string WriteCall(string name, int nArgs)
         {
             string callCommand = $"call {name} {nArgs}";
+
+            return callCommand;
         }
 
-        public void WriteFunction(string name, int nLocals)
+        public string WriteFunction(string name, int nLocals)
         {
             string functionCommand = $"function ${name} ${nLocals}";
+
+            return functionCommand;
         }
 
-        public void WriteReturn()
+        public string WriteReturn()
         {
             string returnCommand = "return";
+
+            return returnCommand;
         }
     }
 }

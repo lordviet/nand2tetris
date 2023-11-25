@@ -4,23 +4,23 @@ namespace JackCompiler.Contracts
 {
     public interface IVMWriter
     {
-        public void WritePush(Segment segment, int index);
+        public string WritePush(Segment segment, int index);
 
-        public void WritePop(Segment segment, int index);
+        public string WritePop(Segment segment, int index);
 
-        public void WriteArithmetic(Command command);
+        public string WriteArithmetic(Command command);
 
-        public void WriteLabel(string label);
+        public string WriteLabel(string label);
 
-        public void WriteGoto(string label);
+        public string WriteGoto(string label);
 
-        public void WriteIf(string label);
+        public string WriteIf(string label);
 
-        public void WriteCall(string name, int nArgs);
+        public string WriteCall(string name, int nArgs);
 
-        public void WriteFunction(string name, int nLocals);
+        public string WriteFunction(string name, int nLocals);
 
-        public void WriteReturn();
+        public string WriteReturn();
     }
 }
 
