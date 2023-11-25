@@ -258,19 +258,26 @@ namespace JackCompiler.Implementations
         {
             TokenType currentToken = this.tokenizer.TokenType();
 
-            if (currentToken != TokenType.Keyword)
+            if (currentToken != TokenType.Keyword && currentToken != TokenType.Identifier)
             {
                 return;
             }
 
-            Keyword typeKeyword = this.tokenizer.Keyword();
-
-            this.EnsureKeywordIsType(typeKeyword);
-
             // Saving the value of the type as a string to be passed in the symbol table
             string type = this.tokenizer.GetCurrentToken();
 
-            this.AppendKeywordToCompiled(typeKeyword);
+            if (currentToken == TokenType.Keyword)
+            {
+                Keyword typeKeyword = this.tokenizer.Keyword();
+
+                this.EnsureKeywordIsType(typeKeyword);
+
+                this.AppendKeywordToCompiled(typeKeyword);
+            }
+            else
+            {
+                this.AppendNextIdentifierToCompiled();
+            }
 
             string paramName = this.tokenizer.GetCurrentToken();
 
