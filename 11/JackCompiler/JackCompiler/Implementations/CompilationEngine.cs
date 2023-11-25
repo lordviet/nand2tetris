@@ -11,15 +11,17 @@ namespace JackCompiler.Implementations
     {
         private readonly IJackTokenizer tokenizer;
         private readonly ISymbolTable symbolTable;
+        private readonly IVMWriter writer;
 
         private readonly StringBuilder compiled;
 
         private string? className;
 
-        public CompilationEngine(IJackTokenizer tokenizer, ISymbolTable symbolTable, bool compileClass = true)
+        public CompilationEngine(IJackTokenizer tokenizer, ISymbolTable symbolTable, IVMWriter writer, bool compileClass = true)
         {
             this.tokenizer = tokenizer;
             this.symbolTable = symbolTable;
+            this.writer = writer;
 
             this.compiled = new StringBuilder();
 
@@ -475,24 +477,47 @@ namespace JackCompiler.Implementations
 
             this.compiled.Append(letStatement.ConstructOpeningTag());
 
-            this.AppendKeywordToCompiled(Keyword.Let);
+            // TODO: Newline for testing purposes
+            this.compiled.AppendLine();
 
-            this.AppendNextIdentifierToCompiled();
+            //this.AppendKeywordToCompiled(Keyword.Let);
+            this.Eat(LexicalElements.ReverseKeywordMap[Keyword.Let]);
+
+            // TODO: Potentially make AppendNextIdentifierToCompiled return a string;
+            string varName = this.tokenizer.GetCurrentToken();
+
+            // At this point I will have it in the symbol table
+            //this.AppendNextIdentifierToCompiled();
+            this.AssertNextTokenIsOfType(TokenType.Identifier);
+            this.tokenizer.Advance();
 
             if (this.tokenizer.TokenType() == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.LeftSquareBracket])
             {
-                this.AppendTokenToCompiled(Symbols.LeftSquareBracket, TokenType.Symbol);
+                //this.AppendTokenToCompiled(Symbols.LeftSquareBracket, TokenType.Symbol);
+                this.Eat(Symbols.LeftSquareBracket);
 
                 this.CompileExpression();
 
-                this.AppendTokenToCompiled(Symbols.RightSquareBracket, TokenType.Symbol);
+                //this.AppendTokenToCompiled(Symbols.RightSquareBracket, TokenType.Symbol);
+                this.Eat(Symbols.RightSquareBracket);
             }
 
-            this.AppendTokenToCompiled(Symbols.EqualitySign, TokenType.Symbol);
+            //this.AppendTokenToCompiled(Symbols.EqualitySign, TokenType.Symbol);
+            this.Eat(Symbols.EqualitySign);
 
-            this.CompileExpression();
+            //this.CompileExpression();
+            this.CompileExpressionCore();
 
-            this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
+            // TODO: method to check the validity of token
+            //this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
+            this.Eat(Symbols.Semicolon);
+
+            IdentifierKind kind = this.symbolTable.KindOf(varName);
+            int index = this.symbolTable.IndexOf(varName);
+
+            string popCommand = this.writer.WritePop(kind.ToSegment(), index);
+
+            this.compiled.Append(popCommand);
 
             this.compiled.Append(letStatement.ConstructClosingTag());
         }
@@ -579,6 +604,7 @@ namespace JackCompiler.Implementations
             this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
         }
 
+        // TODO: May get entirely replaced by CompileExpressionCore
         public void CompileExpression()
         {
             string expressionTag = Tags.Expression;
@@ -601,18 +627,34 @@ namespace JackCompiler.Implementations
 
             if (currentTokenType == TokenType.Symbol && currentToken.IsOp())
             {
-                this.AppendTokenToCompiled(currentToken, TokenType.Symbol);
+                string compiledOp = HandleOpInTerm(this.tokenizer.Symbol());
+
+                //this.AppendTokenToCompiled(currentToken, TokenType.Symbol);
 
                 // NOTE: Recursive Call
                 this.CompileExpressionCore();
+
+                this.compiled.Append(compiledOp);
             }
+        }
+
+        private string HandleOpInTerm(char symbol)
+        {
+            this.tokenizer.Advance();
+
+            return symbol switch
+            {
+                '*' => this.writer.WriteCall(OS.Math.Multiply, OS.Math.ArithmeticOperationParameters),
+                '/' => this.writer.WriteCall(OS.Math.Divide, OS.Math.ArithmeticOperationParameters),
+                _ => this.writer.WriteArithmetic(LexicalElements.NonUnaryOpSymbolCommandMap[symbol])
+            };
         }
 
         public void CompileTerm()
         {
-            string termTag = Tags.Term;
+            //string termTag = Tags.Term;
 
-            this.compiled.Append(termTag.ConstructOpeningTag());
+            //this.compiled.Append(termTag.ConstructOpeningTag());
 
             TokenType currentTokenType = this.tokenizer.TokenType();
             string token = this.tokenizer.GetCurrentToken();
@@ -620,6 +662,9 @@ namespace JackCompiler.Implementations
             switch (currentTokenType)
             {
                 case TokenType.IntegerConstant:
+                    this.compiled.Append(this.writer.WritePush(Segment.Constant, tokenizer.IntegerValue()));
+                    this.tokenizer.Advance();
+                    break;
                 case TokenType.StringConstant:
                     this.AppendTokenToCompiled(token, currentTokenType);
                     break;
@@ -636,7 +681,7 @@ namespace JackCompiler.Implementations
                     throw new UnexpectedTokenTypeException($"Unexpected token type: {currentTokenType}");
             }
 
-            this.compiled.Append(termTag.ConstructClosingTag());
+            //this.compiled.Append(termTag.ConstructClosingTag());
         }
 
         private void HandleKeywordInTerm(Keyword keyword)

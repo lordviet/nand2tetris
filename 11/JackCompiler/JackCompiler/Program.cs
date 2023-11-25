@@ -78,8 +78,9 @@ class Program
     {
         IJackTokenizer tokenizer = new JackTokenizer(fileContents);
         ISymbolTable symbolTable = new SymbolTable();
+        IVMWriter writer = new VMWriter();
 
-        ICompilationEngine engine = new CompilationEngine(tokenizer, symbolTable);
+        ICompilationEngine engine = new CompilationEngine(tokenizer, symbolTable, writer);
 
         return engine.Close();
     }

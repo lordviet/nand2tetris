@@ -85,15 +85,28 @@ namespace JackCompiler
 
             public static readonly Dictionary<string, string> SpecialSymbolOutputMap = new()
             {
-                {"<", "&lt;" },
-                {">", "&gt;" },
-                {"\"", "&quot;"},
+                { "<", "&lt;" },
+                { ">", "&gt;" },
+                { "\"", "&quot;"},
                 { "&", "&amp;"}
+            };
+
+            public static readonly Dictionary<char, Command> NonUnaryOpSymbolCommandMap = new()
+            {
+                { '+', Command.Add },
+                { '-', Command.Sub },
+                { '&', Command.And },
+                { '|', Command.Or },
+                { '<', Command.Lt },
+                { '>', Command.Gt },
+                { '=', Command.Eq},
             };
 
             public const string StringPattern = @"^""[^""]*""";
 
             public const string IdentifierPattern = @"\b[a-zA-Z_][a-zA-Z0-9_]*\b";
+
+            public const int DefaultMultiplyAndDivideParams = 2;
         }
 
         public static class Symbols
@@ -136,6 +149,17 @@ namespace JackCompiler
             public const string IntegerConstant = "integerConstant";
             public const string StringConstant = "stringConstant";
             public const string KeywordConstant = "keywordConstant";
+        }
+
+        public static class OS
+        {
+            public static class Math
+            {
+                public const int ArithmeticOperationParameters = 2;
+
+                public const string Multiply = "Math.multiply";
+                public const string Divide = "Math.divide";
+            }
         }
     }
 }

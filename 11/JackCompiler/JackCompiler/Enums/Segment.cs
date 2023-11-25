@@ -3,7 +3,7 @@
     public enum Segment
     {
         Constant,
-        Arg,
+        Argument,
         Local,
         Static,
         This,
