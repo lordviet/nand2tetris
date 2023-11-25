@@ -2,7 +2,7 @@
 {
     public enum Segment
     {
-        Const,
+        Constant,
         Arg,
         Local,
         Static,

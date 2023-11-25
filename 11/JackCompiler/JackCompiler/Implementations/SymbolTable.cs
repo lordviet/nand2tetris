@@ -48,17 +48,13 @@ namespace JackCompiler.Implementations
 
         public int VarCount(IdentifierKind kind)
         {
-            switch (kind)
+            return kind switch
             {
-                case IdentifierKind.Static:
-                case IdentifierKind.Field:
-                    return this.classScope.Count(kvp => kvp.Value.Kind == kind);
-                case IdentifierKind.Argument:
-                case IdentifierKind.Var:
-                    return this.subroutineScope.Count(kvp => kvp.Value.Kind == kind);
-                default:
-                    throw new Exception($"Identifier kind is not recognized - {kind}");
+                IdentifierKind.Static or IdentifierKind.Field => this.classScope.Count(kvp => kvp.Value.Kind == kind),
+                IdentifierKind.Argument or IdentifierKind.Var => this.subroutineScope.Count(kvp => kvp.Value.Kind == kind),
+                _ => throw new Exception($"Identifier kind is not recognized - {kind}"),
             };
+            ;
         }
 
         // TODO: These three can be abstracted away, idea
