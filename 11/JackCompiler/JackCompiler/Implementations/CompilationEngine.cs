@@ -14,7 +14,7 @@ namespace JackCompiler.Implementations
 
         private readonly StringBuilder compiled;
 
-        private string className;
+        private string? className;
 
         public CompilationEngine(IJackTokenizer tokenizer, ISymbolTable symbolTable, bool compileClass = true)
         {
@@ -167,7 +167,7 @@ namespace JackCompiler.Implementations
         {
             this.symbolTable.StartSubroutine();
 
-            this.symbolTable.Define(name: "this", type: this.className, IdentifierKind.Argument);
+            this.symbolTable.Define(name: "this", type: this.className ?? string.Empty, IdentifierKind.Argument);
 
             // ('constructor' | 'function' | 'method') ('void' | type) subroutineName '(' paramList ')' subroutineBody
 
