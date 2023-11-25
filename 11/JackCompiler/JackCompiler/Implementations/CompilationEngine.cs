@@ -14,6 +14,8 @@ namespace JackCompiler.Implementations
 
         private readonly StringBuilder compiled;
 
+        private string className;
+
         public CompilationEngine(IJackTokenizer tokenizer, ISymbolTable symbolTable, bool compileClass = true)
         {
             this.tokenizer = tokenizer;
@@ -36,6 +38,10 @@ namespace JackCompiler.Implementations
             this.compiled.Append(classKeyword.ConstructOpeningTag());
 
             this.AppendKeywordToCompiled(Keyword.Class);
+
+            // Save the classname for later usage in the symbol table
+            string className = this.tokenizer.GetCurrentToken();
+            this.className = className;
 
             this.AppendNextIdentifierToCompiled();
 
@@ -161,8 +167,7 @@ namespace JackCompiler.Implementations
         {
             this.symbolTable.StartSubroutine();
 
-            // TODO: Retrieve the class name and pass it here
-            this.symbolTable.Define(name: "this", type: "ClassName", IdentifierKind.Argument);
+            this.symbolTable.Define(name: "this", type: this.className, IdentifierKind.Argument);
 
             // ('constructor' | 'function' | 'method') ('void' | type) subroutineName '(' paramList ')' subroutineBody
 
