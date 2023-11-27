@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Xml;
 using JackCompiler.Contracts;
 using JackCompiler.Enums;
 using JackCompiler.Exceptions;
@@ -657,7 +658,7 @@ namespace JackCompiler.Implementations
             //this.compiled.Append(termTag.ConstructOpeningTag());
 
             TokenType currentTokenType = this.tokenizer.TokenType();
-            string token = this.tokenizer.GetCurrentToken();
+            //string token = this.tokenizer.GetCurrentToken();
 
             switch (currentTokenType)
             {
@@ -666,7 +667,8 @@ namespace JackCompiler.Implementations
                     this.tokenizer.Advance();
                     break;
                 case TokenType.StringConstant:
-                    this.AppendTokenToCompiled(token, currentTokenType);
+                    //this.AppendTokenToCompiled(token, currentTokenType);
+                    this.HandleStringConstantInTerm();
                     break;
                 case TokenType.Keyword:
                     this.HandleKeywordInTerm(this.tokenizer.Keyword());
@@ -682,6 +684,24 @@ namespace JackCompiler.Implementations
             }
 
             //this.compiled.Append(termTag.ConstructClosingTag());
+        }
+
+        private void HandleStringConstantInTerm()
+        {
+            // TODO: avoid magic numbers
+            string stringConstant = this.tokenizer.GetCurrentToken();
+
+            this.compiled.Append(this.writer.WritePush(Segment.Constant, stringConstant.Length));
+            this.compiled.Append(this.writer.WriteCall(OS.String.New, 1));
+
+            for(int i = 0; i < stringConstant.Length; i++)
+            {
+                this.compiled.Append(this.writer.WritePush(Segment.Constant, stringConstant[i]));
+                // TODO: double check the 2
+                this.compiled.Append(this.writer.WriteCall(OS.String.AppendChar, 2));
+            }
+
+            this.tokenizer.Advance();
         }
 
         private void HandleKeywordInTerm(Keyword keyword)
