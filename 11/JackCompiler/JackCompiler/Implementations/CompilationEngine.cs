@@ -37,27 +37,43 @@ namespace JackCompiler.Implementations
         {
             // 'class' className '{' classVarDec* subroutineDec* '}'
 
-            string classKeyword = LexicalElements.ReverseKeywordMap[Keyword.Class];
+            //string classKeyword = LexicalElements.ReverseKeywordMap[Keyword.Class];
 
-            this.compiled.Append(classKeyword.ConstructOpeningTag());
+            //this.compiled.Append(classKeyword.ConstructOpeningTag());
 
-            this.AppendKeywordToCompiled(Keyword.Class);
+            //this.AppendKeywordToCompiled(Keyword.Class);
+            this.Eat(LexicalElements.ReverseKeywordMap[Keyword.Class]);
 
             // Save the classname for later usage in the symbol table
             string className = this.tokenizer.GetCurrentToken();
             this.className = className;
 
-            this.AppendNextIdentifierToCompiled();
+            //this.AppendNextIdentifierToCompiled();
+            this.tokenizer.Advance();
 
-            this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
+            //this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
+            this.Eat(Symbols.LeftCurlyBrace);
 
             this.CompileClassVarDecInClass();
 
             this.CompileSubroutineDecInClass();
 
-            this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
+            //this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
+            this.Eat(Symbols.RightCurlyBrace);
 
-            this.compiled.Append(classKeyword.ConstructClosingTag());
+            //this.compiled.Append(classKeyword.ConstructClosingTag());
+        }
+
+        private void CompileClassVarDecInClass()
+        {
+            Keyword[] acceptableKeywords = { Keyword.Static, Keyword.Field };
+            this.CompileClassMemberInClass(acceptableKeywords, this.CompileClassVarDec);
+        }
+
+        private void CompileSubroutineDecInClass()
+        {
+            Keyword[] acceptableKeywords = { Keyword.Constructor, Keyword.Function, Keyword.Method };
+            this.CompileClassMemberInClass(acceptableKeywords, this.CompileSubroutine);
         }
 
         private void CompileClassMemberInClass(Keyword[] acceptableKeywords, Action compilationAction)
@@ -76,31 +92,20 @@ namespace JackCompiler.Implementations
             }
         }
 
-        private void CompileClassVarDecInClass()
-        {
-            Keyword[] acceptableKeywords = { Keyword.Static, Keyword.Field };
-            this.CompileClassMemberInClass(acceptableKeywords, this.CompileClassVarDec);
-        }
-
-        private void CompileSubroutineDecInClass()
-        {
-            Keyword[] acceptableKeywords = { Keyword.Constructor, Keyword.Function, Keyword.Method };
-            this.CompileClassMemberInClass(acceptableKeywords, this.CompileSubroutine);
-        }
-
         public void CompileClassVarDec()
         {
             //('static' | 'field') type varName (', ' varName)* ';'
 
-            string classVarDecTag = Tags.ClassVarDec;
+            //string classVarDecTag = Tags.ClassVarDec;
 
-            this.compiled.Append(classVarDecTag.ConstructOpeningTag());
+            //this.compiled.Append(classVarDecTag.ConstructOpeningTag());
 
             this.CheckIfCurrentTokenIsAmongExpectedKeywords(new Keyword[] { Keyword.Static, Keyword.Field });
 
             Keyword currentKeyword = this.tokenizer.Keyword();
 
-            this.AppendKeywordToCompiled(this.tokenizer.Keyword());
+            //this.AppendKeywordToCompiled(this.tokenizer.Keyword());
+            this.tokenizer.Advance();
 
             string type = this.CompileType();
 
@@ -110,13 +115,15 @@ namespace JackCompiler.Implementations
 
             this.symbolTable.Define(varName, type, kind);
 
-            this.AppendNextIdentifierToCompiled();
+            //this.AppendNextIdentifierToCompiled();
+            this.tokenizer.Advance();
 
             this.CompileCommaSeparatedVarNames(type, kind);
 
-            this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
+            //this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
+            this.Eat(Symbols.Semicolon);
 
-            this.compiled.Append(classVarDecTag.ConstructClosingTag());
+            //this.compiled.Append(classVarDecTag.ConstructClosingTag());
         }
 
         private void CompileCommaSeparatedVarNames(string parentType, IdentifierKind parentIdentifierKind)
@@ -271,20 +278,21 @@ namespace JackCompiler.Implementations
             string functionName = this.className.ConstructFunctionName(this.subroutineName);
             int varCountOfCurrentFunction = this.symbolTable.VarCount(IdentifierKind.Var);
 
-            this.writer.WriteFunction(functionName, varCountOfCurrentFunction);
+            string functionCommand = this.writer.WriteFunction(functionName, varCountOfCurrentFunction);
+            this.compiled.Append(functionCommand);
 
             switch (keyword)
             {
                 // Method with k arguments is compiled to a VM function with k + 1 arguments
                 case Keyword.Method:
-                    this.writer.WritePush(Segment.Argument, 0);
-                    this.writer.WritePop(Segment.Pointer, 0);
+                    this.compiled.Append(this.writer.WritePush(Segment.Argument, 0));
+                    this.compiled.Append(this.writer.WritePop(Segment.Pointer, 0));
                     return;
                 // Constructor with k arguments is compiled to a VM function with k arguments
                 case Keyword.Constructor:
-                    this.writer.WritePush(Segment.Constant, this.symbolTable.VarCount(IdentifierKind.Field));
-                    this.writer.WriteCall(OS.Memory.Alloc, 1);
-                    this.writer.WritePop(Segment.Pointer, 0);
+                    this.compiled.Append(this.writer.WritePush(Segment.Constant, this.symbolTable.VarCount(IdentifierKind.Field)));
+                    this.compiled.Append(this.writer.WriteCall(OS.Memory.Alloc, 1));
+                    this.compiled.Append(this.writer.WritePop(Segment.Pointer, 0));
                     return;
                 default:
                     return;
@@ -372,9 +380,9 @@ namespace JackCompiler.Implementations
         {
             // var type varName (', ' varName)* ';'
 
-            string varDecTag = Tags.VarDec;
+            //string varDecTag = Tags.VarDec;
 
-            this.compiled.Append(varDecTag.ConstructOpeningTag());
+            //this.compiled.Append(varDecTag.ConstructOpeningTag());
 
             TokenType currentToken = this.tokenizer.TokenType();
 
@@ -407,27 +415,27 @@ namespace JackCompiler.Implementations
             //this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
             this.Eat(Symbols.Semicolon);
 
-            this.compiled.Append(varDecTag.ConstructClosingTag());
+            //this.compiled.Append(varDecTag.ConstructClosingTag());
         }
 
         public void CompileStatements()
         {
-            string statementsTag = Tags.Statements;
+            //string statementsTag = Tags.Statements;
 
-            this.compiled.Append(statementsTag.ConstructOpeningTag());
+            //this.compiled.Append(statementsTag.ConstructOpeningTag());
 
             TokenType currentTokenType = this.tokenizer.TokenType();
 
             // To compile a statement we need it to be a keyword that marks the beginning of a statement
             if (currentTokenType != TokenType.Keyword || !this.tokenizer.Keyword().IsBeginningOfStatement())
             {
-                this.compiled.Append(statementsTag.ConstructClosingTag());
+                //this.compiled.Append(statementsTag.ConstructClosingTag());
                 return;
             }
 
             this.CompileStatement();
 
-            this.compiled.Append(statementsTag.ConstructClosingTag());
+            //this.compiled.Append(statementsTag.ConstructClosingTag());
         }
 
         // NOTE: Be careful with recursion
