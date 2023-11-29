@@ -89,6 +89,11 @@ namespace JackCompiler.Extensions
             return $"</{tagName}>";
         }
 
+        public static string ConstructFunctionName(this string className, string subroutineName)
+        {
+            return $"{className}.{subroutineName}";
+        }
+
         public static bool IsKeywordConstant(this string source)
         {
             Keyword[] constants = new Keyword[] {

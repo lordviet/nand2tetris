@@ -151,6 +151,7 @@ namespace JackCompiler
             public const string KeywordConstant = "keywordConstant";
         }
 
+        // TODO: Idea to use a special OSLibMethod { string methodName, int? defaultParameter }
         public static class OS
         {
             public static class Math
@@ -159,6 +160,17 @@ namespace JackCompiler
 
                 public const string Multiply = "Math.multiply";
                 public const string Divide = "Math.divide";
+            }
+
+            public static class String
+            {
+                public const string New = "String.new";
+                public const string AppendChar = "String.appendChar";
+            }
+
+            public static class Memory
+            {
+                public const string Alloc = "Memory.alloc";
             }
         }
     }
