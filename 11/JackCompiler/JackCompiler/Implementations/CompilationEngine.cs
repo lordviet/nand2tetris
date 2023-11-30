@@ -16,6 +16,7 @@ namespace JackCompiler.Implementations
 
         private readonly StringBuilder compiled;
 
+        private int labelIndex;
         private string? className;
         private string? subroutineName;
 
@@ -26,6 +27,8 @@ namespace JackCompiler.Implementations
             this.writer = writer;
 
             this.compiled = new StringBuilder();
+
+            this.labelIndex = 0;
 
             if (compileClass)
             {
@@ -139,21 +142,6 @@ namespace JackCompiler.Implementations
                 this.tokenizer.Advance();
                 //this.AppendNextIdentifierToCompiled();
                 this.CompileCommaSeparatedVarNames(parentType, parentIdentifierKind);
-            }
-
-            return;
-        }
-
-
-        // TODO: Overload to compile code until the subroutine symbol table is done for
-        private void CompileCommaSeparatedVarNames()
-        {
-            if (this.tokenizer.TokenType() == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.Comma])
-            {
-                this.AppendTokenToCompiled(Symbols.Comma, TokenType.Symbol);
-
-                this.AppendNextIdentifierToCompiled();
-                this.CompileCommaSeparatedVarNames();
             }
 
             return;
@@ -366,12 +354,14 @@ namespace JackCompiler.Implementations
 
                 this.EnsureKeywordIsType(typeKeyword);
 
-                this.AppendKeywordToCompiled(typeKeyword);
+                //this.AppendKeywordToCompiled(typeKeyword);
             }
-            else
-            {
-                this.AppendNextIdentifierToCompiled();
-            }
+            //else
+            //{
+            //    this.AppendNextIdentifierToCompiled();
+            //}
+
+            this.tokenizer.Advance();
 
             return type;
         }
@@ -582,73 +572,101 @@ namespace JackCompiler.Implementations
 
         public void CompileWhile()
         {
-            string whileStatement = Statements.While;
+            //string whileStatement = Statements.While;
 
-            this.compiled.Append(whileStatement.ConstructOpeningTag());
+            //this.compiled.Append(whileStatement.ConstructOpeningTag());
 
-            this.AppendKeywordToCompiled(Keyword.While);
+            //this.AppendKeywordToCompiled(Keyword.While);
+            this.Eat(LexicalElements.ReverseKeywordMap[Keyword.While]);
 
-            this.AppendTokenToCompiled(Symbols.LeftParenthesis, TokenType.Symbol);
+            this.Eat(Symbols.LeftParenthesis);
+            //this.AppendTokenToCompiled(Symbols.LeftParenthesis, TokenType.Symbol);
 
             this.CompileExpression();
 
-            this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
+            this.Eat(Symbols.RightParenthesis);
+            //this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
 
-            this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
+            this.Eat(Symbols.LeftCurlyBrace);
+            //this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
 
             this.CompileStatements();
 
-            this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
+            this.Eat(Symbols.RightCurlyBrace);
+            //this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
 
-            this.compiled.Append(whileStatement.ConstructClosingTag());
+            //this.compiled.Append(whileStatement.ConstructClosingTag());
         }
 
         public void CompileReturn()
         {
             // 'return' expression? ';'
 
-            string returnStatement = Statements.Return;
+            //string returnStatement = Statements.Return;
 
-            this.compiled.Append(returnStatement.ConstructOpeningTag());
+            //this.compiled.Append(returnStatement.ConstructOpeningTag());
 
-            this.AppendKeywordToCompiled(Keyword.Return);
+
+            this.Eat(LexicalElements.ReverseKeywordMap[Keyword.Return]);
+            //this.AppendKeywordToCompiled(Keyword.Return);
 
             if (this.IsNextTokenTheBeginningOfExpression())
             {
                 this.CompileExpression();
             }
+            else
+            {
+                // if there's no expression, we push 0 to the stack
+                this.compiled.Append(this.writer.WritePush(Segment.Constant, 0));
+            }
 
-            this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
+            this.Eat(Symbols.Semicolon);
+            //this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
 
-            this.compiled.Append(returnStatement.ConstructClosingTag());
+            //this.compiled.Append(returnStatement.ConstructClosingTag());
+            this.compiled.Append(this.writer.WriteReturn());
         }
 
         public void CompileIf()
         {
-            string ifStatement = Statements.If;
+            string elseLabel = this.ConstructLabel("ELSE");
+            string endLabel = this.ConstructLabel("END_IF");
+            //string ifStatement = Statements.If;
 
-            this.compiled.Append(ifStatement.ConstructOpeningTag());
+            //this.compiled.Append(ifStatement.ConstructOpeningTag());
 
-            this.AppendKeywordToCompiled(Keyword.If);
+            //this.AppendKeywordToCompiled(Keyword.If);
+            this.Eat(LexicalElements.ReverseKeywordMap[Keyword.If]);
 
-            this.AppendTokenToCompiled(Symbols.LeftParenthesis, TokenType.Symbol);
+            //this.AppendTokenToCompiled(Symbols.LeftParenthesis, TokenType.Symbol);
+            this.Eat(Symbols.LeftParenthesis);
 
             this.CompileExpression();
 
-            this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
+            //this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
+            this.Eat(Symbols.RightParenthesis);
 
-            this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
+            this.writer.WriteArithmetic(Command.Not);
+            this.writer.WriteIf(elseLabel);
+
+            this.Eat(Symbols.LeftCurlyBrace);
+            //this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
 
             this.CompileStatements();
 
-            this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
+            this.Eat(Symbols.RightCurlyBrace);
+            //this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
+
+            this.writer.WriteGoto(endLabel);
+            this.writer.WriteLabel(elseLabel);
 
             if (this.tokenizer.TokenType() == TokenType.Keyword && this.tokenizer.Keyword() == Keyword.Else)
             {
                 this.CompileElse();
             }
 
-            this.compiled.Append(ifStatement.ConstructClosingTag());
+            this.writer.WriteLabel(endLabel);
+            //this.compiled.Append(ifStatement.ConstructClosingTag());
         }
 
         private void CompileElse()
@@ -936,6 +954,15 @@ namespace JackCompiler.Implementations
             this.compiled.Append(node);
 
             return;
+        }
+
+        private string ConstructLabel(string labelName)
+        {
+            string label = $"LABEL_{labelName}_{this.labelIndex}";
+
+            this.labelIndex++;
+
+            return label;
         }
 
         private string ResolveIdentifierNodeConstruction(string token)
