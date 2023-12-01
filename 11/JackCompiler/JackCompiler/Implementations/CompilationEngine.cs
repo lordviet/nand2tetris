@@ -510,11 +510,13 @@ namespace JackCompiler.Implementations
 
         private void CompileExpressionListInSubroutineCall()
         {
-            this.AppendTokenToCompiled(Symbols.LeftParenthesis, TokenType.Symbol);
+            //this.AppendTokenToCompiled(Symbols.LeftParenthesis, TokenType.Symbol);
+            this.Eat(Symbols.LeftParenthesis);
 
             this.CompileExpressionList();
 
-            this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
+            //this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
+            this.Eat(Symbols.RightParenthesis);
         }
 
         public void CompileLet()
@@ -572,12 +574,17 @@ namespace JackCompiler.Implementations
 
         public void CompileWhile()
         {
+            string whileLabel = this.ConstructLabel("WHILE");
+            string continueLabel = this.ConstructLabel("CONTINUE_WHILE");
+
             //string whileStatement = Statements.While;
 
             //this.compiled.Append(whileStatement.ConstructOpeningTag());
 
             //this.AppendKeywordToCompiled(Keyword.While);
             this.Eat(LexicalElements.ReverseKeywordMap[Keyword.While]);
+
+            this.compiled.Append(this.writer.WriteLabel(whileLabel));
 
             this.Eat(Symbols.LeftParenthesis);
             //this.AppendTokenToCompiled(Symbols.LeftParenthesis, TokenType.Symbol);
@@ -587,6 +594,9 @@ namespace JackCompiler.Implementations
             this.Eat(Symbols.RightParenthesis);
             //this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
 
+            this.compiled.Append(this.writer.WriteArithmetic(Command.Not));
+            this.compiled.Append(this.writer.WriteIf(continueLabel));
+
             this.Eat(Symbols.LeftCurlyBrace);
             //this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
 
@@ -594,6 +604,9 @@ namespace JackCompiler.Implementations
 
             this.Eat(Symbols.RightCurlyBrace);
             //this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
+
+            this.compiled.Append(this.writer.WriteGoto(whileLabel));
+            this.compiled.Append(this.writer.WriteLabel(continueLabel));
 
             //this.compiled.Append(whileStatement.ConstructClosingTag());
         }
@@ -671,13 +684,16 @@ namespace JackCompiler.Implementations
 
         private void CompileElse()
         {
-            this.AppendKeywordToCompiled(Keyword.Else);
+            this.Eat(LexicalElements.ReverseKeywordMap[Keyword.Else]);
+            //this.AppendKeywordToCompiled(Keyword.Else);
 
-            this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
+            this.Eat(Symbols.LeftCurlyBrace);
+            //this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
 
             this.CompileStatements();
 
-            this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
+            this.Eat(Symbols.RightCurlyBrace);
+            //this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
         }
 
         // TODO: May get entirely replaced by CompileExpressionCore
