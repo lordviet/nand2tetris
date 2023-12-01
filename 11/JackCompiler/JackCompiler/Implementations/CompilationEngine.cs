@@ -462,24 +462,31 @@ namespace JackCompiler.Implementations
         {
             // do subroutineCall;
 
-            string doStatement = Statements.Do;
+            //string doStatement = Statements.Do;
 
-            this.compiled.Append(doStatement.ConstructOpeningTag());
+            //this.compiled.Append(doStatement.ConstructOpeningTag());
 
-            this.AppendKeywordToCompiled(Keyword.Do);
+            this.Eat(LexicalElements.ReverseKeywordMap[Keyword.Do]);
+
+            //this.AppendKeywordToCompiled(Keyword.Do);
 
             this.CompileSubroutineCall();
 
-            this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
+            this.Eat(Symbols.Semicolon);
+            //this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
 
-            this.compiled.Append(doStatement.ConstructClosingTag());
+            this.writer.WritePop(Segment.Temp, 0);
+            //this.compiled.Append(doStatement.ConstructClosingTag());
         }
 
         private void CompileSubroutineCall()
         {
             // subroutineName '(' expressionList ')' | (className | varName) '.' subroutineName '(' expressionList ')'
             // NOTE: all of subroutineName, className and varName are identifiers
-            this.AppendNextIdentifierToCompiled();
+
+            //this.AppendNextIdentifierToCompiled();
+            this.AssertNextTokenIsOfType(TokenType.Identifier);
+            this.tokenizer.Advance();
 
             if (this.tokenizer.TokenType() != TokenType.Symbol)
             {
