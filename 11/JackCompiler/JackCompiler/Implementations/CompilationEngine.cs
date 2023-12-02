@@ -287,20 +287,8 @@ namespace JackCompiler.Implementations
             }
         }
 
+        // TODO: Complete this one
         public void CompileParameterList()
-        {
-            //((type varName) (',' type varName)*)?
-            string parameterListTag = Tags.ParameterList;
-
-            this.compiled.Append(parameterListTag.ConstructOpeningTag());
-
-            // NOTE: Gateway to a recursive method
-            this.CompileParameterListInner();
-
-            this.compiled.Append(parameterListTag.ConstructClosingTag());
-        }
-
-        private void CompileParameterListInner()
         {
             TokenType currentToken = this.tokenizer.TokenType();
 
@@ -322,18 +310,23 @@ namespace JackCompiler.Implementations
             }
             else
             {
-                this.AppendNextIdentifierToCompiled();
+                this.AssertNextTokenIsOfType(TokenType.Identifier);
+                this.tokenizer.Advance();
+                //this.AppendNextIdentifierToCompiled();
             }
 
             string paramName = this.tokenizer.GetCurrentToken();
 
             this.symbolTable.Define(paramName, type, IdentifierKind.Argument);
 
-            this.AppendNextIdentifierToCompiled();
+            this.AssertNextTokenIsOfType(TokenType.Identifier);
+            this.tokenizer.Advance();
+            //this.AppendNextIdentifierToCompiled();
 
             if (this.tokenizer.TokenType() == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.Comma])
             {
-                this.AppendTokenToCompiled(Symbols.Comma, TokenType.Symbol);
+                this.Eat(Symbols.Comma);
+                //this.AppendTokenToCompiled(Symbols.Comma, TokenType.Symbol);
 
                 if (this.tokenizer.TokenType() != TokenType.Keyword)
                 {
@@ -341,7 +334,7 @@ namespace JackCompiler.Implementations
                 }
             }
 
-            this.CompileParameterListInner();
+            this.CompileParameterList();
         }
 
         private string CompileType()
@@ -356,10 +349,11 @@ namespace JackCompiler.Implementations
 
                 //this.AppendKeywordToCompiled(typeKeyword);
             }
-            //else
-            //{
-            //    this.AppendNextIdentifierToCompiled();
-            //}
+            else
+            {
+                this.AssertNextTokenIsOfType(TokenType.Identifier);
+                //this.AppendNextIdentifierToCompiled();
+            }
 
             this.tokenizer.Advance();
 
@@ -506,7 +500,8 @@ namespace JackCompiler.Implementations
                     this.CompileExpressionListInSubroutineCall();
                     break;
                 case Symbols.Dot:
-                    this.AppendTokenToCompiled(Symbols.Dot, TokenType.Symbol);
+                    this.Eat(Symbols.Dot);
+                    //this.AppendTokenToCompiled(Symbols.Dot, TokenType.Symbol);
                     // NOTE: Recursive call, be careful with this invocation, maybe it is required only once since this can be easily broken?
                     this.CompileSubroutineCall();
                     break;
