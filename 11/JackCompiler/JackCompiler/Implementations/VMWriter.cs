@@ -56,7 +56,7 @@ namespace JackCompiler.Implementations
 
         public string WriteFunction(string name, int nLocals)
         {
-            string functionCommand = $"function ${name} ${nLocals}\n";
+            string functionCommand = $"function {name} {nLocals}\n";
 
             return functionCommand;
         }

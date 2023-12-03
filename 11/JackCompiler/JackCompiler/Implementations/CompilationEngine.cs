@@ -171,9 +171,9 @@ namespace JackCompiler.Implementations
 
             // ('constructor' | 'function' | 'method') ('void' | type) subroutineName '(' paramList ')' subroutineBody
 
-            string subroutineDecTag = Tags.SubroutineDec;
+            //string subroutineDecTag = Tags.SubroutineDec;
 
-            this.compiled.Append(subroutineDecTag.ConstructOpeningTag());
+            //this.compiled.Append(subroutineDecTag.ConstructOpeningTag());
 
             this.CheckIfCurrentTokenIsAmongExpectedKeywords(new Keyword[] { Keyword.Constructor, Keyword.Function, Keyword.Method });
             //this.AppendKeywordToCompiled(this.tokenizer.Keyword());
@@ -210,7 +210,7 @@ namespace JackCompiler.Implementations
 
             this.CompileSubroutineBody(subroutineKeyword);
 
-            this.compiled.Append(subroutineDecTag.ConstructClosingTag());
+            //this.compiled.Append(subroutineDecTag.ConstructClosingTag());
         }
 
         private void CompileSubroutineBody(Keyword subroutineKeyword)
@@ -499,7 +499,7 @@ namespace JackCompiler.Implementations
                     this.CompileExpressionListInSubroutineCall(previousIdentifierToken);
                     break;
                 case Symbols.Dot:
-                    this.Eat(Symbols.Dot);
+                    //this.Eat(Symbols.Dot);
                     //this.AppendTokenToCompiled(Symbols.Dot, TokenType.Symbol);
                     // NOTE: Recursive call, be careful with this invocation, maybe it is required only once since this can be easily broken?
                     //this.CompileSubroutineCall();
