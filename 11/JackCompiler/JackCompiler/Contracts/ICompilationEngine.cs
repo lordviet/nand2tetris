@@ -28,7 +28,7 @@
 
 		void CompileTerm();
 
-		void CompileExpressionList();
+		int CompileExpressionList();
 
 		string Close();
     }

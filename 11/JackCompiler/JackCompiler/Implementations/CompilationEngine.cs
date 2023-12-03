@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using System.Xml;
 using JackCompiler.Contracts;
 using JackCompiler.Enums;
 using JackCompiler.Exceptions;
@@ -287,7 +286,7 @@ namespace JackCompiler.Implementations
             }
         }
 
-        // TODO: Complete this one
+        // TODO: Double check this one?
         public void CompileParameterList()
         {
             TokenType currentToken = this.tokenizer.TokenType();
@@ -305,8 +304,8 @@ namespace JackCompiler.Implementations
                 Keyword typeKeyword = this.tokenizer.Keyword();
 
                 this.EnsureKeywordIsType(typeKeyword);
-
-                this.AppendKeywordToCompiled(typeKeyword);
+                this.tokenizer.Advance();
+                //this.AppendKeywordToCompiled(typeKeyword);
             }
             else
             {
@@ -503,7 +502,8 @@ namespace JackCompiler.Implementations
                     this.Eat(Symbols.Dot);
                     //this.AppendTokenToCompiled(Symbols.Dot, TokenType.Symbol);
                     // NOTE: Recursive call, be careful with this invocation, maybe it is required only once since this can be easily broken?
-                    this.CompileSubroutineCall();
+                    //this.CompileSubroutineCall();
+                    this.CompileDotSymbolInSubroutineCall(previousIdentifierToken);
                     break;
                 default:
                     throw new Exception($"Expected either a '{Symbols.LeftParenthesis}' or a '{Symbols.Dot}' when handling subroutine call.");
@@ -526,30 +526,90 @@ namespace JackCompiler.Implementations
             this.compiled.Append(this.writer.WriteCall(subroutineName, expressionCount));
         }
 
+        //private void CompileExpressionListInSubroutineCallCore(string subroutineNameToken)
+        //{
+        //    this.Eat(Symbols.LeftParenthesis);
+
+        //    int expressionCount = this.CompileExpressionList();
+
+        //    this.Eat(Symbols.RightParenthesis);
+
+        //    string subroutineName = $"{this.className}.{subroutineNameToken}";
+        //    this.compiled.Append(this.writer.WriteCall(subroutineName, expressionCount));
+        //}
+
+        private void CompileDotSymbolInSubroutineCall(string objectName)
+        {
+            this.Eat(Symbols.Dot);
+
+            int arguments = 0;
+
+            string subroutineName = this.AssertNextTokenIsOfType(TokenType.Identifier);
+            this.tokenizer.Advance();
+
+            string? objectType = this.symbolTable.TypeOf(objectName);
+
+            if (objectType is not null && LexicalElements.KeywordMap.ContainsKey(objectType))
+            {
+                throw new Exception("Object type in subroutine call must not be an in-built type!");
+            }
+
+            string symbolTableEntryName;
+
+            if (objectType is null)
+            {
+                symbolTableEntryName = $"{objectName}.{subroutineName}";
+            }
+            else
+            {
+                arguments++;
+
+                IdentifierKind objectKind = this.symbolTable.KindOf(objectName);
+                int objectIndex = this.symbolTable.IndexOf(objectName);
+
+                this.compiled.Append(writer.WritePush(objectKind.ToSegment(), objectIndex));
+                symbolTableEntryName = $"{objectType}.{subroutineName}";
+            }
+
+            this.Eat(Symbols.LeftParenthesis);
+
+            arguments += this.CompileExpressionList();
+
+            this.Eat(Symbols.RightParenthesis);
+
+            this.compiled.Append(this.writer.WriteCall(symbolTableEntryName, arguments));
+        }
+
         public void CompileLet()
         {
             // 'let' varName ('[' expression ']')? '=' expression ';'
 
-            string letStatement = Statements.Let;
+            //string letStatement = Statements.Let;
 
-            this.compiled.Append(letStatement.ConstructOpeningTag());
+            //this.compiled.Append(letStatement.ConstructOpeningTag());
 
             // TODO: Newline for testing purposes
-            this.compiled.AppendLine();
+            //this.compiled.AppendLine();
 
             //this.AppendKeywordToCompiled(Keyword.Let);
             this.Eat(LexicalElements.ReverseKeywordMap[Keyword.Let]);
 
             // TODO: Potentially make AppendNextIdentifierToCompiled return a string;
-            string varName = this.tokenizer.GetCurrentToken();
-
-            // At this point I will have it in the symbol table
-            //this.AppendNextIdentifierToCompiled();
-            this.AssertNextTokenIsOfType(TokenType.Identifier);
+            string varName = this.AssertNextTokenIsOfType(TokenType.Identifier);
             this.tokenizer.Advance();
+
+            IdentifierKind kind = this.symbolTable.KindOf(varName);
+            int index = this.symbolTable.IndexOf(varName);
+
+            bool complexVariableAccessor = false;
 
             if (this.tokenizer.TokenType() == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.LeftSquareBracket])
             {
+                complexVariableAccessor = true;
+
+                // NOTE: Push array variable and base address to the Stack
+                this.compiled.Append(this.writer.WritePush(kind.ToSegment(), index));
+
                 //this.AppendTokenToCompiled(Symbols.LeftSquareBracket, TokenType.Symbol);
                 this.Eat(Symbols.LeftSquareBracket);
 
@@ -557,26 +617,29 @@ namespace JackCompiler.Implementations
 
                 //this.AppendTokenToCompiled(Symbols.RightSquareBracket, TokenType.Symbol);
                 this.Eat(Symbols.RightSquareBracket);
+
+                this.compiled.Append(this.writer.WriteArithmetic(Command.Add));
             }
 
             //this.AppendTokenToCompiled(Symbols.EqualitySign, TokenType.Symbol);
             this.Eat(Symbols.EqualitySign);
 
-            //this.CompileExpression();
             this.CompileExpression();
 
-            // TODO: method to check the validity of token
             //this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
             this.Eat(Symbols.Semicolon);
 
-            IdentifierKind kind = this.symbolTable.KindOf(varName);
-            int index = this.symbolTable.IndexOf(varName);
-
-            string popCommand = this.writer.WritePop(kind.ToSegment(), index);
-
-            this.compiled.Append(popCommand);
-
-            this.compiled.Append(letStatement.ConstructClosingTag());
+            if (complexVariableAccessor)
+            {
+                this.compiled.Append(this.writer.WritePop(Segment.Temp, 0));
+                this.compiled.Append(this.writer.WritePop(Segment.Pointer, 1));
+                this.compiled.Append(this.writer.WritePush(Segment.Temp, 0));
+                this.compiled.Append(this.writer.WritePop(Segment.That, 0));
+            }
+            else
+            {
+                this.compiled.Append(this.writer.WritePop(kind.ToSegment(), index));
+            }
         }
 
         public void CompileWhile()
@@ -1001,7 +1064,7 @@ namespace JackCompiler.Implementations
         {
             string token = this.AssertNextTokenIsOfType(TokenType.Identifier);
 
-            this.AppendTokenToCompiled(token, TokenType.Identifier);
+            //this.AppendTokenToCompiled(token, TokenType.Identifier);
         }
 
         // TODO: Possibly remove
@@ -1009,7 +1072,7 @@ namespace JackCompiler.Implementations
         {
             string keyword = LexicalElements.ReverseKeywordMap[key];
 
-            this.AppendTokenToCompiled(keyword, TokenType.Keyword);
+            //this.AppendTokenToCompiled(keyword, TokenType.Keyword);
 
             return;
         }
@@ -1053,7 +1116,7 @@ namespace JackCompiler.Implementations
                 return token.ConstructIdentifierNode();
             }
 
-            return token.ConstructIdentifierNodeEnhanced(this.symbolTable.TypeOf(token), this.symbolTable.KindOf(token), symbolTableIndex);
+            return token.ConstructIdentifierNodeEnhanced(this.symbolTable.TypeOf(token) ?? string.Empty, this.symbolTable.KindOf(token), symbolTableIndex);
         }
 
         private void EnsureKeywordIsType(Keyword keyword)

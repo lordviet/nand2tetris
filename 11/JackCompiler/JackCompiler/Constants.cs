@@ -5,7 +5,7 @@ namespace JackCompiler
     public static class Constants
     {
         public const string DefaultInputFileExtension = ".jack";
-        public const string DefaultOutputFileExtension = ".xml";
+        public const string DefaultOutputFileExtension = ".vm";
 
         public static class LexicalElements
         {

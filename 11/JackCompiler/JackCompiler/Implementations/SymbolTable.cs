@@ -94,7 +94,7 @@ namespace JackCompiler.Implementations
             return IdentifierKind.None;
         }
 
-        public string TypeOf(string name)
+        public string? TypeOf(string name)
         {
             if (subroutineScope.ContainsKey(name))
             {
@@ -106,7 +106,8 @@ namespace JackCompiler.Implementations
                 return classScope[name].Type;
             }
 
-            throw new Exception($"Neither class, nor subroutine scope contains {name}");
+            return null;
+            //throw new Exception($"Neither class, nor subroutine scope contains {name}");
         }
 
         public int IndexOf(string name)

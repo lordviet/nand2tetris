@@ -12,7 +12,7 @@ namespace JackCompiler.Contracts
 
         IdentifierKind KindOf(string name);
 
-        string TypeOf(string name);
+        string? TypeOf(string name);
 
         int IndexOf(string name);
     }

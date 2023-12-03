@@ -1,5 +1,4 @@
-﻿using System.Xml.Linq;
-using JackCompiler;
+﻿using JackCompiler;
 using JackCompiler.Contracts;
 using JackCompiler.Implementations;
 
@@ -52,9 +51,9 @@ class Program
             string fileContents = File.ReadAllText(filePath);
             string fileNameWithoutExtensions = Path.GetFileNameWithoutExtension(filePath);
 
-            string analyzed = AnalyzeFile(fileContents);
+            string compiled = CompileFile(fileContents);
 
-            SaveOutputFile(filePath, fileNameWithoutExtensions, analyzed);
+            SaveOutputFile(filePath, fileNameWithoutExtensions, compiled);
         }
     }
 
@@ -69,12 +68,12 @@ class Program
         string fileContents = File.ReadAllText(filePath);
         string fileNameWithoutExtensions = Path.GetFileNameWithoutExtension(filePath);
 
-        string analyzed = AnalyzeFile(fileContents);
+        string compiled = CompileFile(fileContents);
 
-        SaveOutputFile(filePath, fileNameWithoutExtensions, analyzed);
+        SaveOutputFile(filePath, fileNameWithoutExtensions, compiled);
     }
 
-    private static string AnalyzeFile(string fileContents)
+    private static string CompileFile(string fileContents)
     {
         IJackTokenizer tokenizer = new JackTokenizer(fileContents);
         ISymbolTable symbolTable = new SymbolTable();
@@ -85,7 +84,7 @@ class Program
         return engine.Close();
     }
 
-    private static void SaveOutputFile(string basePath, string fileName, string analyzedCode)
+    private static void SaveOutputFile(string basePath, string fileName, string compiledCode)
     {
         // Save the compiled code to the output file
         string? directoryName = Path.GetDirectoryName(basePath);
@@ -101,8 +100,7 @@ class Program
 
         try
         {
-            XDocument formatted = XDocument.Parse(analyzedCode);
-            File.WriteAllText(outputFile, formatted.ToString());
+            File.WriteAllText(outputFile, compiledCode.ToString());
             Console.WriteLine("Syntax analysis successfully completed. Output file: " + outputFile);
         }
         catch (Exception ex)
