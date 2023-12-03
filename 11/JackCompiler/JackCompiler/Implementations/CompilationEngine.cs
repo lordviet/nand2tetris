@@ -167,8 +167,6 @@ namespace JackCompiler.Implementations
         {
             this.symbolTable.StartSubroutine();
 
-            this.symbolTable.Define(name: "this", type: this.className ?? string.Empty, IdentifierKind.Argument);
-
             // ('constructor' | 'function' | 'method') ('void' | type) subroutineName '(' paramList ')' subroutineBody
 
             //string subroutineDecTag = Tags.SubroutineDec;
@@ -178,6 +176,12 @@ namespace JackCompiler.Implementations
             this.CheckIfCurrentTokenIsAmongExpectedKeywords(new Keyword[] { Keyword.Constructor, Keyword.Function, Keyword.Method });
             //this.AppendKeywordToCompiled(this.tokenizer.Keyword());
             Keyword subroutineKeyword = this.tokenizer.Keyword();
+
+            if (subroutineKeyword == Keyword.Method)
+            {
+                this.symbolTable.Define(name: "this", type: this.className ?? string.Empty, IdentifierKind.Argument);
+            }
+
             this.tokenizer.Advance();
 
             TokenType currentToken = this.tokenizer.TokenType();
