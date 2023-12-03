@@ -804,7 +804,23 @@ namespace JackCompiler.Implementations
                 throw new UnexpectedKeywordException();
             }
 
-            this.AppendTokenToCompiled(LexicalElements.ReverseKeywordMap[keyword], TokenType.Keyword);
+            switch (keyword)
+            {
+                case Keyword.True:
+                    this.writer.WritePush(Segment.Constant, 0);
+                    this.writer.WriteArithmetic(Command.Not);
+                    return;
+                case Keyword.False:
+                case Keyword.Null:
+                    this.writer.WritePush(Segment.Constant, 0);
+                    return;
+                case Keyword.This:
+                    this.writer.WritePush(Segment.Pointer, 0);
+                    return;
+            }
+
+            this.tokenizer.Advance();
+            //this.AppendTokenToCompiled(LexicalElements.ReverseKeywordMap[keyword], TokenType.Keyword);
         }
 
 
@@ -822,17 +838,21 @@ namespace JackCompiler.Implementations
                 return;
             }
 
-            this.AppendTokenToCompiled(Symbols.LeftParenthesis, TokenType.Symbol);
+            //this.AppendTokenToCompiled(Symbols.LeftParenthesis, TokenType.Symbol);
+            this.Eat(Symbols.LeftParenthesis);
 
             this.CompileExpression();
 
-            this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
+            //this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
+            this.Eat(Symbols.RightParenthesis);
         }
 
         private void HandleIdentifierInTerm()
         {
             // varName | varName ‘[‘ expression ‘]’ | subroutineCall
-            this.AppendNextIdentifierToCompiled();
+            //this.AppendNextIdentifierToCompiled();
+            this.AssertNextTokenIsOfType(TokenType.Identifier);
+            this.tokenizer.Advance();
 
             TokenType currentTokenType = this.tokenizer.TokenType();
 
@@ -846,11 +866,13 @@ namespace JackCompiler.Implementations
 
             if (symbol == LexicalElements.SymbolMap[Symbols.LeftSquareBracket])
             {
-                this.AppendTokenToCompiled(Symbols.LeftSquareBracket, TokenType.Symbol);
+                //this.AppendTokenToCompiled(Symbols.LeftSquareBracket, TokenType.Symbol);
+                this.Eat(Symbols.LeftSquareBracket);
 
                 this.CompileExpression();
 
-                this.AppendTokenToCompiled(Symbols.RightSquareBracket, TokenType.Symbol);
+                //this.AppendTokenToCompiled(Symbols.RightSquareBracket, TokenType.Symbol);
+                this.Eat(Symbols.RightSquareBracket);
             }
 
             if (symbol == LexicalElements.SymbolMap[Symbols.LeftParenthesis] || symbol == LexicalElements.SymbolMap[Symbols.Dot])
