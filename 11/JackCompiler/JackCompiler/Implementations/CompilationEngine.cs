@@ -807,16 +807,16 @@ namespace JackCompiler.Implementations
             switch (keyword)
             {
                 case Keyword.True:
-                    this.writer.WritePush(Segment.Constant, 0);
-                    this.writer.WriteArithmetic(Command.Not);
-                    return;
+                    this.compiled.Append(this.writer.WritePush(Segment.Constant, 0));
+                    this.compiled.Append(this.writer.WriteArithmetic(Command.Not));
+                    break;
                 case Keyword.False:
                 case Keyword.Null:
-                    this.writer.WritePush(Segment.Constant, 0);
-                    return;
+                    this.compiled.Append(this.writer.WritePush(Segment.Constant, 0));
+                    break;
                 case Keyword.This:
-                    this.writer.WritePush(Segment.Pointer, 0);
-                    return;
+                    this.compiled.Append(this.writer.WritePush(Segment.Pointer, 0));
+                    break;
             }
 
             this.tokenizer.Advance();
@@ -830,10 +830,19 @@ namespace JackCompiler.Implementations
 
             if (currentToken.IsUnaryOp())
             {
-                this.AppendTokenToCompiled(currentToken, TokenType.Symbol);
+                //this.AppendTokenToCompiled(currentToken, TokenType.Symbol);
+                this.tokenizer.Advance();
 
                 // NOTE: Recursive call
                 this.CompileTerm();
+
+                this.compiled.Append(currentToken switch
+                {
+                    "-" => this.writer.WriteArithmetic(Command.Neg),
+                    "~" => this.writer.WriteArithmetic(Command.Not),
+                    _ => throw new Exception($"Unexpected token: {currentToken}")
+                });
+
 
                 return;
             }
