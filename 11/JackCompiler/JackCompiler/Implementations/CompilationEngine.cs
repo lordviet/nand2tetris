@@ -468,7 +468,7 @@ namespace JackCompiler.Implementations
             this.Eat(Symbols.Semicolon);
             //this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
 
-            this.writer.WritePop(Segment.Temp, 0);
+            this.compiled.Append(this.writer.WritePop(Segment.Temp, 0));
             //this.compiled.Append(doStatement.ConstructClosingTag());
         }
 
@@ -567,7 +567,7 @@ namespace JackCompiler.Implementations
                 IdentifierKind objectKind = this.symbolTable.KindOf(objectName);
                 int objectIndex = this.symbolTable.IndexOf(objectName);
 
-                this.compiled.Append(writer.WritePush(objectKind.ToSegment(), objectIndex));
+                this.compiled.Append(this.writer.WritePush(objectKind.ToSegment(), objectIndex));
                 symbolTableEntryName = $"{objectType}.{subroutineName}";
             }
 
@@ -584,17 +584,8 @@ namespace JackCompiler.Implementations
         {
             // 'let' varName ('[' expression ']')? '=' expression ';'
 
-            //string letStatement = Statements.Let;
-
-            //this.compiled.Append(letStatement.ConstructOpeningTag());
-
-            // TODO: Newline for testing purposes
-            //this.compiled.AppendLine();
-
-            //this.AppendKeywordToCompiled(Keyword.Let);
             this.Eat(LexicalElements.ReverseKeywordMap[Keyword.Let]);
 
-            // TODO: Potentially make AppendNextIdentifierToCompiled return a string;
             string varName = this.AssertNextTokenIsOfType(TokenType.Identifier);
             this.tokenizer.Advance();
 
@@ -610,23 +601,19 @@ namespace JackCompiler.Implementations
                 // NOTE: Push array variable and base address to the Stack
                 this.compiled.Append(this.writer.WritePush(kind.ToSegment(), index));
 
-                //this.AppendTokenToCompiled(Symbols.LeftSquareBracket, TokenType.Symbol);
                 this.Eat(Symbols.LeftSquareBracket);
 
                 this.CompileExpression();
 
-                //this.AppendTokenToCompiled(Symbols.RightSquareBracket, TokenType.Symbol);
                 this.Eat(Symbols.RightSquareBracket);
 
                 this.compiled.Append(this.writer.WriteArithmetic(Command.Add));
             }
 
-            //this.AppendTokenToCompiled(Symbols.EqualitySign, TokenType.Symbol);
             this.Eat(Symbols.EqualitySign);
 
             this.CompileExpression();
 
-            //this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
             this.Eat(Symbols.Semicolon);
 
             if (complexVariableAccessor)
@@ -729,8 +716,8 @@ namespace JackCompiler.Implementations
             //this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
             this.Eat(Symbols.RightParenthesis);
 
-            this.writer.WriteArithmetic(Command.Not);
-            this.writer.WriteIf(elseLabel);
+            this.compiled.Append(this.writer.WriteArithmetic(Command.Not));
+            this.compiled.Append(this.writer.WriteIf(elseLabel));
 
             this.Eat(Symbols.LeftCurlyBrace);
             //this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
@@ -740,15 +727,15 @@ namespace JackCompiler.Implementations
             this.Eat(Symbols.RightCurlyBrace);
             //this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
 
-            this.writer.WriteGoto(endLabel);
-            this.writer.WriteLabel(elseLabel);
+            this.compiled.Append(this.writer.WriteGoto(endLabel));
+            this.compiled.Append(this.writer.WriteLabel(elseLabel));
 
             if (this.tokenizer.TokenType() == TokenType.Keyword && this.tokenizer.Keyword() == Keyword.Else)
             {
                 this.CompileElse();
             }
 
-            this.writer.WriteLabel(endLabel);
+            this.compiled.Append(this.writer.WriteLabel(endLabel));
             //this.compiled.Append(ifStatement.ConstructClosingTag());
         }
 
