@@ -914,29 +914,24 @@ namespace JackCompiler.Implementations
 
             // varName | varName ‘[‘ expression ‘]’ | subroutineCall
             string currentIdentifier = this.AssertNextTokenIsOfType(TokenType.Identifier);
+
+            IdentifierKind varKind = symbolTable.KindOf(currentIdentifier);
+            int varNameIndex = symbolTable.IndexOf(currentIdentifier);
+
             this.tokenizer.Advance();
 
             TokenType currentTokenType = this.tokenizer.TokenType();
 
             // NOTE: If the current token type is not a symbol, it must be a varName
-            if (currentTokenType != TokenType.Symbol)
-            {
-                IdentifierKind varKind = symbolTable.KindOf(currentIdentifier);
-                int varNameIndex = symbolTable.IndexOf(currentIdentifier);
-
-                this.compiled.Append(this.writer.WritePush(varKind.ToSegment(), varNameIndex));
-
-                return;
-            }
-
+            // NOTE: If the current token type is a symbol and it is a ")", it must be 
             string currentToken = this.tokenizer.GetCurrentToken();
-            char symbol = this.tokenizer.Symbol();
 
-            if (symbol == LexicalElements.SymbolMap[Symbols.LeftSquareBracket])
+            // HEAVEN STARTS HERE
+            if (currentTokenType == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.LeftSquareBracket])
             {
                 // NOTE: Push array variable and its base address to the stack
-                IdentifierKind varKind = symbolTable.KindOf(currentIdentifier);
-                int varNameIndex = symbolTable.IndexOf(currentIdentifier);
+                //IdentifierKind varKind = symbolTable.KindOf(currentIdentifier);
+                //int varNameIndex = symbolTable.IndexOf(currentIdentifier);
 
                 this.compiled.Append(this.writer.WritePush(varKind.ToSegment(), varNameIndex));
 
@@ -953,12 +948,17 @@ namespace JackCompiler.Implementations
 
                 this.compiled.Append(this.writer.WritePop(Segment.Pointer, 1));
                 this.compiled.Append(this.writer.WritePush(Segment.That, 0));
+
+                return;
             }
 
-            if (symbol == LexicalElements.SymbolMap[Symbols.LeftParenthesis] || symbol == LexicalElements.SymbolMap[Symbols.Dot])
+            if (currentTokenType == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.Dot])
             {
                 this.HandleSubroutineCallSymbol(currentIdentifier, currentToken);
+                return;
             }
+
+            this.compiled.Append(this.writer.WritePush(varKind.ToSegment(), varNameIndex));
 
             return;
         }
