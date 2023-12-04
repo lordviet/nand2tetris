@@ -833,7 +833,8 @@ namespace JackCompiler.Implementations
         private void HandleStringConstantInTerm()
         {
             // TODO: avoid magic numbers
-            string stringConstant = this.tokenizer.GetCurrentToken();
+            // TODO: double check the trimming
+            string stringConstant = this.tokenizer.GetCurrentToken().Trim('"');
 
             this.compiled.Append(this.writer.WritePush(Segment.Constant, stringConstant.Length));
             this.compiled.Append(this.writer.WriteCall(OS.String.New, 1));
@@ -920,7 +921,6 @@ namespace JackCompiler.Implementations
             // NOTE: If the current token type is not a symbol, it must be a varName
             if (currentTokenType != TokenType.Symbol)
             {
-
                 IdentifierKind varKind = symbolTable.KindOf(currentIdentifier);
                 int varNameIndex = symbolTable.IndexOf(currentIdentifier);
 
