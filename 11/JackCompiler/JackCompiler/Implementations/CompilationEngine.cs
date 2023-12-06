@@ -602,14 +602,15 @@ namespace JackCompiler.Implementations
             {
                 complexVariableAccessor = true;
 
-                // NOTE: Push array variable and base address to the Stack
-                this.compiled.Append(this.writer.WritePush(kind.ToSegment(), index));
-
                 this.Eat(Symbols.LeftSquareBracket);
 
                 this.CompileExpression();
 
                 this.Eat(Symbols.RightSquareBracket);
+
+                // TODO: Double check the ordering of this Push, it used to happen before CompileExpression
+                // NOTE: Push array variable and base address to the Stack
+                this.compiled.Append(this.writer.WritePush(kind.ToSegment(), index));
 
                 this.compiled.Append(this.writer.WriteArithmetic(Command.Add));
             }
@@ -636,7 +637,7 @@ namespace JackCompiler.Implementations
         public void CompileWhile()
         {
             string whileLabel = this.ConstructLabel("WHILE");
-            string continueLabel = this.ConstructLabel("CONTINUE_WHILE");
+            string endLabel = this.ConstructLabel("WHILE_END");
 
             //string whileStatement = Statements.While;
 
@@ -656,7 +657,7 @@ namespace JackCompiler.Implementations
             //this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
 
             this.compiled.Append(this.writer.WriteArithmetic(Command.Not));
-            this.compiled.Append(this.writer.WriteIf(continueLabel));
+            this.compiled.Append(this.writer.WriteIf(endLabel));
 
             this.Eat(Symbols.LeftCurlyBrace);
             //this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
@@ -667,7 +668,7 @@ namespace JackCompiler.Implementations
             //this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
 
             this.compiled.Append(this.writer.WriteGoto(whileLabel));
-            this.compiled.Append(this.writer.WriteLabel(continueLabel));
+            this.compiled.Append(this.writer.WriteLabel(endLabel));
 
             //this.compiled.Append(whileStatement.ConstructClosingTag());
         }
@@ -929,11 +930,8 @@ namespace JackCompiler.Implementations
             // HEAVEN STARTS HERE
             if (currentTokenType == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.LeftSquareBracket])
             {
-                // NOTE: Push array variable and its base address to the stack
                 //IdentifierKind varKind = symbolTable.KindOf(currentIdentifier);
                 //int varNameIndex = symbolTable.IndexOf(currentIdentifier);
-
-                this.compiled.Append(this.writer.WritePush(varKind.ToSegment(), varNameIndex));
 
                 //this.AppendTokenToCompiled(Symbols.LeftSquareBracket, TokenType.Symbol);
                 this.Eat(Symbols.LeftSquareBracket);
@@ -942,6 +940,10 @@ namespace JackCompiler.Implementations
 
                 //this.AppendTokenToCompiled(Symbols.RightSquareBracket, TokenType.Symbol);
                 this.Eat(Symbols.RightSquareBracket);
+
+                // TODO: Double check re-ordering, moved it after expression, it used to be before that
+                // NOTE: Push array variable and its base address to the stack
+                this.compiled.Append(this.writer.WritePush(varKind.ToSegment(), varNameIndex));
 
                 // NOTE: Take into consideration the offset
                 this.compiled.Append(this.writer.WriteArithmetic(Command.Add));
