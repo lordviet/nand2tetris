@@ -15,14 +15,13 @@ namespace JackCompiler.Implementations
 
         private readonly StringBuilder compiled;
 
-        private int labelIndex;
         private string? className;
         private string? subroutineName;
 
         private int ifLabelIndex;
         private int whileLabelIndex;
 
-        public CompilationEngine(IJackTokenizer tokenizer, ISymbolTable symbolTable, IVMWriter writer, bool compileClass = true)
+        public CompilationEngine(IJackTokenizer tokenizer, ISymbolTable symbolTable, IVMWriter writer)
         {
             this.tokenizer = tokenizer;
             this.symbolTable = symbolTable;
@@ -30,45 +29,27 @@ namespace JackCompiler.Implementations
 
             this.compiled = new StringBuilder();
 
-            this.labelIndex = 0;
             this.ifLabelIndex = 0;
             this.whileLabelIndex = 0;
 
-            if (compileClass)
-            {
-                this.CompileClass();
-            }
+            this.CompileClass();
         }
 
+        // 'class' className '{' classVarDec* subroutineDec* '}'
         public void CompileClass()
         {
-            // 'class' className '{' classVarDec* subroutineDec* '}'
-
-            //string classKeyword = LexicalElements.ReverseKeywordMap[Keyword.Class];
-
-            //this.compiled.Append(classKeyword.ConstructOpeningTag());
-
-            //this.AppendKeywordToCompiled(Keyword.Class);
             this.Eat(LexicalElements.ReverseKeywordMap[Keyword.Class]);
 
             // Save the classname for later usage in the symbol table
             string className = this.tokenizer.GetCurrentToken();
             this.className = className;
 
-            //this.AppendNextIdentifierToCompiled();
             this.tokenizer.Advance();
 
-            //this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
             this.Eat(Symbols.LeftCurlyBrace);
-
             this.CompileClassVarDecInClass();
-
             this.CompileSubroutineDecInClass();
-
-            //this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
             this.Eat(Symbols.RightCurlyBrace);
-
-            //this.compiled.Append(classKeyword.ConstructClosingTag());
         }
 
         private void CompileClassVarDecInClass()
@@ -99,52 +80,37 @@ namespace JackCompiler.Implementations
             }
         }
 
+        // ('static' | 'field') type varName (', ' varName)* ';'
         public void CompileClassVarDec()
         {
-            //('static' | 'field') type varName (', ' varName)* ';'
-
-            //string classVarDecTag = Tags.ClassVarDec;
-
-            //this.compiled.Append(classVarDecTag.ConstructOpeningTag());
-
             this.CheckIfCurrentTokenIsAmongExpectedKeywords(new Keyword[] { Keyword.Static, Keyword.Field });
 
             Keyword currentKeyword = this.tokenizer.Keyword();
 
-            //this.AppendKeywordToCompiled(this.tokenizer.Keyword());
             this.tokenizer.Advance();
 
             string type = this.CompileType();
-
             string varName = this.tokenizer.GetCurrentToken();
 
             IdentifierKind kind = currentKeyword.ToIdentifierKind();
 
             this.symbolTable.Define(varName, type, kind);
-
-            //this.AppendNextIdentifierToCompiled();
             this.tokenizer.Advance();
 
             this.CompileCommaSeparatedVarNames(type, kind);
-
-            //this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
             this.Eat(Symbols.Semicolon);
-
-            //this.compiled.Append(classVarDecTag.ConstructClosingTag());
         }
 
         private void CompileCommaSeparatedVarNames(string parentType, IdentifierKind parentIdentifierKind)
         {
             if (this.tokenizer.TokenType() == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.Comma])
             {
-                //this.AppendTokenToCompiled(Symbols.Comma, TokenType.Symbol);
                 this.Eat(Symbols.Comma);
 
                 string varName = this.tokenizer.GetCurrentToken();
                 this.symbolTable.Define(varName, parentType, parentIdentifierKind);
-
                 this.tokenizer.Advance();
-                //this.AppendNextIdentifierToCompiled();
+
                 this.CompileCommaSeparatedVarNames(parentType, parentIdentifierKind);
             }
 
@@ -168,22 +134,15 @@ namespace JackCompiler.Implementations
             }
         }
 
+        // ('constructor' | 'function' | 'method') ('void' | type) subroutineName '(' paramList ')' subroutineBody
         public void CompileSubroutine()
         {
-            // TODO: Experiment
             this.ifLabelIndex = 0;
             this.whileLabelIndex = 0;
 
             this.symbolTable.StartSubroutine();
 
-            // ('constructor' | 'function' | 'method') ('void' | type) subroutineName '(' paramList ')' subroutineBody
-
-            //string subroutineDecTag = Tags.SubroutineDec;
-
-            //this.compiled.Append(subroutineDecTag.ConstructOpeningTag());
-
             this.CheckIfCurrentTokenIsAmongExpectedKeywords(new Keyword[] { Keyword.Constructor, Keyword.Function, Keyword.Method });
-            //this.AppendKeywordToCompiled(this.tokenizer.Keyword());
             Keyword subroutineKeyword = this.tokenizer.Keyword();
 
             if (subroutineKeyword == Keyword.Method)
@@ -197,8 +156,6 @@ namespace JackCompiler.Implementations
 
             if (currentToken == TokenType.Keyword && this.tokenizer.Keyword() == Keyword.Void)
             {
-                // TODO: Compile void
-                //this.AppendTokenToCompiled(this.tokenizer.GetCurrentToken(), TokenType.Keyword);
                 this.tokenizer.Advance();
             }
             else
@@ -211,41 +168,22 @@ namespace JackCompiler.Implementations
             this.subroutineName = subroutineName;
             this.tokenizer.Advance();
 
-            //this.AppendNextIdentifierToCompiled();
 
             this.Eat(Symbols.LeftParenthesis);
-            //this.AppendTokenToCompiled(Symbols.LeftParenthesis, TokenType.Symbol);
-
             this.CompileParameterList();
-
             this.Eat(Symbols.RightParenthesis);
-            //this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
 
             this.CompileSubroutineBody(subroutineKeyword);
-
-            //this.compiled.Append(subroutineDecTag.ConstructClosingTag());
         }
 
+        // '{' varDec* statements '}'
         private void CompileSubroutineBody(Keyword subroutineKeyword)
         {
-            //string subroutineBodyTag = Tags.SubroutineBody;
-
-            //this.compiled.Append(subroutineBodyTag.ConstructOpeningTag());
-
-            // '{' varDec* statements '}'
             this.Eat(Symbols.LeftCurlyBrace);
-            //this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
-
             this.CompileVarDecInSubroutineBody();
-
             this.WriteSubroutineDec(subroutineKeyword);
-
             this.CompileStatements();
-
             this.Eat(Symbols.RightCurlyBrace);
-            //this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
-
-            //this.compiled.Append(subroutineBodyTag.ConstructClosingTag());
         }
 
         private void CompileVarDecInSubroutineBody()
@@ -299,7 +237,6 @@ namespace JackCompiler.Implementations
             }
         }
 
-        // TODO: Double check this one?
         public void CompileParameterList()
         {
             TokenType currentToken = this.tokenizer.TokenType();
@@ -318,13 +255,11 @@ namespace JackCompiler.Implementations
 
                 this.EnsureKeywordIsType(typeKeyword);
                 this.tokenizer.Advance();
-                //this.AppendKeywordToCompiled(typeKeyword);
             }
             else
             {
                 this.AssertNextTokenIsOfType(TokenType.Identifier);
                 this.tokenizer.Advance();
-                //this.AppendNextIdentifierToCompiled();
             }
 
             string paramName = this.tokenizer.GetCurrentToken();
@@ -333,16 +268,14 @@ namespace JackCompiler.Implementations
 
             this.AssertNextTokenIsOfType(TokenType.Identifier);
             this.tokenizer.Advance();
-            //this.AppendNextIdentifierToCompiled();
 
             if (this.tokenizer.TokenType() == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.Comma])
             {
                 this.Eat(Symbols.Comma);
-                //this.AppendTokenToCompiled(Symbols.Comma, TokenType.Symbol);
 
                 if (this.tokenizer.TokenType() != TokenType.Keyword)
                 {
-                    throw new Exception("A comma in the parameter list should be followed by a keyword.");
+                    throw new UnexpectedTokenTypeException(TokenType.Keyword, this.tokenizer.TokenType());
                 }
             }
 
@@ -358,13 +291,10 @@ namespace JackCompiler.Implementations
                 Keyword typeKeyword = this.tokenizer.Keyword();
 
                 this.EnsureKeywordIsType(typeKeyword);
-
-                //this.AppendKeywordToCompiled(typeKeyword);
             }
             else
             {
                 this.AssertNextTokenIsOfType(TokenType.Identifier);
-                //this.AppendNextIdentifierToCompiled();
             }
 
             this.tokenizer.Advance();
@@ -372,14 +302,9 @@ namespace JackCompiler.Implementations
             return type;
         }
 
+        // var type varName (', ' varName)* ';'
         public void CompileVarDec()
         {
-            // var type varName (', ' varName)* ';'
-
-            //string varDecTag = Tags.VarDec;
-
-            //this.compiled.Append(varDecTag.ConstructOpeningTag());
-
             TokenType currentToken = this.tokenizer.TokenType();
 
             if (currentToken != TokenType.Keyword)
@@ -394,47 +319,32 @@ namespace JackCompiler.Implementations
                 throw new UnexpectedKeywordException(Keyword.Var, currentKeyword);
             }
 
-            //this.AppendKeywordToCompiled(currentKeyword);
             this.tokenizer.Advance();
 
             string type = this.CompileType();
-
             string varName = this.tokenizer.GetCurrentToken();
-
             this.symbolTable.Define(varName, type, IdentifierKind.Var);
 
-            //this.AppendNextIdentifierToCompiled();
             this.tokenizer.Advance();
 
             this.CompileCommaSeparatedVarNames(type, IdentifierKind.Var);
 
-            //this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
             this.Eat(Symbols.Semicolon);
-
-            //this.compiled.Append(varDecTag.ConstructClosingTag());
         }
 
         public void CompileStatements()
         {
-            //string statementsTag = Tags.Statements;
-
-            //this.compiled.Append(statementsTag.ConstructOpeningTag());
-
             TokenType currentTokenType = this.tokenizer.TokenType();
 
             // To compile a statement we need it to be a keyword that marks the beginning of a statement
             if (currentTokenType != TokenType.Keyword || !this.tokenizer.Keyword().IsBeginningOfStatement())
             {
-                //this.compiled.Append(statementsTag.ConstructClosingTag());
                 return;
             }
 
             this.CompileStatement();
-
-            //this.compiled.Append(statementsTag.ConstructClosingTag());
         }
 
-        // NOTE: Be careful with recursion
         private void CompileStatement()
         {
             switch (this.tokenizer.Keyword())
@@ -464,33 +374,20 @@ namespace JackCompiler.Implementations
             }
         }
 
+        // do subroutineCall;
         public void CompileDo()
         {
-            // do subroutineCall;
-
-            //string doStatement = Statements.Do;
-
-            //this.compiled.Append(doStatement.ConstructOpeningTag());
-
             this.Eat(LexicalElements.ReverseKeywordMap[Keyword.Do]);
-
-            //this.AppendKeywordToCompiled(Keyword.Do);
-
             this.CompileSubroutineCall();
-
             this.Eat(Symbols.Semicolon);
-            //this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
 
             this.compiled.Append(this.writer.WritePop(Segment.Temp, 0));
-            //this.compiled.Append(doStatement.ConstructClosingTag());
         }
 
+        // subroutineName '(' expressionList ')' | (className | varName) '.' subroutineName '(' expressionList ')'
+        // NOTE: all of subroutineName, className and varName are identifiers
         private void CompileSubroutineCall()
         {
-            // subroutineName '(' expressionList ')' | (className | varName) '.' subroutineName '(' expressionList ')'
-            // NOTE: all of subroutineName, className and varName are identifiers
-
-            //this.AppendNextIdentifierToCompiled();
             string currentIdentifier = this.AssertNextTokenIsOfType(TokenType.Identifier);
             this.tokenizer.Advance();
 
@@ -523,30 +420,16 @@ namespace JackCompiler.Implementations
         {
             this.compiled.Append(this.writer.WritePush(Segment.Pointer, 0));
 
-            //this.AppendTokenToCompiled(Symbols.LeftParenthesis, TokenType.Symbol);
             this.Eat(Symbols.LeftParenthesis);
 
-            // NOTE: This 1 is for the this?
+            // NOTE: Add 1 for the this pointer
             int expressionCount = this.CompileExpressionList() + 1;
 
-            //this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
             this.Eat(Symbols.RightParenthesis);
 
             string subroutineName = $"{this.className}.{subroutineNameToken}";
             this.compiled.Append(this.writer.WriteCall(subroutineName, expressionCount));
         }
-
-        //private void CompileExpressionListInSubroutineCallCore(string subroutineNameToken)
-        //{
-        //    this.Eat(Symbols.LeftParenthesis);
-
-        //    int expressionCount = this.CompileExpressionList();
-
-        //    this.Eat(Symbols.RightParenthesis);
-
-        //    string subroutineName = $"{this.className}.{subroutineNameToken}";
-        //    this.compiled.Append(this.writer.WriteCall(subroutineName, expressionCount));
-        //}
 
         private void CompileDotSymbolInSubroutineCall(string objectName)
         {
@@ -590,10 +473,9 @@ namespace JackCompiler.Implementations
             this.compiled.Append(this.writer.WriteCall(symbolTableEntryName, arguments));
         }
 
+        // 'let' varName ('[' expression ']')? '=' expression ';'
         public void CompileLet()
         {
-            // 'let' varName ('[' expression ']')? '=' expression ';'
-
             this.Eat(LexicalElements.ReverseKeywordMap[Keyword.Let]);
 
             string varName = this.AssertNextTokenIsOfType(TokenType.Identifier);
@@ -609,22 +491,16 @@ namespace JackCompiler.Implementations
                 complexVariableAccessor = true;
 
                 this.Eat(Symbols.LeftSquareBracket);
-
                 this.CompileExpression();
-
                 this.Eat(Symbols.RightSquareBracket);
 
-                // TODO: Double check the ordering of this Push, it used to happen before CompileExpression
                 // NOTE: Push array variable and base address to the Stack
                 this.compiled.Append(this.writer.WritePush(kind.ToSegment(), index));
-
                 this.compiled.Append(this.writer.WriteArithmetic(Command.Add));
             }
 
             this.Eat(Symbols.EqualitySign);
-
             this.CompileExpression();
-
             this.Eat(Symbols.Semicolon);
 
             if (complexVariableAccessor)
@@ -642,59 +518,32 @@ namespace JackCompiler.Implementations
 
         public void CompileWhile()
         {
-            //string whileLabel = this.ConstructLabel("WHILE");
-            //string endLabel = this.ConstructLabel("WHILE_END");
-
-            string whileLabel = this.ConstructLabelAlternative("WHILE_EXP", this.whileLabelIndex);
-            string endLabel = this.ConstructLabelAlternative("WHILE_END", this.whileLabelIndex);
+            string whileLabel = this.ConstructLabel("WHILE_EXP", this.whileLabelIndex);
+            string endLabel = this.ConstructLabel("WHILE_END", this.whileLabelIndex);
 
             this.whileLabelIndex++;
 
-            //string whileStatement = Statements.While;
-
-            //this.compiled.Append(whileStatement.ConstructOpeningTag());
-
-            //this.AppendKeywordToCompiled(Keyword.While);
             this.Eat(LexicalElements.ReverseKeywordMap[Keyword.While]);
-
             this.compiled.Append(this.writer.WriteLabel(whileLabel));
 
             this.Eat(Symbols.LeftParenthesis);
-            //this.AppendTokenToCompiled(Symbols.LeftParenthesis, TokenType.Symbol);
-
             this.CompileExpression();
-
             this.Eat(Symbols.RightParenthesis);
-            //this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
 
             this.compiled.Append(this.writer.WriteArithmetic(Command.Not));
             this.compiled.Append(this.writer.WriteIf(endLabel));
 
             this.Eat(Symbols.LeftCurlyBrace);
-            //this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
-
             this.CompileStatements();
-
             this.Eat(Symbols.RightCurlyBrace);
-            //this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
 
             this.compiled.Append(this.writer.WriteGoto(whileLabel));
             this.compiled.Append(this.writer.WriteLabel(endLabel));
-
-            //this.compiled.Append(whileStatement.ConstructClosingTag());
         }
 
         public void CompileReturn()
         {
-            // 'return' expression? ';'
-
-            //string returnStatement = Statements.Return;
-
-            //this.compiled.Append(returnStatement.ConstructOpeningTag());
-
-
             this.Eat(LexicalElements.ReverseKeywordMap[Keyword.Return]);
-            //this.AppendKeywordToCompiled(Keyword.Return);
 
             if (this.IsNextTokenTheBeginningOfExpression())
             {
@@ -707,63 +556,14 @@ namespace JackCompiler.Implementations
             }
 
             this.Eat(Symbols.Semicolon);
-            //this.AppendTokenToCompiled(Symbols.Semicolon, TokenType.Symbol);
-
-            //this.compiled.Append(returnStatement.ConstructClosingTag());
             this.compiled.Append(this.writer.WriteReturn());
-        }
-
-        public void CompileIfDepr()
-        {
-            string elseLabel = this.ConstructLabel("ELSE");
-            string endLabel = this.ConstructLabel("END_IF");
-            //string ifStatement = Statements.If;
-
-            //this.compiled.Append(ifStatement.ConstructOpeningTag());
-
-            //this.AppendKeywordToCompiled(Keyword.If);
-            this.Eat(LexicalElements.ReverseKeywordMap[Keyword.If]);
-
-            //this.AppendTokenToCompiled(Symbols.LeftParenthesis, TokenType.Symbol);
-            this.Eat(Symbols.LeftParenthesis);
-
-            this.CompileExpression();
-
-            //this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
-            this.Eat(Symbols.RightParenthesis);
-
-            //this.compiled.Append(this.writer.WriteArithmetic(Command.Not));
-            this.compiled.Append(this.writer.WriteIf(elseLabel));
-
-            this.Eat(Symbols.LeftCurlyBrace);
-            //this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
-
-            this.CompileStatements();
-
-            this.Eat(Symbols.RightCurlyBrace);
-            //this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
-
-            this.compiled.Append(this.writer.WriteGoto(endLabel));
-            this.compiled.Append(this.writer.WriteLabel(elseLabel));
-
-            if (this.tokenizer.TokenType() == TokenType.Keyword && this.tokenizer.Keyword() == Keyword.Else)
-            {
-                this.CompileElse();
-            }
-
-            this.compiled.Append(this.writer.WriteLabel(endLabel));
-            //this.compiled.Append(ifStatement.ConstructClosingTag());
         }
 
         public void CompileIf()
         {
-            //string ifTrueLabel = this.ConstructLabel("IF_TRUE");
-            //string ifFalseLabel = this.ConstructLabel("IF_FALSE");
-            //string endLabel = this.ConstructLabel("END_IF");
-
-            string ifTrueLabel = this.ConstructLabelAlternative("IF_TRUE", this.ifLabelIndex);
-            string ifFalseLabel = this.ConstructLabelAlternative("IF_FALSE", this.ifLabelIndex);
-            string endLabel = this.ConstructLabelAlternative("IF_END", this.ifLabelIndex);
+            string ifTrueLabel = this.ConstructLabel("IF_TRUE", this.ifLabelIndex);
+            string ifFalseLabel = this.ConstructLabel("IF_FALSE", this.ifLabelIndex);
+            string endLabel = this.ConstructLabel("IF_END", this.ifLabelIndex);
 
             this.ifLabelIndex++;
 
@@ -788,31 +588,21 @@ namespace JackCompiler.Implementations
 
                 this.CompileElse();
 
-                // TODO: Monitor this one
                 this.compiled.Append(this.writer.WriteLabel(endLabel));
             }
             else
             {
                 this.compiled.Append(this.writer.WriteLabel(ifFalseLabel));
-
             }
-            // TODO: Potentially wrong?
-            //this.compiled.Append(this.writer.WriteLabel(endLabel));
-            //this.compiled.Append(this.writer.WriteLabel(ifFalseLabel));
         }
 
         private void CompileElse()
         {
             this.Eat(LexicalElements.ReverseKeywordMap[Keyword.Else]);
-            //this.AppendKeywordToCompiled(Keyword.Else);
 
             this.Eat(Symbols.LeftCurlyBrace);
-            //this.AppendTokenToCompiled(Symbols.LeftCurlyBrace, TokenType.Symbol);
-
             this.CompileStatements();
-
             this.Eat(Symbols.RightCurlyBrace);
-            //this.AppendTokenToCompiled(Symbols.RightCurlyBrace, TokenType.Symbol);
         }
 
         public void CompileExpression()
@@ -825,8 +615,6 @@ namespace JackCompiler.Implementations
             if (currentTokenType == TokenType.Symbol && currentToken.IsOp())
             {
                 string compiledOp = this.HandleOpInTerm(this.tokenizer.Symbol());
-
-                //this.AppendTokenToCompiled(currentToken, TokenType.Symbol);
 
                 // NOTE: Recursive Call
                 this.CompileExpression();
@@ -849,12 +637,7 @@ namespace JackCompiler.Implementations
 
         public void CompileTerm()
         {
-            //string termTag = Tags.Term;
-
-            //this.compiled.Append(termTag.ConstructOpeningTag());
-
             TokenType currentTokenType = this.tokenizer.TokenType();
-            //string token = this.tokenizer.GetCurrentToken();
 
             switch (currentTokenType)
             {
@@ -876,8 +659,6 @@ namespace JackCompiler.Implementations
                 default:
                     throw new UnexpectedTokenTypeException($"Unexpected token type: {currentTokenType}");
             }
-
-            //this.compiled.Append(termTag.ConstructClosingTag());
         }
 
         private void HandleIntegerConstantInTerm()
@@ -891,7 +672,6 @@ namespace JackCompiler.Implementations
         private void HandleStringConstantInTerm()
         {
             // TODO: avoid magic numbers
-            // TODO: double check the trimming
             string stringConstant = this.tokenizer.GetCurrentToken().Trim('"');
 
             this.compiled.Append(this.writer.WritePush(Segment.Constant, stringConstant.Length));
@@ -900,7 +680,6 @@ namespace JackCompiler.Implementations
             for (int i = 0; i < stringConstant.Length; i++)
             {
                 this.compiled.Append(this.writer.WritePush(Segment.Constant, stringConstant[i]));
-                // TODO: double check the 2
                 this.compiled.Append(this.writer.WriteCall(OS.String.AppendChar, 2));
             }
 
@@ -930,7 +709,6 @@ namespace JackCompiler.Implementations
             }
 
             this.tokenizer.Advance();
-            //this.AppendTokenToCompiled(LexicalElements.ReverseKeywordMap[keyword], TokenType.Keyword);
         }
 
 
@@ -940,7 +718,6 @@ namespace JackCompiler.Implementations
 
             if (currentToken.IsUnaryOp())
             {
-                //this.AppendTokenToCompiled(currentToken, TokenType.Symbol);
                 this.tokenizer.Advance();
 
                 // NOTE: Recursive call
@@ -953,24 +730,17 @@ namespace JackCompiler.Implementations
                     _ => throw new Exception($"Unexpected token: {currentToken}")
                 });
 
-
                 return;
             }
 
-            //this.AppendTokenToCompiled(Symbols.LeftParenthesis, TokenType.Symbol);
             this.Eat(Symbols.LeftParenthesis);
-
             this.CompileExpression();
-
-            //this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
             this.Eat(Symbols.RightParenthesis);
         }
 
+        // varName | varName ‘[‘ expression ‘]’ | subroutineCall
         private void HandleIdentifierInTerm()
         {
-            //this.AppendNextIdentifierToCompiled();
-
-            // varName | varName ‘[‘ expression ‘]’ | subroutineCall
             string currentIdentifier = this.AssertNextTokenIsOfType(TokenType.Identifier);
 
             IdentifierKind varKind = symbolTable.KindOf(currentIdentifier);
@@ -984,21 +754,12 @@ namespace JackCompiler.Implementations
             // NOTE: If the current token type is a symbol and it is a ")", it must be 
             string currentToken = this.tokenizer.GetCurrentToken();
 
-            // HEAVEN STARTS HERE
             if (currentTokenType == TokenType.Symbol && this.tokenizer.Symbol() == LexicalElements.SymbolMap[Symbols.LeftSquareBracket])
             {
-                //IdentifierKind varKind = symbolTable.KindOf(currentIdentifier);
-                //int varNameIndex = symbolTable.IndexOf(currentIdentifier);
-
-                //this.AppendTokenToCompiled(Symbols.LeftSquareBracket, TokenType.Symbol);
                 this.Eat(Symbols.LeftSquareBracket);
-
                 this.CompileExpression();
-
-                //this.AppendTokenToCompiled(Symbols.RightSquareBracket, TokenType.Symbol);
                 this.Eat(Symbols.RightSquareBracket);
 
-                // TODO: Double check re-ordering, moved it after expression, it used to be before that
                 // NOTE: Push array variable and its base address to the stack
                 this.compiled.Append(this.writer.WritePush(varKind.ToSegment(), varNameIndex));
 
@@ -1022,15 +783,10 @@ namespace JackCompiler.Implementations
             return;
         }
 
+        // (expression (',' expression)*)?
         public int CompileExpressionList()
         {
-            // (expression (',' expression)*)?
-
-            //string expressionListTag = Tags.ExpressionList;
-
-            //this.compiled.Append(expressionListTag.ConstructOpeningTag());
             int expressionCount = 0;
-
 
             if (this.IsNextTokenTheBeginningOfExpression())
             {
@@ -1039,8 +795,6 @@ namespace JackCompiler.Implementations
 
                 expressionCount += this.CompileExpressionInExpressionList();
             }
-
-            //this.compiled.Append(expressionListTag.ConstructClosingTag());
 
             return expressionCount;
         }
@@ -1054,7 +808,6 @@ namespace JackCompiler.Implementations
 
             if (currentTokenType == TokenType.Symbol && currentToken == Symbols.Comma)
             {
-                //this.AppendTokenToCompiled(currentToken, currentTokenType);
                 this.tokenizer.Advance();
 
                 this.CompileExpression();
@@ -1109,70 +862,9 @@ namespace JackCompiler.Implementations
             return;
         }
 
-        // TODO: Possibly remove
-        private void AppendNextIdentifierToCompiled()
-        {
-            string token = this.AssertNextTokenIsOfType(TokenType.Identifier);
-
-            //this.AppendTokenToCompiled(token, TokenType.Identifier);
-        }
-
-        // TODO: Possibly remove
-        private void AppendKeywordToCompiled(Keyword key)
-        {
-            string keyword = LexicalElements.ReverseKeywordMap[key];
-
-            //this.AppendTokenToCompiled(keyword, TokenType.Keyword);
-
-            return;
-        }
-
-        // TODO: Possibly remove
-        private void AppendTokenToCompiled(string token, TokenType type)
-        {
-            this.Eat(token);
-
-            string node = type switch
-            {
-                TokenType.Keyword => token.ConstructKeywordNode(),
-                TokenType.Symbol => token.ConstructSymbolNode(),
-                TokenType.Identifier => ResolveIdentifierNodeConstruction(token),
-                TokenType.IntegerConstant => token.ConstructIntegerConstantNode(),
-                TokenType.StringConstant => token.ConstructStringConstantNode(),
-                _ => throw new UnexpectedTokenTypeException()
-            };
-
-            this.compiled.Append(node);
-
-            return;
-        }
-
-        // TODO: Potentially depr.
-        private string ConstructLabel(string labelName)
-        {
-            string label = $"LABEL_{labelName}_{this.labelIndex}";
-
-            this.labelIndex++;
-
-            return label;
-        }
-
-        private string ConstructLabelAlternative(string labelName, int index)
+        private string ConstructLabel(string labelName, int index)
         {
             return $"{labelName}{index}";
-        }
-
-        private string ResolveIdentifierNodeConstruction(string token)
-        {
-            int symbolTableIndex = this.symbolTable.IndexOf(token);
-
-            // TODO: I have some missing implementations for class list, subroutines and expressions
-            if (symbolTableIndex == -1)
-            {
-                return token.ConstructIdentifierNode();
-            }
-
-            return token.ConstructIdentifierNodeEnhanced(this.symbolTable.TypeOf(token) ?? string.Empty, this.symbolTable.KindOf(token), symbolTableIndex);
         }
 
         private void EnsureKeywordIsType(Keyword keyword)

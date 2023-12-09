@@ -8,7 +8,6 @@ namespace JackCompiler.Extensions
         {
             return source switch
             {
-                // TODO: double check
                 IdentifierKind.Field => Segment.This,
                 IdentifierKind.Static => Segment.Static,
                 IdentifierKind.Var => Segment.Local,

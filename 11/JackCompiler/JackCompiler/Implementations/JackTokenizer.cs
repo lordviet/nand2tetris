@@ -14,7 +14,7 @@ namespace JackCompiler.Implementations
         public JackTokenizer(string fileContents)
         {
             this.fileContents = PreprocessFileContents(fileContents);
-            counter = 0;
+            this.counter = 0;
         }
 
         public string GetCurrentToken()
@@ -24,12 +24,12 @@ namespace JackCompiler.Implementations
 
         public bool HasMoreTokens()
         {
-            return counter < fileContents.Length;
+            return this.counter < fileContents.Length;
         }
 
         public void Advance()
         {
-            counter++;
+            this.counter++;
         }
 
         public TokenType TokenType()
@@ -86,14 +86,6 @@ namespace JackCompiler.Implementations
 
             return Constants.LexicalElements.SymbolMap[currentToken];
         }
-
-        //public string Identifier()
-        //{
-        //    this.ThrowIfTokenTypeDoesNotMatchExpected(Enums.TokenType.Identifier, TokenType());
-
-        //    // TODO: Missing implementation
-        //    throw new NotImplementedException();
-        //}
 
         public int IntegerValue()
         {
