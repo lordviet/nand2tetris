@@ -512,10 +512,6 @@ namespace JackCompiler.Implementations
                     this.CompileExpressionListInSubroutineCall(previousIdentifierToken);
                     break;
                 case Symbols.Dot:
-                    //this.Eat(Symbols.Dot);
-                    //this.AppendTokenToCompiled(Symbols.Dot, TokenType.Symbol);
-                    // NOTE: Recursive call, be careful with this invocation, maybe it is required only once since this can be easily broken?
-                    //this.CompileSubroutineCall();
                     this.CompileDotSymbolInSubroutineCall(previousIdentifierToken);
                     break;
                 default:
@@ -530,7 +526,8 @@ namespace JackCompiler.Implementations
             //this.AppendTokenToCompiled(Symbols.LeftParenthesis, TokenType.Symbol);
             this.Eat(Symbols.LeftParenthesis);
 
-            int expressionCount = this.CompileExpressionList();
+            // NOTE: This 1 is for the this?
+            int expressionCount = this.CompileExpressionList() + 1;
 
             //this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
             this.Eat(Symbols.RightParenthesis);
@@ -793,7 +790,8 @@ namespace JackCompiler.Implementations
 
                 // TODO: Monitor this one
                 this.compiled.Append(this.writer.WriteLabel(endLabel));
-            } else
+            }
+            else
             {
                 this.compiled.Append(this.writer.WriteLabel(ifFalseLabel));
 
