@@ -101,7 +101,7 @@ class Program
         try
         {
             File.WriteAllText(outputFile, compiledCode.ToString());
-            Console.WriteLine("Syntax analysis successfully completed. Output file: " + outputFile);
+            Console.WriteLine("Compilation successfully completed. Output file: " + outputFile);
         }
         catch (Exception ex)
         {
