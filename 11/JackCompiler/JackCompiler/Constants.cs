@@ -1,4 +1,5 @@
 ﻿using JackCompiler.Enums;
+using JackCompiler.Models;
 
 namespace JackCompiler
 {
@@ -105,8 +106,6 @@ namespace JackCompiler
             public const string StringPattern = @"^""[^""]*""";
 
             public const string IdentifierPattern = @"\b[a-zA-Z_][a-zA-Z0-9_]*\b";
-
-            public const int DefaultMultiplyAndDivideParams = 2;
         }
 
         public static class Symbols
@@ -151,26 +150,25 @@ namespace JackCompiler
             public const string KeywordConstant = "keywordConstant";
         }
 
-        // TODO: Idea to use a special OSLibMethod { string methodName, int? defaultParameter }
         public static class OS
         {
             public static class Math
             {
-                public const int ArithmeticOperationParameters = 2;
+                private const int ArithmeticOperationParameters = 2;
 
-                public const string Multiply = "Math.multiply";
-                public const string Divide = "Math.divide";
+                public static readonly OSLibMethod Multiply = new("Math.multiply", ArithmeticOperationParameters);
+                public static readonly OSLibMethod Divide = new("Math.divide", ArithmeticOperationParameters);
             }
 
             public static class String
             {
-                public const string New = "String.new";
-                public const string AppendChar = "String.appendChar";
+                public static readonly OSLibMethod New = new("String.new", 1);
+                public static readonly OSLibMethod AppendChar = new("String.appendChar", 2);
             }
 
             public static class Memory
             {
-                public const string Alloc = "Memory.alloc";
+                public static readonly OSLibMethod Alloc = new("Memory.alloc", 1);
             }
         }
     }

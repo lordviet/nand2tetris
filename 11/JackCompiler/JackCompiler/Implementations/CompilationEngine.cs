@@ -221,7 +221,7 @@ namespace JackCompiler.Implementations
                 // Constructor with k arguments is compiled to a VM function with k arguments
                 case Keyword.Constructor:
                     this.writer.WritePush(Segment.Constant, this.symbolTable.VarCount(IdentifierKind.Field));
-                    this.writer.WriteCall(OS.Memory.Alloc, 1);
+                    this.writer.WriteCall(OS.Memory.Alloc.MethodName, OS.Memory.Alloc.DefaultParameter);
                     this.writer.WritePop(Segment.Pointer, 0);
                     return;
                 default:
@@ -415,7 +415,8 @@ namespace JackCompiler.Implementations
             this.Eat(Symbols.LeftParenthesis);
 
             // NOTE: Add 1 for the this pointer
-            int expressionCount = this.CompileExpressionList() + 1;
+            const int thisPointerCount = 1;
+            int expressionCount = this.CompileExpressionList() + thisPointerCount;
 
             this.Eat(Symbols.RightParenthesis);
 
@@ -623,10 +624,10 @@ namespace JackCompiler.Implementations
             switch (symbol)
             {
                 case '*':
-                    this.writer.WriteCall(OS.Math.Multiply, OS.Math.ArithmeticOperationParameters);
+                    this.writer.WriteCall(OS.Math.Multiply.MethodName, OS.Math.Multiply.DefaultParameter);
                     break;
                 case '/':
-                    this.writer.WriteCall(OS.Math.Divide, OS.Math.ArithmeticOperationParameters);
+                    this.writer.WriteCall(OS.Math.Divide.MethodName, OS.Math.Divide.DefaultParameter);
                     break;
                 default:
                     this.writer.WriteArithmetic(LexicalElements.NonUnaryOpSymbolCommandMap[symbol]);
@@ -670,16 +671,15 @@ namespace JackCompiler.Implementations
 
         private void HandleStringConstantInTerm()
         {
-            // TODO: avoid magic numbers
             string stringConstant = this.tokenizer.GetCurrentToken().Trim('"');
 
             this.writer.WritePush(Segment.Constant, stringConstant.Length);
-            this.writer.WriteCall(OS.String.New, 1);
+            this.writer.WriteCall(OS.String.New.MethodName, OS.String.New.DefaultParameter);
 
             for (int i = 0; i < stringConstant.Length; i++)
             {
                 this.writer.WritePush(Segment.Constant, stringConstant[i]);
-                this.writer.WriteCall(OS.String.AppendChar, 2);
+                this.writer.WriteCall(OS.String.AppendChar.MethodName, OS.String.AppendChar.DefaultParameter);
             }
 
             this.tokenizer.Advance();
