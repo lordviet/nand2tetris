@@ -19,6 +19,9 @@ namespace JackCompiler.Implementations
         private string? className;
         private string? subroutineName;
 
+        private int ifLabelIndex;
+        private int whileLabelIndex;
+
         public CompilationEngine(IJackTokenizer tokenizer, ISymbolTable symbolTable, IVMWriter writer, bool compileClass = true)
         {
             this.tokenizer = tokenizer;
@@ -28,6 +31,8 @@ namespace JackCompiler.Implementations
             this.compiled = new StringBuilder();
 
             this.labelIndex = 0;
+            this.ifLabelIndex = 0;
+            this.whileLabelIndex = 0;
 
             if (compileClass)
             {
@@ -165,6 +170,10 @@ namespace JackCompiler.Implementations
 
         public void CompileSubroutine()
         {
+            // TODO: Experiment
+            this.ifLabelIndex = 0;
+            this.whileLabelIndex = 0;
+
             this.symbolTable.StartSubroutine();
 
             // ('constructor' | 'function' | 'method') ('void' | type) subroutineName '(' paramList ')' subroutineBody
@@ -636,8 +645,13 @@ namespace JackCompiler.Implementations
 
         public void CompileWhile()
         {
-            string whileLabel = this.ConstructLabel("WHILE");
-            string endLabel = this.ConstructLabel("WHILE_END");
+            //string whileLabel = this.ConstructLabel("WHILE");
+            //string endLabel = this.ConstructLabel("WHILE_END");
+
+            string whileLabel = this.ConstructLabelAlternative("WHILE_EXP", this.whileLabelIndex);
+            string endLabel = this.ConstructLabelAlternative("WHILE_END", this.whileLabelIndex);
+
+            this.whileLabelIndex++;
 
             //string whileStatement = Statements.While;
 
@@ -746,9 +760,15 @@ namespace JackCompiler.Implementations
 
         public void CompileIf()
         {
-            string ifTrueLabel = this.ConstructLabel("IF_TRUE");
-            string ifFalseLabel = this.ConstructLabel("IF_FALSE");
-            string endLabel = this.ConstructLabel("END_IF");
+            //string ifTrueLabel = this.ConstructLabel("IF_TRUE");
+            //string ifFalseLabel = this.ConstructLabel("IF_FALSE");
+            //string endLabel = this.ConstructLabel("END_IF");
+
+            string ifTrueLabel = this.ConstructLabelAlternative("IF_TRUE", this.ifLabelIndex);
+            string ifFalseLabel = this.ConstructLabelAlternative("IF_FALSE", this.ifLabelIndex);
+            string endLabel = this.ConstructLabelAlternative("IF_END", this.ifLabelIndex);
+
+            this.ifLabelIndex++;
 
             this.Eat(LexicalElements.ReverseKeywordMap[Keyword.If]);
 
@@ -770,9 +790,17 @@ namespace JackCompiler.Implementations
                 this.compiled.Append(this.writer.WriteLabel(ifFalseLabel));
 
                 this.CompileElse();
-            }
 
-            this.compiled.Append(this.writer.WriteLabel(endLabel));
+                // TODO: Monitor this one
+                this.compiled.Append(this.writer.WriteLabel(endLabel));
+            } else
+            {
+                this.compiled.Append(this.writer.WriteLabel(ifFalseLabel));
+
+            }
+            // TODO: Potentially wrong?
+            //this.compiled.Append(this.writer.WriteLabel(endLabel));
+            //this.compiled.Append(this.writer.WriteLabel(ifFalseLabel));
         }
 
         private void CompileElse()
@@ -1121,6 +1149,7 @@ namespace JackCompiler.Implementations
             return;
         }
 
+        // TODO: Potentially depr.
         private string ConstructLabel(string labelName)
         {
             string label = $"LABEL_{labelName}_{this.labelIndex}";
@@ -1128,6 +1157,11 @@ namespace JackCompiler.Implementations
             this.labelIndex++;
 
             return label;
+        }
+
+        private string ConstructLabelAlternative(string labelName, int index)
+        {
+            return $"{labelName}{index}";
         }
 
         private string ResolveIdentifierNodeConstruction(string token)
