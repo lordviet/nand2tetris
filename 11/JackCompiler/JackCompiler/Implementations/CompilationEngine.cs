@@ -702,7 +702,7 @@ namespace JackCompiler.Implementations
             this.compiled.Append(this.writer.WriteReturn());
         }
 
-        public void CompileIf()
+        public void CompileIfDepr()
         {
             string elseLabel = this.ConstructLabel("ELSE");
             string endLabel = this.ConstructLabel("END_IF");
@@ -721,7 +721,7 @@ namespace JackCompiler.Implementations
             //this.AppendTokenToCompiled(Symbols.RightParenthesis, TokenType.Symbol);
             this.Eat(Symbols.RightParenthesis);
 
-            this.compiled.Append(this.writer.WriteArithmetic(Command.Not));
+            //this.compiled.Append(this.writer.WriteArithmetic(Command.Not));
             this.compiled.Append(this.writer.WriteIf(elseLabel));
 
             this.Eat(Symbols.LeftCurlyBrace);
@@ -742,6 +742,37 @@ namespace JackCompiler.Implementations
 
             this.compiled.Append(this.writer.WriteLabel(endLabel));
             //this.compiled.Append(ifStatement.ConstructClosingTag());
+        }
+
+        public void CompileIf()
+        {
+            string ifTrueLabel = this.ConstructLabel("IF_TRUE");
+            string ifFalseLabel = this.ConstructLabel("IF_FALSE");
+            string endLabel = this.ConstructLabel("END_IF");
+
+            this.Eat(LexicalElements.ReverseKeywordMap[Keyword.If]);
+
+            this.Eat(Symbols.LeftParenthesis);
+            this.CompileExpression();
+            this.Eat(Symbols.RightParenthesis);
+
+            this.compiled.Append(this.writer.WriteIf(ifTrueLabel));
+            this.compiled.Append(this.writer.WriteGoto(ifFalseLabel));
+            this.compiled.Append(this.writer.WriteLabel(ifTrueLabel));
+
+            this.Eat(Symbols.LeftCurlyBrace);
+            this.CompileStatements();
+            this.Eat(Symbols.RightCurlyBrace);
+
+            if (this.tokenizer.TokenType() == TokenType.Keyword && this.tokenizer.Keyword() == Keyword.Else)
+            {
+                this.compiled.Append(this.writer.WriteGoto(endLabel));
+                this.compiled.Append(this.writer.WriteLabel(ifFalseLabel));
+
+                this.CompileElse();
+            }
+
+            this.compiled.Append(this.writer.WriteLabel(endLabel));
         }
 
         private void CompileElse()
@@ -767,7 +798,7 @@ namespace JackCompiler.Implementations
 
             if (currentTokenType == TokenType.Symbol && currentToken.IsOp())
             {
-                string compiledOp = HandleOpInTerm(this.tokenizer.Symbol());
+                string compiledOp = this.HandleOpInTerm(this.tokenizer.Symbol());
 
                 //this.AppendTokenToCompiled(currentToken, TokenType.Symbol);
 
