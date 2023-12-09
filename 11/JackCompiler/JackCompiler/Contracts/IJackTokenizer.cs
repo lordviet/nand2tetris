@@ -16,8 +16,6 @@ namespace JackCompiler.Contracts
 
 		char Symbol();
 
-		//string Identifier();
-
 		int IntegerValue();
 
 		string StringValue();
