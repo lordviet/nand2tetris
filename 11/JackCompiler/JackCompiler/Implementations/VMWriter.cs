@@ -1,71 +1,75 @@
-﻿using JackCompiler.Contracts;
+﻿using System.Text;
+using JackCompiler.Contracts;
 using JackCompiler.Enums;
 
 namespace JackCompiler.Implementations
 {
     public class VMWriter : IVMWriter
     {
-        public string WritePush(Segment segment, int index)
+        private readonly StringBuilder compiled;
+
+        public VMWriter()
+        {
+            this.compiled = new StringBuilder();
+        }
+
+        public void WritePush(Segment segment, int index)
         {
             string pushCommand = $"push {segment.ToString().ToLower()} {index}\n";
-
-            return pushCommand;
+            this.compiled.Append(pushCommand);
         }
 
-        public string WritePop(Segment segment, int index)
+        public void WritePop(Segment segment, int index)
         {
             string popCommand = $"pop {segment.ToString().ToLower()} {index}\n";
-
-            return popCommand;
+            this.compiled.Append(popCommand);
         }
 
-        public string WriteArithmetic(Command command)
+        public void WriteArithmetic(Command command)
         {
             string arithmeticCommand = $"{command.ToString().ToLower()}\n";
-
-            return arithmeticCommand;
+            this.compiled.Append(arithmeticCommand);
         }
 
-        public string WriteLabel(string label)
+        public void WriteLabel(string label)
         {
             string labelCommand = $"label {label}\n";
-
-            return labelCommand;
+            this.compiled.Append(labelCommand);
         }
 
-        public string WriteGoto(string label)
+        public void WriteGoto(string label)
         {
             string gotoCommand = $"goto {label}\n";
-
-            return gotoCommand;
+            this.compiled.Append(gotoCommand);
         }
 
-        public string WriteIf(string label)
+        public void WriteIf(string label)
         {
             string ifCommand = $"if-goto {label}\n";
-
-            return ifCommand;
+            this.compiled.Append(ifCommand);
         }
 
-        public string WriteCall(string name, int nArgs)
+        public void WriteCall(string name, int nArgs)
         {
             string callCommand = $"call {name} {nArgs}\n";
-
-            return callCommand;
+            this.compiled.Append(callCommand);
         }
 
-        public string WriteFunction(string name, int nLocals)
+        public void WriteFunction(string name, int nLocals)
         {
             string functionCommand = $"function {name} {nLocals}\n";
-
-            return functionCommand;
+            this.compiled.Append(functionCommand);
         }
 
-        public string WriteReturn()
+        public void WriteReturn()
         {
             string returnCommand = "return\n";
+            this.compiled.Append(returnCommand);
+        }
 
-            return returnCommand;
+        public string ExportVMCode()
+        {
+            return this.compiled.ToString();
         }
     }
 }

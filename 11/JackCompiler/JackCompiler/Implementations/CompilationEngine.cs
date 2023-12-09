@@ -1,5 +1,4 @@
-﻿using System.Text;
-using JackCompiler.Contracts;
+﻿using JackCompiler.Contracts;
 using JackCompiler.Enums;
 using JackCompiler.Exceptions;
 using JackCompiler.Extensions;
@@ -13,8 +12,6 @@ namespace JackCompiler.Implementations
         private readonly ISymbolTable symbolTable;
         private readonly IVMWriter writer;
 
-        private readonly StringBuilder compiled;
-
         private string? className;
         private string? subroutineName;
 
@@ -26,8 +23,6 @@ namespace JackCompiler.Implementations
             this.tokenizer = tokenizer;
             this.symbolTable = symbolTable;
             this.writer = writer;
-
-            this.compiled = new StringBuilder();
 
             this.ifLabelIndex = 0;
             this.whileLabelIndex = 0;
@@ -41,9 +36,7 @@ namespace JackCompiler.Implementations
             this.Eat(LexicalElements.ReverseKeywordMap[Keyword.Class]);
 
             // Save the classname for later usage in the symbol table
-            string className = this.tokenizer.GetCurrentToken();
-            this.className = className;
-
+            this.className = this.tokenizer.GetCurrentToken();
             this.tokenizer.Advance();
 
             this.Eat(Symbols.LeftCurlyBrace);
@@ -216,21 +209,20 @@ namespace JackCompiler.Implementations
             string functionName = this.className.ConstructFunctionName(this.subroutineName);
             int varCountOfCurrentFunction = this.symbolTable.VarCount(IdentifierKind.Var);
 
-            string functionCommand = this.writer.WriteFunction(functionName, varCountOfCurrentFunction);
-            this.compiled.Append(functionCommand);
+            this.writer.WriteFunction(functionName, varCountOfCurrentFunction);
 
             switch (keyword)
             {
                 // Method with k arguments is compiled to a VM function with k + 1 arguments
                 case Keyword.Method:
-                    this.compiled.Append(this.writer.WritePush(Segment.Argument, 0));
-                    this.compiled.Append(this.writer.WritePop(Segment.Pointer, 0));
+                    this.writer.WritePush(Segment.Argument, 0);
+                    this.writer.WritePop(Segment.Pointer, 0);
                     return;
                 // Constructor with k arguments is compiled to a VM function with k arguments
                 case Keyword.Constructor:
-                    this.compiled.Append(this.writer.WritePush(Segment.Constant, this.symbolTable.VarCount(IdentifierKind.Field)));
-                    this.compiled.Append(this.writer.WriteCall(OS.Memory.Alloc, 1));
-                    this.compiled.Append(this.writer.WritePop(Segment.Pointer, 0));
+                    this.writer.WritePush(Segment.Constant, this.symbolTable.VarCount(IdentifierKind.Field));
+                    this.writer.WriteCall(OS.Memory.Alloc, 1);
+                    this.writer.WritePop(Segment.Pointer, 0);
                     return;
                 default:
                     return;
@@ -381,7 +373,7 @@ namespace JackCompiler.Implementations
             this.CompileSubroutineCall();
             this.Eat(Symbols.Semicolon);
 
-            this.compiled.Append(this.writer.WritePop(Segment.Temp, 0));
+            this.writer.WritePop(Segment.Temp, 0);
         }
 
         // subroutineName '(' expressionList ')' | (className | varName) '.' subroutineName '(' expressionList ')'
@@ -418,7 +410,7 @@ namespace JackCompiler.Implementations
 
         private void CompileExpressionListInSubroutineCall(string subroutineNameToken)
         {
-            this.compiled.Append(this.writer.WritePush(Segment.Pointer, 0));
+            this.writer.WritePush(Segment.Pointer, 0);
 
             this.Eat(Symbols.LeftParenthesis);
 
@@ -428,7 +420,7 @@ namespace JackCompiler.Implementations
             this.Eat(Symbols.RightParenthesis);
 
             string subroutineName = $"{this.className}.{subroutineNameToken}";
-            this.compiled.Append(this.writer.WriteCall(subroutineName, expressionCount));
+            this.writer.WriteCall(subroutineName, expressionCount);
         }
 
         private void CompileDotSymbolInSubroutineCall(string objectName)
@@ -460,7 +452,7 @@ namespace JackCompiler.Implementations
                 IdentifierKind objectKind = this.symbolTable.KindOf(objectName);
                 int objectIndex = this.symbolTable.IndexOf(objectName);
 
-                this.compiled.Append(this.writer.WritePush(objectKind.ToSegment(), objectIndex));
+                this.writer.WritePush(objectKind.ToSegment(), objectIndex);
                 symbolTableEntryName = $"{objectType}.{subroutineName}";
             }
 
@@ -470,7 +462,7 @@ namespace JackCompiler.Implementations
 
             this.Eat(Symbols.RightParenthesis);
 
-            this.compiled.Append(this.writer.WriteCall(symbolTableEntryName, arguments));
+            this.writer.WriteCall(symbolTableEntryName, arguments);
         }
 
         // 'let' varName ('[' expression ']')? '=' expression ';'
@@ -495,8 +487,8 @@ namespace JackCompiler.Implementations
                 this.Eat(Symbols.RightSquareBracket);
 
                 // NOTE: Push array variable and base address to the Stack
-                this.compiled.Append(this.writer.WritePush(kind.ToSegment(), index));
-                this.compiled.Append(this.writer.WriteArithmetic(Command.Add));
+                this.writer.WritePush(kind.ToSegment(), index);
+                this.writer.WriteArithmetic(Command.Add);
             }
 
             this.Eat(Symbols.EqualitySign);
@@ -505,14 +497,14 @@ namespace JackCompiler.Implementations
 
             if (complexVariableAccessor)
             {
-                this.compiled.Append(this.writer.WritePop(Segment.Temp, 0));
-                this.compiled.Append(this.writer.WritePop(Segment.Pointer, 1));
-                this.compiled.Append(this.writer.WritePush(Segment.Temp, 0));
-                this.compiled.Append(this.writer.WritePop(Segment.That, 0));
+                this.writer.WritePop(Segment.Temp, 0);
+                this.writer.WritePop(Segment.Pointer, 1);
+                this.writer.WritePush(Segment.Temp, 0);
+                this.writer.WritePop(Segment.That, 0);
             }
             else
             {
-                this.compiled.Append(this.writer.WritePop(kind.ToSegment(), index));
+                this.writer.WritePop(kind.ToSegment(), index);
             }
         }
 
@@ -524,21 +516,21 @@ namespace JackCompiler.Implementations
             this.whileLabelIndex++;
 
             this.Eat(LexicalElements.ReverseKeywordMap[Keyword.While]);
-            this.compiled.Append(this.writer.WriteLabel(whileLabel));
+            this.writer.WriteLabel(whileLabel);
 
             this.Eat(Symbols.LeftParenthesis);
             this.CompileExpression();
             this.Eat(Symbols.RightParenthesis);
 
-            this.compiled.Append(this.writer.WriteArithmetic(Command.Not));
-            this.compiled.Append(this.writer.WriteIf(endLabel));
+            this.writer.WriteArithmetic(Command.Not);
+            this.writer.WriteIf(endLabel);
 
             this.Eat(Symbols.LeftCurlyBrace);
             this.CompileStatements();
             this.Eat(Symbols.RightCurlyBrace);
 
-            this.compiled.Append(this.writer.WriteGoto(whileLabel));
-            this.compiled.Append(this.writer.WriteLabel(endLabel));
+            this.writer.WriteGoto(whileLabel);
+            this.writer.WriteLabel(endLabel);
         }
 
         public void CompileReturn()
@@ -552,11 +544,11 @@ namespace JackCompiler.Implementations
             else
             {
                 // if there's no expression, we push 0 to the stack
-                this.compiled.Append(this.writer.WritePush(Segment.Constant, 0));
+                this.writer.WritePush(Segment.Constant, 0);
             }
 
             this.Eat(Symbols.Semicolon);
-            this.compiled.Append(this.writer.WriteReturn());
+            this.writer.WriteReturn();
         }
 
         public void CompileIf()
@@ -573,9 +565,9 @@ namespace JackCompiler.Implementations
             this.CompileExpression();
             this.Eat(Symbols.RightParenthesis);
 
-            this.compiled.Append(this.writer.WriteIf(ifTrueLabel));
-            this.compiled.Append(this.writer.WriteGoto(ifFalseLabel));
-            this.compiled.Append(this.writer.WriteLabel(ifTrueLabel));
+            this.writer.WriteIf(ifTrueLabel);
+            this.writer.WriteGoto(ifFalseLabel);
+            this.writer.WriteLabel(ifTrueLabel);
 
             this.Eat(Symbols.LeftCurlyBrace);
             this.CompileStatements();
@@ -583,16 +575,16 @@ namespace JackCompiler.Implementations
 
             if (this.tokenizer.TokenType() == TokenType.Keyword && this.tokenizer.Keyword() == Keyword.Else)
             {
-                this.compiled.Append(this.writer.WriteGoto(endLabel));
-                this.compiled.Append(this.writer.WriteLabel(ifFalseLabel));
+                this.writer.WriteGoto(endLabel);
+                this.writer.WriteLabel(ifFalseLabel);
 
                 this.CompileElse();
 
-                this.compiled.Append(this.writer.WriteLabel(endLabel));
+                this.writer.WriteLabel(endLabel);
             }
             else
             {
-                this.compiled.Append(this.writer.WriteLabel(ifFalseLabel));
+                this.writer.WriteLabel(ifFalseLabel);
             }
         }
 
@@ -614,25 +606,32 @@ namespace JackCompiler.Implementations
 
             if (currentTokenType == TokenType.Symbol && currentToken.IsOp())
             {
-                string compiledOp = this.HandleOpInTerm(this.tokenizer.Symbol());
+                char currentSymbol = this.tokenizer.Symbol();
+                this.tokenizer.Advance();
+                //string compiledOp = this.HandleOpInTerm(this.tokenizer.Symbol());
 
                 // NOTE: Recursive Call
                 this.CompileExpression();
 
-                this.compiled.Append(compiledOp);
+                this.HandleOpInTerm(currentSymbol);
+                //this.compiled.Append(compiledOp);
             }
         }
 
-        private string HandleOpInTerm(char symbol)
+        private void HandleOpInTerm(char symbol)
         {
-            this.tokenizer.Advance();
-
-            return symbol switch
+            switch (symbol)
             {
-                '*' => this.writer.WriteCall(OS.Math.Multiply, OS.Math.ArithmeticOperationParameters),
-                '/' => this.writer.WriteCall(OS.Math.Divide, OS.Math.ArithmeticOperationParameters),
-                _ => this.writer.WriteArithmetic(LexicalElements.NonUnaryOpSymbolCommandMap[symbol])
-            };
+                case '*':
+                    this.writer.WriteCall(OS.Math.Multiply, OS.Math.ArithmeticOperationParameters);
+                    break;
+                case '/':
+                    this.writer.WriteCall(OS.Math.Divide, OS.Math.ArithmeticOperationParameters);
+                    break;
+                default:
+                    this.writer.WriteArithmetic(LexicalElements.NonUnaryOpSymbolCommandMap[symbol]);
+                    break;
+            }
         }
 
         public void CompileTerm()
@@ -665,7 +664,7 @@ namespace JackCompiler.Implementations
         {
             int integerConstant = this.tokenizer.IntegerValue();
 
-            this.compiled.Append(this.writer.WritePush(Segment.Constant, integerConstant));
+            this.writer.WritePush(Segment.Constant, integerConstant);
             this.tokenizer.Advance();
         }
 
@@ -674,13 +673,13 @@ namespace JackCompiler.Implementations
             // TODO: avoid magic numbers
             string stringConstant = this.tokenizer.GetCurrentToken().Trim('"');
 
-            this.compiled.Append(this.writer.WritePush(Segment.Constant, stringConstant.Length));
-            this.compiled.Append(this.writer.WriteCall(OS.String.New, 1));
+            this.writer.WritePush(Segment.Constant, stringConstant.Length);
+            this.writer.WriteCall(OS.String.New, 1);
 
             for (int i = 0; i < stringConstant.Length; i++)
             {
-                this.compiled.Append(this.writer.WritePush(Segment.Constant, stringConstant[i]));
-                this.compiled.Append(this.writer.WriteCall(OS.String.AppendChar, 2));
+                this.writer.WritePush(Segment.Constant, stringConstant[i]);
+                this.writer.WriteCall(OS.String.AppendChar, 2);
             }
 
             this.tokenizer.Advance();
@@ -696,15 +695,15 @@ namespace JackCompiler.Implementations
             switch (keyword)
             {
                 case Keyword.True:
-                    this.compiled.Append(this.writer.WritePush(Segment.Constant, 0));
-                    this.compiled.Append(this.writer.WriteArithmetic(Command.Not));
+                    this.writer.WritePush(Segment.Constant, 0);
+                    this.writer.WriteArithmetic(Command.Not);
                     break;
                 case Keyword.False:
                 case Keyword.Null:
-                    this.compiled.Append(this.writer.WritePush(Segment.Constant, 0));
+                    this.writer.WritePush(Segment.Constant, 0);
                     break;
                 case Keyword.This:
-                    this.compiled.Append(this.writer.WritePush(Segment.Pointer, 0));
+                    this.writer.WritePush(Segment.Pointer, 0);
                     break;
             }
 
@@ -723,12 +722,17 @@ namespace JackCompiler.Implementations
                 // NOTE: Recursive call
                 this.CompileTerm();
 
-                this.compiled.Append(currentToken switch
+                switch (currentToken)
                 {
-                    "-" => this.writer.WriteArithmetic(Command.Neg),
-                    "~" => this.writer.WriteArithmetic(Command.Not),
-                    _ => throw new Exception($"Unexpected token: {currentToken}")
-                });
+                    case "-":
+                        this.writer.WriteArithmetic(Command.Neg);
+                        break;
+                    case "~":
+                        this.writer.WriteArithmetic(Command.Not);
+                        break;
+                    default:
+                        throw new Exception($"Unexpected token: {currentToken}");
+                }
 
                 return;
             }
@@ -761,13 +765,13 @@ namespace JackCompiler.Implementations
                 this.Eat(Symbols.RightSquareBracket);
 
                 // NOTE: Push array variable and its base address to the stack
-                this.compiled.Append(this.writer.WritePush(varKind.ToSegment(), varNameIndex));
+                this.writer.WritePush(varKind.ToSegment(), varNameIndex);
 
                 // NOTE: Take into consideration the offset
-                this.compiled.Append(this.writer.WriteArithmetic(Command.Add));
+                this.writer.WriteArithmetic(Command.Add);
 
-                this.compiled.Append(this.writer.WritePop(Segment.Pointer, 1));
-                this.compiled.Append(this.writer.WritePush(Segment.That, 0));
+                this.writer.WritePop(Segment.Pointer, 1);
+                this.writer.WritePush(Segment.That, 0);
 
                 return;
             }
@@ -778,7 +782,7 @@ namespace JackCompiler.Implementations
                 return;
             }
 
-            this.compiled.Append(this.writer.WritePush(varKind.ToSegment(), varNameIndex));
+            this.writer.WritePush(varKind.ToSegment(), varNameIndex);
 
             return;
         }
@@ -821,7 +825,7 @@ namespace JackCompiler.Implementations
 
         public string Close()
         {
-            return this.compiled.ToString();
+            return this.writer.ExportVMCode();
         }
 
         private string AssertNextTokenIsOfType(TokenType expectedTokenType)
