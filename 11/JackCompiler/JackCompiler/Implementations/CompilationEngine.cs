@@ -511,8 +511,8 @@ namespace JackCompiler.Implementations
 
         public void CompileWhile()
         {
-            string whileLabel = this.ConstructLabel("WHILE_EXP", this.whileLabelIndex);
-            string endLabel = this.ConstructLabel("WHILE_END", this.whileLabelIndex);
+            string whileLabel = this.ConstructLabel(Labels.While.Expression, this.whileLabelIndex);
+            string endLabel = this.ConstructLabel(Labels.While.End, this.whileLabelIndex);
 
             this.whileLabelIndex++;
 
@@ -554,9 +554,9 @@ namespace JackCompiler.Implementations
 
         public void CompileIf()
         {
-            string ifTrueLabel = this.ConstructLabel("IF_TRUE", this.ifLabelIndex);
-            string ifFalseLabel = this.ConstructLabel("IF_FALSE", this.ifLabelIndex);
-            string endLabel = this.ConstructLabel("IF_END", this.ifLabelIndex);
+            string ifTrueLabel = this.ConstructLabel(Labels.If.True, this.ifLabelIndex);
+            string ifFalseLabel = this.ConstructLabel(Labels.If.False, this.ifLabelIndex);
+            string endLabel = this.ConstructLabel(Labels.If.End, this.ifLabelIndex);
 
             this.ifLabelIndex++;
 

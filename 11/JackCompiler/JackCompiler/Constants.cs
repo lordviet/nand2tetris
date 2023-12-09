@@ -84,14 +84,6 @@ namespace JackCompiler
                 { "~", '~' }
             };
 
-            public static readonly Dictionary<string, string> SpecialSymbolOutputMap = new()
-            {
-                { "<", "&lt;" },
-                { ">", "&gt;" },
-                { "\"", "&quot;"},
-                { "&", "&amp;"}
-            };
-
             public static readonly Dictionary<char, Command> NonUnaryOpSymbolCommandMap = new()
             {
                 { '+', Command.Add },
@@ -102,10 +94,6 @@ namespace JackCompiler
                 { '>', Command.Gt },
                 { '=', Command.Eq},
             };
-
-            public const string StringPattern = @"^""[^""]*""";
-
-            public const string IdentifierPattern = @"\b[a-zA-Z_][a-zA-Z0-9_]*\b";
         }
 
         public static class Symbols
@@ -122,32 +110,20 @@ namespace JackCompiler
             public const string Dot = ".";
         }
 
-        public static class Statements
+        public static class Labels
         {
-            public const string Let = "letStatement";
-            public const string If = "ifStatement";
-            public const string While = "whileStatement";
-            public const string Do = "doStatement";
-            public const string Return = "returnStatement";
-        }
+            public static class If
+            {
+                public const string True = "IF_TRUE";
+                public const string False = "IF_FALSE";
+                public const string End = "IF_END";
+            }
 
-        public static class Tags
-        {
-            public const string ClassVarDec = "classVarDec";
-            public const string VarDec = "varDec";
-            public const string ParameterList = "parameterList";
-            public const string SubroutineDec = "subroutineDec";
-            public const string SubroutineBody = "subroutineBody";
-            public const string Term = "term";
-            public const string Expression = "expression";
-            public const string ExpressionList = "expressionList";
-            public const string Statements = "statements";
-            public const string Symbol = "symbol";
-            public const string Keyword = "keyword";
-            public const string Identifier = "identifier";
-            public const string IntegerConstant = "integerConstant";
-            public const string StringConstant = "stringConstant";
-            public const string KeywordConstant = "keywordConstant";
+            public static class While
+            {
+                public const string Expression = "WHILE_EXP";
+                public const string End = "WHILE_END";
+            }
         }
 
         public static class OS
