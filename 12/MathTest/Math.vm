@@ -195,8 +195,8 @@ pop local 1
 push argument 1
 call Math.abs 1
 pop local 2
-push argument 1
-push argument 0
+push local 2
+push local 1
 gt
 if-goto IF_TRUE0
 goto IF_FALSE0
@@ -211,9 +211,9 @@ add
 call Math.divide 2
 pop local 0
 push local 1
+push constant 2
 push local 0
-push local 0
-add
+call Math.multiply 2
 push local 2
 call Math.multiply 2
 sub

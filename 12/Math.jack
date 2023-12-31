@@ -29,7 +29,7 @@ class Math {
         let twoToThe[12] = 4096;
         let twoToThe[13] = 8192;
         let twoToThe[14] = 16384;
-        let twoToThe[15] = 32767;
+        let twoToThe[15] = 16384 + 16384;
 
         let supportedBits = 16;
 
@@ -80,17 +80,17 @@ class Math {
         let absX = Math.abs(x);
         let absY = Math.abs(y);
 
-        if (y > x) {
+        if (absY > absX) {
             return 0;
         }
 
         let q = Math.divide(absX, (absY + absY));
 
-        if ((absX - ((q + q) * absY)) < absY) {
+        if ((absX - (2 * q * absY)) < absY) {
             return Math.determineSignPostDivision(x, y, (q + q));
         }
 
-        return Math.determineSignPostDivision(x, y, ((q + q) + 1));
+        return Math.determineSignPostDivision(x, y, (q + q + 1));
     }
 
     function int determineSignPostDivision(int x, int y, int result) {
@@ -99,7 +99,7 @@ class Math {
         let isXNegative = x < 0;
         let isYNegative = y < 0;
 
-        if(isXNegative = isYNegative) {
+        if (isXNegative = isYNegative) {
             return result;
         }
 
@@ -149,6 +149,6 @@ class Math {
 
     /** Returns true if the i-th bit of x is 1. */
     function boolean bit(int x, int i) {
-        return (x & twoToThe[i]) = 0;
+        return ~((x & twoToThe[i]) = 0);
     }
 }
