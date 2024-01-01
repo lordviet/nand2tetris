@@ -11,10 +11,17 @@
 class Memory {
 
     static Array ram;
+    static Array heap;
 
     /** Initializes the class. */
     function void init() {
         let ram = 0;
+        let heap = 2048; // heapBase
+        let freeList = heap;
+        let heap[0] = null; // next
+        let heap[1] = 16383 - 2048; // size
+
+        return;
     }
 
     /** Returns the RAM value at the given address. */
