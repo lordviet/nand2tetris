@@ -11,13 +11,13 @@
 class Memory {
 
     static Array ram;
-    static Array heap;
+    static Array free;
 
     /** Initializes the class. */
     function void init() {
         let ram = 0;
-        let heap = 2048; // heapBase
-        let freeList = heap;
+        let free = 2048; // heapBase
+
         let heap[0] = null; // next
         let heap[1] = 16383 - 2048; // size
 
@@ -38,6 +38,17 @@ class Memory {
     /** Finds an available RAM block of the given size and returns
      *  a reference to its base address. */
     function int alloc(int size) {
+        var Array pointer;
+        var Array nextList;
+        var Array prevList;
+
+        var int listSize, next;
+
+        if (size < free[0]) {
+            let pointer = free + 1;
+            let free = free + size + 1;
+            return pointer;
+        }
     }
 
     /** De-allocates the given object (cast as an array) by making
