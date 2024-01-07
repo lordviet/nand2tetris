@@ -49,7 +49,7 @@ class Memory {
         let block = free;
         let prevBlock = 0;
 
-        while(block[length] < size) {
+        while (block[length] < size) {
             let prevBlock = block;
             let block = block[next];
 
