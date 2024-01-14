@@ -95,6 +95,38 @@ class Screen {
         return;
     }
 
+    function void drawDiagonalLine(int x1, int y1, int x2, int y2, int dx, int dy) {
+        var int a, b;
+        var int adyMinusbdx;
+        var int yIncremented;
+
+        let a = 0;
+        let b = 0;
+        let adyMinusbdx = 0;
+        
+        if(dy < 0) {
+            let yIncremented = -1;
+        }
+        else {
+            let yIncremented = 1;
+        }
+
+        while(~(a > dx) & (((yIncremented = 1) & ~(b > dy)) | ((yIncremented = -1) & ~(b < dy)))) {
+            do Screen.drawPixel(x1 + a, y1 + b);
+
+            if(adyMinusbdx < 0) {
+                let a = a + 1;
+                let adyMinusbdx = adyMinusbdx + (dy * yIncremented);
+            }
+            else {
+                let b = b + yIncremented;
+                let adyMinusbdx = adyMinusbdx - dx;
+            }
+        }
+
+        return;
+    }
+
     function void drawVerticalLine(int x, int y1, int y2) {
         var int temp;
         
